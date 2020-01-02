@@ -1,9 +1,25 @@
 import { expect } from "chai";
 
-import {base58_decode, base58_encode, hex_decode, hex_encode, packInteger, unpackInteger} from "../src/Binary";
+import {
+    base58_decode,
+    base58_encode,
+    hex_decode,
+    hex_encode,
+    packInteger,
+    signInteger,
+    unpackInteger
+} from "../src/Binary";
 import {prepare} from "../src/Serialization/State";
 
 describe("Binary", () => {
+    it("sign negative integer", () => {
+        expect(Number(signInteger(BigInt(-534), 2))).to.equal(65002);
+    });
+
+    it("sign positive integer", () => {
+        expect(Number(signInteger(BigInt(534), 2))).to.equal(534);
+    });
+
     it("pack integer below 127", () => {
         expect(packInteger(BigInt(5))).to.deep.equal(new Uint8Array([0b10000101]));
     });

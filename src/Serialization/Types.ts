@@ -5,6 +5,7 @@ import FloatingParser from "./TypeParser/FloatingParser";
 import IPFSParser from "./TypeParser/IPFSParser";
 import StringParser from "./TypeParser/StringParser";
 import VariableIntegerParser from "./TypeParser/VariableIntegerParser";
+import BooleanParser from "./TypeParser/BooleanParser";
 
 // tslint:disable:object-literal-sort-keys
 export const ParserTypes: {[id: string]: ITypeParser} = {
@@ -28,7 +29,7 @@ export const ParserTypes: {[id: string]: ITypeParser} = {
     fixed32: new FixedIntegerParser(4),
     fixed64: new FixedIntegerParser(8),
 
-    bool: new FixedIntegerParser(1),
+    bool: new BooleanParser(),
 
     bytes: new ByteParser(),
     string: new StringParser(),
