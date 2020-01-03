@@ -1,4 +1,4 @@
-import {concatByteArrays, packInteger, unpackInteger} from "../../Binary";
+import {concat_byte_arrays, packInteger, unpackInteger} from "../../Binary";
 import DeserializationError from "../../Errors/DeserializationError";
 import SerializationState from "../State";
 import {ITypeParser} from "./index";
@@ -18,6 +18,6 @@ export default class VariableParser implements ITypeParser {
     }
 
     public serialize(data: any): Uint8Array {
-        return concatByteArrays([packInteger(BigInt(data.length)), data]);
+        return concat_byte_arrays([packInteger(BigInt(data.length)), data]);
     }
 }

@@ -2,8 +2,8 @@ import DeserializationError from "./Errors/DeserializationError";
 import SerializationError from "./Errors/SerializationError";
 import SerializationState from "./Serialization/State";
 
-import base from "base-x";
 import bigInt, {BigInteger} from "big-integer";
+import BaseCoder from "./Base";
 
 export function packInteger(input: any, maxSize: number = 8): Uint8Array {
     const bytes: number[] = [];
@@ -99,16 +99,14 @@ export function unsignInteger(input: any, size: number): BigInteger {
     }
 }
 
-const bs58 = base("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
+const bs58 = new BaseCoder("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
 
 export function base58_decode(data: string): Uint8Array {
-    const buffer = bs58.decode(data);
-
-    return new Uint8Array(buffer);
+    return bs58.decode(data);
 }
 
 export function base58_encode(data: Uint8Array): string {
-    return bs58.encode(Buffer.from(data.buffer));
+    return bs58.encode(data);
 }
 
 export function hex_decode(hex: string) {
@@ -125,7 +123,7 @@ export function hex_encode(bytes: Uint8Array) {
     return bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
 }
 
-export function concatByteArrays(arr: Uint8Array[]) {
+export function concat_byte_arrays(arr: Uint8Array[]) {
     // concat all bytearrays into one array
     const data = new Uint8Array(arr.reduce((acc, val) => acc + val.length, 0));
 
@@ -136,14 +134,4 @@ export function concatByteArrays(arr: Uint8Array[]) {
     }
 
     return data;
-}
-
-export function bigPow(n: bigint | number, e: bigint | number): bigint {
-    let sum = BigInt(1);
-
-    for(let i = BigInt(0); i < BigInt(e); i++) {
-        sum *= BigInt(n);
-    }
-
-    return sum;
 }

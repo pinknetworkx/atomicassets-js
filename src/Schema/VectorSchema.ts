@@ -1,4 +1,4 @@
-import {concatByteArrays, packInteger, unpackInteger} from "../Binary";
+import {concat_byte_arrays, packInteger, unpackInteger} from "../Binary";
 import SerializationState from "../Serialization/State";
 import {ISchema} from "./index";
 
@@ -23,6 +23,6 @@ export default class VectorSchema implements ISchema {
             data.push(this.element.serialize(element));
         }
 
-        return concatByteArrays(data);
+        return concat_byte_arrays(data);
     }
 }

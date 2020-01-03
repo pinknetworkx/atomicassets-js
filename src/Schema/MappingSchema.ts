@@ -1,4 +1,4 @@
-import {concatByteArrays, packInteger, unpackInteger} from "../Binary";
+import {concat_byte_arrays, packInteger, unpackInteger} from "../Binary";
 import SchemaError from "../Errors/SchemaError";
 import SerializationState from "../Serialization/State";
 import {ISchema, MappingAttribute} from "./index";
@@ -42,7 +42,7 @@ export default class MappingSchema implements ISchema {
 
         data.push(packInteger(BigInt(0)));
 
-        return concatByteArrays(data);
+        return concat_byte_arrays(data);
     }
 
     private getAttribute(identifier: number): MappingAttribute {

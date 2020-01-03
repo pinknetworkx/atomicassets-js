@@ -18,7 +18,7 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: ['.ts']
+        extensions: ['.ts', '.js']
     },
     output: {
         filename: x => x.chunk.name.replace('_', '-') + '.js',

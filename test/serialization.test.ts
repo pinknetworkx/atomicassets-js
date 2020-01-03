@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import {base58_decode, concatByteArrays, hex_decode, packInteger, signInteger} from "../src/Binary";
+import {base58_decode, concat_byte_arrays, hex_decode, packInteger, signInteger} from "../src/Binary";
 import {ObjectSchema} from "../src/Schema";
 import {deserialize, serialize} from "../src/Serialization";
 
@@ -39,18 +39,18 @@ describe("Basic Serialization", () => {
         share: 1024.25,
     };
 
-    const serializedName = concatByteArrays([
+    const serializedName = concat_byte_arrays([
         packInteger(BigInt(1)),
         packInteger(BigInt(rawObject.name.length)),
         new Uint8Array(encoder.encode(rawObject.name)),
     ]);
 
-    const serializedImage = concatByteArrays([
+    const serializedImage = concat_byte_arrays([
         packInteger(BigInt(2)),
         base58_decode(rawObject.img),
     ]);
 
-    const serializedRarity = concatByteArrays([
+    const serializedRarity = concat_byte_arrays([
         packInteger(BigInt(3)),
         packInteger(BigInt(534), 2),
         packInteger(BigInt(4)),
@@ -61,7 +61,7 @@ describe("Basic Serialization", () => {
         new Uint8Array([0x2, 0x16]),
     ]);
 
-    const serializedDepth = concatByteArrays([
+    const serializedDepth = concat_byte_arrays([
         packInteger(BigInt(7)),
         packInteger(signInteger(BigInt(-1000000), 4), 4),
         packInteger(BigInt(8)),
@@ -72,17 +72,17 @@ describe("Basic Serialization", () => {
         new Uint8Array([0b11111111, 0b11110000, 0b10111101, 0b11000000]),
     ]);
 
-    const serializedWear = concatByteArrays([
+    const serializedWear = concat_byte_arrays([
         packInteger(BigInt(11)),
         new Uint8Array([0x3f, 0x40, 0, 0]),
     ]);
 
-    const serializedTradeable = concatByteArrays([
+    const serializedTradeable = concat_byte_arrays([
         packInteger(BigInt(12)),
         new Uint8Array([1]),
     ]);
 
-    const serializedShare = concatByteArrays([
+    const serializedShare = concat_byte_arrays([
         packInteger(BigInt(13)),
         hex_decode("4090010000000000"),
     ]);
@@ -184,7 +184,7 @@ describe("Basic Serialization", () => {
     });
 
     it("serialize object", () => {
-        expect(serialize(rawObject, schema)).to.deep.equal(concatByteArrays([
+        expect(serialize(rawObject, schema)).to.deep.equal(concat_byte_arrays([
             serializedName,
             serializedImage,
             serializedRarity,
@@ -196,7 +196,7 @@ describe("Basic Serialization", () => {
     });
 
     it("deserialize object", () => {
-        expect(deserialize(concatByteArrays([
+        expect(deserialize(concat_byte_arrays([
             serializedName,
             serializedImage,
             serializedRarity,

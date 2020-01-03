@@ -1,11 +1,11 @@
 import {ITypeParser} from "./TypeParser";
+import BooleanParser from "./TypeParser/BooleanParser";
 import {ByteParser} from "./TypeParser/ByteParser";
 import FixedIntegerParser from "./TypeParser/FixedIntegerParser";
 import FloatingParser from "./TypeParser/FloatingParser";
 import IPFSParser from "./TypeParser/IPFSParser";
 import StringParser from "./TypeParser/StringParser";
 import VariableIntegerParser from "./TypeParser/VariableIntegerParser";
-import BooleanParser from "./TypeParser/BooleanParser";
 
 // tslint:disable:object-literal-sort-keys
 export const ParserTypes: {[id: string]: ITypeParser} = {
