@@ -5,7 +5,7 @@ import {ITypeParser} from "./index";
 
 export default class VariableParser implements ITypeParser {
     public deserialize(state: SerializationState): any {
-        const length = Number(unpackInteger(state));
+        const length = unpackInteger(state).toJSNumber();
         state.position += length;
 
         const data = state.data.slice(state.position - length, state.position);

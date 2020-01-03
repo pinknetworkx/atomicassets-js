@@ -6,7 +6,7 @@ export default class VectorSchema implements ISchema {
     constructor(private readonly element: ISchema) { }
 
     public deserialize(state: SerializationState): any {
-        const length = unpackInteger(state);
+        const length = unpackInteger(state).toJSNumber();
         const array: any[] = [];
 
         for(let i = 0; i < length; i++) {

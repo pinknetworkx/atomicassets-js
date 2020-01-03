@@ -7,7 +7,7 @@ import {
     hex_encode,
     packInteger,
     signInteger,
-    unpackInteger
+    unpackInteger,
 } from "../src/Binary";
 import {prepare} from "../src/Serialization/State";
 
@@ -27,7 +27,7 @@ describe("Binary", () => {
     it("unpack integer below 127", () => {
         const data = new Uint8Array([0b10000101]);
 
-        expect(Number(unpackInteger(prepare(data)))).to.equal(5);
+        expect(unpackInteger(prepare(data)).toJSNumber()).to.equal(5);
     });
 
     it("pack 2 bytes", () => {
@@ -37,7 +37,7 @@ describe("Binary", () => {
     it("unpack 2 bytes", () => {
         const data = new Uint8Array([0b01100110, 0b10000001]);
 
-        expect(Number(unpackInteger(prepare(data)))).to.equal(230);
+        expect(unpackInteger(prepare(data)).toJSNumber()).to.equal(230);
     });
 
     it("pack max integer", () => {
@@ -47,7 +47,7 @@ describe("Binary", () => {
     it("unpack max integer", () => {
         const data = new Uint8Array([0b01010110, 0b01110010, 0b01111001, 0b01111111, 0b1111]);
 
-        expect(Number(unpackInteger(prepare(data), 4))).to.equal(4294867286);
+        expect(unpackInteger(prepare(data), 4).toJSNumber()).to.equal(4294867286);
     });
 
     it("base58 encode", () => {

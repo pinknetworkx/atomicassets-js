@@ -2,11 +2,14 @@ import DeserializationError from "./Errors/DeserializationError";
 import SerializationError from "./Errors/SerializationError";
 import SerializationState from "./Serialization/State";
 
-export function packInteger(input: bigint, maxSize: number = 8): Uint8Array {
-    const bytes: number[] = [];
-    let n = input;
+import base from "base-x";
+import bigInt, {BigInteger} from "big-integer";
 
-    if(n < 0) {
+export function packInteger(input: any, maxSize: number = 8): Uint8Array {
+    const bytes: number[] = [];
+    let n = bigInt(input);
+
+    if(n.lesser(0)) {
         throw new SerializationError("cant pack negative integer");
     }
 
@@ -14,7 +17,7 @@ export function packInteger(input: bigint, maxSize: number = 8): Uint8Array {
         throw new SerializationError("cant pack integer greater than 64bit");
     }
 
-    if(n >= bigPow(2, maxSize * 8)) {
+    if(n.greaterOrEquals(bigInt(2).pow(maxSize * 8))) {
         throw new SerializationError("integer too large");
     }
 
@@ -22,27 +25,27 @@ export function packInteger(input: bigint, maxSize: number = 8): Uint8Array {
         let byte;
 
         if(i === maxSize) {
-            byte = n & BigInt(0xFF);
-            n >>= BigInt(8);
+            byte = n.and(0xFF);
+            n = n.shiftRight(8);
         } else {
-            byte = n & BigInt(0x7F);
-            n >>= BigInt(7);
+            byte = n.and(0x7F);
+            n = n.shiftRight(7);
 
-            if(n === BigInt(0)) {
-                bytes.push(Number(byte) + 128);
+            if(n.equals(0)) {
+                bytes.push(byte.toJSNumber() + 128);
 
                 break;
             }
         }
 
-        bytes.push(Number(byte));
+        bytes.push(byte.toJSNumber());
     }
 
     return new Uint8Array(bytes);
 }
 
-export function unpackInteger(state: SerializationState, maxSize: number = 8): bigint {
-    let result: bigint = BigInt(0);
+export function unpackInteger(state: SerializationState, maxSize: number = 8): BigInteger {
+    let result: BigInteger = bigInt(0);
 
     if(maxSize > 8) {
         throw new DeserializationError("cant unpack integer greater than 64bit");
@@ -53,47 +56,50 @@ export function unpackInteger(state: SerializationState, maxSize: number = 8): b
             throw new DeserializationError("failed to unpack integer");
         }
 
-        const byte: number = state.data[state.position];
+        const byte = bigInt(state.data[state.position]);
         state.position += 1;
 
-        if(byte > 127 && i < maxSize) {
-            result += (BigInt(byte) & BigInt(0x7F)) << BigInt(7 * i);
+        if(byte.greater(127) && i < maxSize) {
+            result = result.plus(byte.and(0x7F).shiftLeft(7 * i));
 
             break;
         }
 
-        result += BigInt(byte) << BigInt(7 * i);
+        result = result.plus(byte.shiftLeft(7 * i));
     }
 
     return result;
 }
 
-export function signInteger(n: bigint, size: number): bigint {
-    if(n > bigPow(2, (8 * size - 1))) {
+export function signInteger(input: any, size: number): BigInteger {
+    const n = bigInt(input);
+
+    if(n.greater(bigInt(2).pow(8 * size - 1))) {
         throw new Error("cannot sign integer: too big");
     }
 
-    if(n >= 0) {
+    if(n.greaterOrEquals(0)) {
         return n;
     } else {
-        return ((BigInt(-1) * n) ^ (bigPow(2, 8 * size) - BigInt(1))) + BigInt(1);
+        return n.negate().xor(bigInt(2).pow(8 * size).minus(1)).plus(1);
     }
 }
 
-export function unsignInteger(n: bigint, size: number): bigint {
-    if(n > bigPow(2, (8 * size))) {
+export function unsignInteger(input: any, size: number): BigInteger {
+    const n = bigInt(input);
+
+    if(n.greater(bigInt(2).pow(8 * size))) {
         throw new Error("cannot unsign integer: too big");
     }
 
-    if(n > bigPow(2, (8 * size - 1))) {
-        return BigInt(-1) * ((n - BigInt(1)) ^ (bigPow(2, 8 * size) - BigInt(1)));
+    if(n.greater(bigInt(2).pow(8 * size - 1))) {
+        return n.minus(1).xor(bigInt(2).pow(8 * size).minus(1)).negate();
     } else {
         return n;
     }
 }
 
-// tslint:disable-next-line:no-var-requires
-const bs58 = require("base-x")("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
+const bs58 = base("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
 
 export function base58_decode(data: string): Uint8Array {
     const buffer = bs58.decode(data);

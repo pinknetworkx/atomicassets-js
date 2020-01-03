@@ -2,10 +2,12 @@ import {packInteger, signInteger, unpackInteger, unsignInteger} from "../../Bina
 import SerializationState from "../State";
 import {ITypeParser} from "./index";
 
+import bigInt from "big-integer";
+
 export default class VariableIntegerParser implements ITypeParser {
     constructor(public readonly size: number, private readonly unsigned: boolean, private readonly negative: boolean) { }
 
-    public deserialize(state: SerializationState): bigint | number {
+    public deserialize(state: SerializationState): number {
         let n = unpackInteger(state, this.size);
 
         if(!this.unsigned) {
@@ -13,21 +15,17 @@ export default class VariableIntegerParser implements ITypeParser {
         }
 
         if(this.negative) {
-            n = BigInt(-1) * n;
+            n = n.negate();
         }
 
-        if(this.size < 6) {
-            return Number(n);
-        }
-
-        return n;
+        return n.toJSNumber();
     }
 
-    public serialize(data: bigint | number): Uint8Array {
-        let n = BigInt(data);
+    public serialize(data: any): Uint8Array {
+        let n = bigInt(data);
 
         if(this.negative) {
-            n = BigInt(-1) * n;
+            n = n.negate();
         }
 
         if(!this.unsigned) {

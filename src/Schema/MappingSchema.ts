@@ -4,7 +4,7 @@ import SerializationState from "../Serialization/State";
 import {ISchema, MappingAttribute} from "./index";
 
 export default class MappingSchema implements ISchema {
-    private readonly reserved: bigint = BigInt(1);
+    private readonly reserved = 1;
 
     constructor(private readonly attributes: MappingAttribute[]) { }
 
@@ -14,11 +14,11 @@ export default class MappingSchema implements ISchema {
         while(state.position < state.data.length) {
             const identifier = unpackInteger(state);
 
-            if(identifier === BigInt(0)) {
+            if(identifier.equals(0)) {
                 break;
             }
 
-            const attribute = this.getAttribute(identifier);
+            const attribute = this.getAttribute(identifier.toJSNumber());
 
             object[attribute.name] = attribute.value.deserialize(state);
         }
@@ -36,7 +36,7 @@ export default class MappingSchema implements ISchema {
                 continue;
             }
 
-            data.push(packInteger(BigInt(i) + this.reserved));
+            data.push(packInteger(i + this.reserved));
             data.push(attribute.value.serialize(object[attribute.name]));
         }
 
@@ -45,7 +45,7 @@ export default class MappingSchema implements ISchema {
         return concatByteArrays(data);
     }
 
-    private getAttribute(identifier: bigint): MappingAttribute {
+    private getAttribute(identifier: number): MappingAttribute {
         const attributeID = identifier - this.reserved;
 
         if(attributeID >= this.attributes.length) {
