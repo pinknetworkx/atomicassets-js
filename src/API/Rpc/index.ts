@@ -1,10 +1,10 @@
 import RpcError from "../../Errors/RpcError";
 import RpcAsset from "./Asset";
 import RpcCache from "./Cache";
-import RpcQueue from "./Queue";
-import RpcPreset from "./Preset";
-import RpcScheme from "./Scheme";
 import RpcOffer from "./Offer";
+import RpcPreset from "./Preset";
+import RpcQueue from "./Queue";
+import RpcScheme from "./Scheme";
 
 type Fetch = (input?: Request | string, init?: RequestInit) => Promise<Response>;
 type ApiArgs = {fetch?: Fetch, rateLimit?: number };
@@ -13,8 +13,9 @@ export default class RpcApi {
     public readonly queue: RpcQueue;
     public readonly cache: RpcCache;
 
-    private readonly endpoint: string;
-    private readonly contract: string;
+    public readonly endpoint: string;
+    public readonly contract: string;
+
     private readonly fetchBuiltin: Fetch;
 
     constructor(endpoint: string, contract: string, args: ApiArgs = {rateLimit: 4}) {
@@ -31,32 +32,28 @@ export default class RpcApi {
         this.cache = new RpcCache();
     }
 
-    public async get_asset(owner: string, id: number): Promise<RpcAsset> {
-        const rows = await this.get_table_rows({code: this.contract, scope: owner, table_key: "id", lower_bound: id, upper_bound: id});
-
-        if(rows.length !== 1) {
-            return null;
-        }
-
-        const asset = this.cache.asset(id, rows[0]);
-
-        return new RpcAsset(asset.id, asset);
+    public async get_asset(owner: string, id: string): Promise<RpcAsset> {
+        return new RpcAsset(this, owner, id);
     }
 
     public async get_preset(id: number): Promise<RpcPreset> {
-
+        return new RpcPreset(this, id);
     }
 
-    public async get_scheme(id: number): Promise<RpcScheme> {
-
+    public async get_scheme(name: string): Promise<RpcScheme> {
+        return new RpcScheme(this, name);
     }
 
     public async get_offer(id: number): Promise<RpcOffer> {
+        return new RpcOffer(this, id);
+    }
 
+    public async get_account_offers(account: string): Promise<RpcOffer[]> {
+        return await this.queue.account_offers(account);
     }
 
     public async get_account_assets(account: string): Promise<RpcAsset[]> {
-
+        return await this.queue.account_assets(account);
     }
 
     public async get_table_rows({

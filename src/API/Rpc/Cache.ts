@@ -2,66 +2,46 @@ export type AssetRow = any;
 export type PresetRow = any;
 export type SchemeRow = any;
 export type CollectionRow = any;
+export type OfferRow = any;
 
 export default class RpcCache {
-    private assets: {[id: string]: AssetRow} = {};
-    private presets: {[id: string]: PresetRow} = {};
-    private schemes: {[id: string]: SchemeRow} = {};
-    private collections: {[id: string]: CollectionRow} = {};
+    private readonly assets: {[id: string]: {data: AssetRow, expiration: number}} = {};
+    private readonly presets: {[id: string]: {data: PresetRow, expiration: number}} = {};
+    private readonly schemes: {[id: string]: {data: SchemeRow, expiration: number}} = {};
+    private readonly collections: {[id: string]: {data: CollectionRow, expiration: number}} = {};
+    private readonly offers: {[id: string]: {data: OfferRow, expiration: number}} = {};
 
-    public asset(assetID: number | string, data?: AssetRow): AssetRow {
-        if(data) {
-            this.assets[String(assetID)] = data;
-
-            return data;
-        }
-
-        if(typeof this.assets[String(assetID)] === "undefined") {
-            return null;
-        }
-
-        return this.assets[String(assetID)];
+    public asset(assetID: string, data?: AssetRow): AssetRow | null {
+        return this.access<AssetRow>(assetID, this.assets, data);
     }
 
-    public preset(presetID: number, data?: PresetRow): PresetRow {
-        if(data) {
-            this.presets[String(presetID)] = data;
-
-            return data;
-        }
-
-        if(typeof this.presets[String(presetID)] === "undefined") {
-            return null;
-        }
-
-        return this.presets[String(presetID)];
+    public preset(presetID: number, data?: PresetRow): PresetRow | null {
+        return this.access<PresetRow>(presetID, this.presets, data);
     }
 
-    public scheme(scheme: string, data?: SchemeRow): SchemeRow {
-        if(data) {
-            this.schemes[String(scheme)] = data;
-
-            return data;
-        }
-
-        if(typeof this.schemes[String(scheme)] === "undefined") {
-            return null;
-        }
-
-        return this.schemes[String(scheme)];
+    public scheme(scheme: string, data?: SchemeRow): SchemeRow | null {
+        return this.access<SchemeRow>(scheme, this.schemes, data);
     }
 
-    public collection(collection: string, data?: CollectionRow): CollectionRow {
+    public collection(collection: string, data?: CollectionRow): CollectionRow | null {
+        return this.access<CollectionRow>(collection, this.collections, data);
+    }
+
+    public offer(offerID: string, data?: OfferRow): OfferRow | null {
+        return this.access<OfferRow>(offerID, this.offers, data);
+    }
+
+    private access<T>(identifier: string | number, cache: {[id: string]: {expiration: number, data: T}}, data?: T): T | null {
         if(data) {
-            this.collections[String(collection)] = data;
+            cache[String(identifier)] = {expiration: Date.now() + 15 * 60 * 1000, data};
 
             return data;
         }
 
-        if(typeof this.collections[String(collection)] === "undefined") {
+        if(typeof this.assets[String(identifier)] === "undefined" || this.assets[String(identifier)].expiration >= Date.now()) {
             return null;
         }
 
-        return this.collections[String(collection)];
+        return this.assets[String(identifier)].data;
     }
 }
