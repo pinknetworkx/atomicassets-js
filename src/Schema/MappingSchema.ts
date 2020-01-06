@@ -40,7 +40,7 @@ export default class MappingSchema implements ISchema {
             data.push(attribute.value.serialize(object[attribute.name]));
         }
 
-        data.push(packInteger(BigInt(0)));
+        data.push(packInteger(0));
 
         return concat_byte_arrays(data);
     }

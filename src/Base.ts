@@ -39,6 +39,7 @@ export default class BaseCoder {
             pbegin++;
             zeroes++;
         }
+
         // Allocate enough space in big-endian base58 representation.
         const size = ((pend - pbegin) * this.iFACTOR + 1) >>> 0;
         const b58 = new Uint8Array(size);
@@ -56,11 +57,13 @@ export default class BaseCoder {
             length = i;
             pbegin++;
         }
+
         // Skip leading zeroes in base58 result.
         let it2 = size - length;
         while (it2 !== size && b58[it2] === 0) {
             it2++;
         }
+
         // Translate the result into a string.
         let str = this.LEADER.repeat(zeroes);
         for (; it2 < size; ++it2) { str += this.ALPHABET.charAt(b58[it2]); }
@@ -71,6 +74,7 @@ export default class BaseCoder {
     public decode(source: string) {
         const buffer = this.decodeUnsafe(source);
         if (buffer) { return buffer; }
+
         throw new Error("Non-base" + this.BASE + " character");
     }
 
@@ -79,6 +83,7 @@ export default class BaseCoder {
         let psz = 0;
         // Skip leading spaces.
         if (source[psz] === " ") { return new Uint8Array(0); }
+
         // Skip and count leading '1's.
         let zeroes = 0;
         let length = 0;
@@ -86,9 +91,11 @@ export default class BaseCoder {
             zeroes++;
             psz++;
         }
+
         // Allocate enough space in big-endian base256 representation.
         const size = (((source.length - psz) * this.FACTOR) + 1) >>> 0 ;// log(58) / log(256), rounded up.
         const b256 = new Uint8Array(size);
+
         // Process the characters.
         while (source[psz]) {
             // Decode character
@@ -105,6 +112,7 @@ export default class BaseCoder {
             length = i;
             psz++;
         }
+
         // Skip trailing spaces.
         if (source[psz] === " ") { return new Uint8Array(0); }
         // Skip leading zeroes in b256.
@@ -115,10 +123,12 @@ export default class BaseCoder {
 
         const vch = new Uint8Array(zeroes + (size - it4));
         vch.fill(0x00, 0, zeroes);
+
         let j = zeroes;
         while (it4 !== size) {
             vch[j++] = b256[it4++];
         }
+
         return vch;
     }
 }

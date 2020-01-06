@@ -9,7 +9,7 @@ export interface ISchema {
     deserialize(state: SerializationState): Uint8Array;
 }
 
-export type SchemaObject = {name: string, type: string, object: number};
+export type SchemaObject = {name: string, type: string, parent: number};
 export type MappingAttribute = {name: string, value: ISchema};
 
 type ObjectLookup = {[id: number]: SchemaObject[]};
@@ -53,11 +53,11 @@ export function ObjectSchema(schema: SchemaObject[]): ISchema {
     const objectLookup: ObjectLookup = {};
 
     for(const schemaObject of schema) {
-        if(typeof objectLookup[schemaObject.object] === "undefined") {
-            objectLookup[schemaObject.object] = [];
+        if(typeof objectLookup[schemaObject.parent] === "undefined") {
+            objectLookup[schemaObject.parent] = [];
         }
 
-        objectLookup[schemaObject.object].push(schemaObject);
+        objectLookup[schemaObject.parent].push(schemaObject);
     }
 
     return buildObjectSchema(0, objectLookup);

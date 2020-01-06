@@ -11,9 +11,9 @@ export default class FloatingParser extends FixedParser {
 
     public deserialize(state: SerializationState): number {
         if(this.isDouble) {
-            return fp.readDoubleBE(super.deserialize(state));
+            return fp.readDoubleLE(super.deserialize(state));
         } else {
-            return fp.readFloatBE(super.deserialize(state));
+            return fp.readFloatLE(super.deserialize(state));
         }
     }
 
@@ -22,11 +22,11 @@ export default class FloatingParser extends FixedParser {
         let bytes: number[] = [];
 
         if(this.isDouble) {
-            fp.writeDoubleBE(bytes, data);
+            fp.writeDoubleLE(bytes, data);
 
             return super.serialize(new Uint8Array(bytes));
         } else {
-            fp.writeFloatBE(bytes, data);
+            fp.writeFloatLE(bytes, data);
 
             return super.serialize(new Uint8Array(bytes));
         }

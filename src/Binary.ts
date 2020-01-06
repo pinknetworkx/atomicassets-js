@@ -27,18 +27,20 @@ export function packInteger(input: any, maxSize: number = 8): Uint8Array {
         if(i === maxSize) {
             byte = n.and(0xFF);
             n = n.shiftRight(8);
+
+            bytes.push(byte.toJSNumber());
         } else {
             byte = n.and(0x7F);
             n = n.shiftRight(7);
 
             if(n.equals(0)) {
-                bytes.push(byte.toJSNumber() + 128);
+                bytes.push(byte.toJSNumber());
 
                 break;
             }
-        }
 
-        bytes.push(byte.toJSNumber());
+            bytes.push(byte.toJSNumber() + 128);
+        }
     }
 
     return new Uint8Array(bytes);
@@ -59,13 +61,13 @@ export function unpackInteger(state: SerializationState, maxSize: number = 8): B
         const byte = bigInt(state.data[state.position]);
         state.position += 1;
 
-        if(byte.greater(127) && i < maxSize) {
-            result = result.plus(byte.and(0x7F).shiftLeft(7 * i));
+        if(byte.lesser(128) || i === maxSize) {
+            result = result.plus(byte.shiftLeft(7 * i));
 
             break;
+        } else {
+            result = result.plus(byte.and(0x7F).shiftLeft(7 * i));
         }
-
-        result = result.plus(byte.shiftLeft(7 * i));
     }
 
     return result;
@@ -74,7 +76,7 @@ export function unpackInteger(state: SerializationState, maxSize: number = 8): B
 export function signInteger(input: any, size: number): BigInteger {
     const n = bigInt(input);
 
-    if(n.greater(bigInt(2).pow(8 * size - 1))) {
+    if(n.greaterOrEquals(bigInt(2).pow(8 * size - 1))) {
         throw new Error("cannot sign integer: too big");
     }
 

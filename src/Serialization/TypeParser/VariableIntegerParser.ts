@@ -7,7 +7,7 @@ import bigInt from "big-integer";
 export default class VariableIntegerParser implements ITypeParser {
     constructor(public readonly size: number, private readonly unsigned: boolean, private readonly negative: boolean) { }
 
-    public deserialize(state: SerializationState): number {
+    public deserialize(state: SerializationState): number | string {
         let n = unpackInteger(state, this.size);
 
         if(!this.unsigned) {
@@ -18,7 +18,11 @@ export default class VariableIntegerParser implements ITypeParser {
             n = n.negate();
         }
 
-        return n.toJSNumber();
+        if(this.size <= 6) {
+            return n.toJSNumber();
+        }
+
+        return n.toString();
     }
 
     public serialize(data: any): Uint8Array {

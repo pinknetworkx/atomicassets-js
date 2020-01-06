@@ -21,31 +21,31 @@ describe("Binary", () => {
     });
 
     it("pack integer below 127", () => {
-        expect(packInteger(BigInt(5))).to.deep.equal(new Uint8Array([0b10000101]));
+        expect(packInteger(BigInt(5))).to.deep.equal(new Uint8Array([0b00000101]));
     });
 
     it("unpack integer below 127", () => {
-        const data = new Uint8Array([0b10000101]);
+        const data = new Uint8Array([0b00000101]);
 
         expect(unpackInteger(prepare(data)).toJSNumber()).to.equal(5);
     });
 
     it("pack 2 bytes", () => {
-        expect(packInteger(BigInt(230))).to.deep.equal(new Uint8Array([0b01100110, 0b10000001]));
+        expect(packInteger(BigInt(230))).to.deep.equal(new Uint8Array([0b11100110, 0b00000001]));
     });
 
     it("unpack 2 bytes", () => {
-        const data = new Uint8Array([0b01100110, 0b10000001]);
+        const data = new Uint8Array([0b11100110, 0b00000001]);
 
         expect(unpackInteger(prepare(data)).toJSNumber()).to.equal(230);
     });
 
     it("pack max integer", () => {
-        expect(packInteger(BigInt(4294867286), 4)).to.deep.equal(new Uint8Array([0b01010110, 0b01110010, 0b01111001, 0b01111111, 0b1111]));
+        expect(packInteger(BigInt(4294867286), 4)).to.deep.equal(new Uint8Array([0b11010110, 0b11110010, 0b11111001, 0b11111111, 0b00001111]));
     });
 
     it("unpack max integer", () => {
-        const data = new Uint8Array([0b01010110, 0b01110010, 0b01111001, 0b01111111, 0b1111]);
+        const data = new Uint8Array([0b11010110, 0b11110010, 0b11111001, 0b11111111, 0b00001111]);
 
         expect(unpackInteger(prepare(data), 4).toJSNumber()).to.equal(4294867286);
     });

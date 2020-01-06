@@ -17,7 +17,7 @@ export default class VectorSchema implements ISchema {
     }
 
     public serialize(array: any[]): Uint8Array {
-        const data: Uint8Array[] = [packInteger(BigInt(array.length))];
+        const data: Uint8Array[] = [packInteger(array.length)];
 
         for(const element of array) {
             data.push(this.element.serialize(element));

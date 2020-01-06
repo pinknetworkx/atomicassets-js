@@ -5,8 +5,8 @@ import FixedParser from "./FixedParser";
 import bigInt, {BigInteger} from "big-integer";
 
 export default class FixedIntegerParser extends FixedParser {
-    public deserialize(state: SerializationState): number {
-        const data: Uint8Array = super.deserialize(state);
+    public deserialize(state: SerializationState): number | string {
+        const data: Uint8Array = super.deserialize(state).reverse();
         let n = bigInt(0);
 
         for(const byte of data) {
@@ -16,11 +16,11 @@ export default class FixedIntegerParser extends FixedParser {
 
         n = unsignInteger(n, this.size);
 
-        if(this.size < 6) {
-            return Number(n);
+        if(this.size <= 6) {
+            return n.toJSNumber();
         }
 
-        return n.toJSNumber();
+        return n.toString();
     }
 
     public serialize(data: any): Uint8Array {
@@ -34,6 +34,6 @@ export default class FixedIntegerParser extends FixedParser {
             n = n.shiftRight(8);
         }
 
-        return super.serialize(new Uint8Array(buffer.reverse()));
+        return super.serialize(new Uint8Array(buffer));
     }
 }

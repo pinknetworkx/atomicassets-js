@@ -18,6 +18,6 @@ export default class VariableParser implements ITypeParser {
     }
 
     public serialize(data: any): Uint8Array {
-        return concat_byte_arrays([packInteger(BigInt(data.length)), data]);
+        return concat_byte_arrays([packInteger(data.length), data]);
     }
 }

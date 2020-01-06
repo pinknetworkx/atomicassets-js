@@ -16,7 +16,7 @@ export function serialize(object: any, schema: ISchema): Uint8Array {
 
 export function deserialize(data: Uint8Array, schema: ISchema): any {
     if(schema instanceof MappingSchema) {
-        data = concat_byte_arrays([data, packInteger(BigInt(0))]);
+        data = concat_byte_arrays([data, packInteger(0)]);
     }
 
     const state = new SerializationState(data, 0);
