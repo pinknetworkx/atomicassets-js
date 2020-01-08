@@ -1,5 +1,5 @@
-import {concat_byte_arrays, packInteger, unpackInteger} from "../Binary";
 import SchemaError from "../Errors/SchemaError";
+import {concat_byte_arrays, packInteger, unpackInteger} from "../Serialization/Binary";
 import SerializationState from "../Serialization/State";
 import {ISchema, MappingAttribute} from "./index";
 

@@ -1,4 +1,4 @@
-import {concat_byte_arrays, packInteger, unpackInteger} from "../Binary";
+import {concat_byte_arrays, packInteger, unpackInteger} from "../Serialization/Binary";
 import SerializationState from "../Serialization/State";
 import {ISchema} from "./index";
 

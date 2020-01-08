@@ -1,6 +1,6 @@
-import {concat_byte_arrays, packInteger} from "../Binary";
 import {ISchema} from "../Schema";
 import MappingSchema from "../Schema/MappingSchema";
+import {concat_byte_arrays, packInteger} from "./Binary";
 import SerializationState from "./State";
 
 export function serialize(object: any, schema: ISchema): Uint8Array {

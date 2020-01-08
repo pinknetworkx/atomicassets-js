@@ -1,4 +1,4 @@
-import {hex_encode} from "../../Binary";
+import {hex_encode} from "../../Serialization/Binary";
 import {AssetRow} from "./Cache";
 import RpcApi from "./index";
 import RpcPreset from "./Preset";

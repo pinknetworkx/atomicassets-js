@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        nftstandard: './src/index.ts',
+        atomicassets: './src/index.ts',
     },
     mode: 'production',
     module: {

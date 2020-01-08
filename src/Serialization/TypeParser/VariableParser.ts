@@ -1,5 +1,5 @@
-import {concat_byte_arrays, packInteger, unpackInteger} from "../../Binary";
 import DeserializationError from "../../Errors/DeserializationError";
+import {concat_byte_arrays, packInteger, unpackInteger} from "../Binary";
 import SerializationState from "../State";
 import {ITypeParser} from "./index";
 

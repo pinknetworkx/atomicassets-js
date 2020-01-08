@@ -1,8 +1,8 @@
-import {hex_encode} from "../../Binary";
+import {hex_encode} from "../../Serialization/Binary";
 import {PresetRow} from "./Cache";
 import RpcCollection from "./Collection";
-import RpcScheme from "./Scheme";
 import RpcApi from "./index";
+import RpcScheme from "./Scheme";
 
 export default class RpcPreset {
     public readonly id: number;

@@ -1,9 +1,9 @@
-import DeserializationError from "./Errors/DeserializationError";
-import SerializationError from "./Errors/SerializationError";
-import SerializationState from "./Serialization/State";
+import DeserializationError from "../Errors/DeserializationError";
+import SerializationError from "../Errors/SerializationError";
+import SerializationState from "./State";
 
 import bigInt, {BigInteger} from "big-integer";
-import BaseCoder from "./Base";
+import BaseCoder from "./Coders/Base";
 
 export function packInteger(input: any, maxSize: number = 8): Uint8Array {
     const bytes: number[] = [];

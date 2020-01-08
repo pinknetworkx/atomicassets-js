@@ -8,7 +8,7 @@ import {
     packInteger,
     signInteger,
     unpackInteger,
-} from "../src/Binary";
+} from "../src/Serialization/Binary";
 import {prepare} from "../src/Serialization/State";
 
 describe("Binary", () => {

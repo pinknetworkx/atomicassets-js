@@ -1,5 +1,5 @@
-import {base58_decode, base58_encode} from "../../Binary";
 import SerializationError from "../../Errors/SerializationError";
+import {base58_decode, base58_encode} from "../Binary";
 import SerializationState from "../State";
 import VariableParser from "./VariableParser";
 

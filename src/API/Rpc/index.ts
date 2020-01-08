@@ -72,7 +72,7 @@ export default class RpcApi {
         index_position = 1, key_type = "",
     }: any): Promise<any> {
         let rows: any[] = [];
-        let resp = {more: true, rows: []};
+        let resp: {more: boolean, rows: any[]} = {more: true, rows: []};
 
         while(resp.more) {
             resp = await this.fetch_rpc("/v1/chain/get_table_rows", {

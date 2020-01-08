@@ -1,4 +1,3 @@
-import {signInteger, unsignInteger} from "../../Binary";
 import SerializationState from "../State";
 import FixedParser from "./FixedParser";
 

@@ -4,7 +4,7 @@ import RpcApi from "./index";
 
 export default class RpcQueue {
     private elements: any[] = [];
-    private times = [];
+    private times: any[] = [];
 
     private interval: any = null;
 
@@ -92,7 +92,7 @@ export default class RpcQueue {
 
     private async fetch_all_rows(code: string, scope: string, table: string, tableKey: string, lowerBound = "", upperBound = ""): Promise<any[]>  {
         let rows: any[] = [];
-        let resp = {more: true, rows: []};
+        let resp: {more: boolean, rows: any[]} = {more: true, rows: []};
 
         while(resp.more) {
             resp = await this.api.get_table_rows({

@@ -1,8 +1,8 @@
 import { expect } from "chai";
 
-import {base58_decode, concat_byte_arrays, hex_decode, packInteger, signInteger} from "../src/Binary";
 import {ObjectSchema} from "../src/Schema";
 import {deserialize, serialize} from "../src/Serialization";
+import {base58_decode, concat_byte_arrays, hex_decode, packInteger, signInteger} from "../src/Serialization/Binary";
 
 describe("Basic Serialization", () => {
     const schema = ObjectSchema([

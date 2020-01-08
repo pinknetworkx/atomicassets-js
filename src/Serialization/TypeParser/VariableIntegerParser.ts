@@ -1,4 +1,4 @@
-import {packInteger, signInteger, unpackInteger, unsignInteger} from "../../Binary";
+import {packInteger, signInteger, unpackInteger, unsignInteger} from "../Binary";
 import SerializationState from "../State";
 import {ITypeParser} from "./index";
 

@@ -8,8 +8,6 @@
     "pack": "webpack --config webpack.prod.js"
   },
   "dependencies": {
-    "node-fetch": "~2.6.0",
-    "ieee-float": "~0.6.0",
     "big-integer": "~1.6.48"
   },
   "devDependencies": {
