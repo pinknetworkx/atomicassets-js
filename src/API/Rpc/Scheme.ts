@@ -11,11 +11,15 @@ export default class RpcScheme {
     public constructor(private readonly api: RpcApi, name: string, data?: SchemeRow) {
         this.name = name;
 
-        this._data = new Promise(async (resolve) => {
+        this._data = new Promise(async (resolve, reject) => {
             if(data) {
                 resolve(data);
             } else {
-                resolve(await api.queue.scheme(name));
+                try {
+                    resolve(await api.queue.scheme(name));
+                } catch (e) {
+                    reject(e);
+                }
             }
         });
     }

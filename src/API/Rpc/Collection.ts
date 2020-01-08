@@ -10,11 +10,15 @@ export default class RpcCollection {
     public constructor(private readonly api: RpcApi, name: string, data?: CollectionRow) {
         this.name = name;
 
-        this._data = new Promise(async (resolve) => {
+        this._data = new Promise(async (resolve, reject) => {
             if(data) {
                 resolve(data);
             } else {
-                resolve(await api.queue.collection(name));
+                try {
+                    resolve(await api.queue.collection(name));
+                } catch (e) {
+                    reject(e);
+                }
             }
         });
     }

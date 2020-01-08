@@ -1,5 +1,5 @@
 {
-  "name": "nft-standard",
+  "name": "atomicassets",
   "version": "0.0.1",
   "scripts": {
     "build": "tsc",

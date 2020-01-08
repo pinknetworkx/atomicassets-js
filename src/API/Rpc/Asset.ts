@@ -14,21 +14,29 @@ export default class RpcAsset {
     public constructor(private readonly api: RpcApi, owner: string, id: string, data?: AssetRow, preset?: RpcPreset) {
         this.id = id;
 
-        this._data = new Promise(async (resolve) => {
+        this._data = new Promise(async (resolve, reject) => {
             if(data) {
                 resolve(data);
             } else {
-                resolve(await api.queue.asset(owner, id));
+                try {
+                    resolve(await api.queue.asset(owner, id));
+                } catch (e) {
+                    reject(e);
+                }
             }
         });
 
-        this._preset = new Promise(async (resolve) => {
+        this._preset = new Promise(async (resolve, reject) => {
             if(preset) {
                 resolve(preset);
             } else {
-                const row = await this._data;
+                try {
+                    const row = await this._data;
 
-                resolve(new RpcPreset(api, row.presetid));
+                    resolve(new RpcPreset(api, row.presetid));
+                } catch (e) {
+                    reject(e);
+                }
             }
         });
     }

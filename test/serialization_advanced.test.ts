@@ -62,7 +62,7 @@ describe("Advanced Serialization", () => {
         },
     ]);
 
-    const serializedObject = new Uint8Array("01 04 48 61 6e 73 02 ad e2 e5 0d 03 22 12 20 68 f2 ff 69 2a 26 6f cd f2 5f 89 cc f3 3e 57 9d 27 72 69 b4 44 2a 21 30 c0 33 e0 2e 12 67 0e 44 04 00 00 40 3f 05 02 01 06 62 72 75 74 61 6c 02 84 47 03 01 f7 35 9a 75 e9 08 57 40 00 00 01 0a 61 75 63 68 20 6b 72 61 73 73 02 84 e8 03 00 06 02 03 01 00 00 00 02 00 00 00 03 00 00 00 03 a8 41 01 00 09 00 00 00 38 73 9c 49 07 01".split(" ").map((val) => parseInt(val, 16)));
+    const serializedObject = new Uint8Array("04 04 48 61 6e 73 05 ad e2 e5 0d 06 22 12 20 68 f2 ff 69 2a 26 6f cd f2 5f 89 cc f3 3e 57 9d 27 72 69 b4 44 2a 21 30 c0 33 e0 2e 12 67 0e 44 07 00 00 40 3f 08 02 04 06 62 72 75 74 61 6c 05 84 47 06 04 f7 35 9a 75 e9 08 57 40 00 00 04 0a 61 75 63 68 20 6b 72 61 73 73 05 84 e8 03 00 09 02 03 01 00 00 00 02 00 00 00 03 00 00 00 03 a8 41 01 00 09 00 00 00 38 73 9c 49 0a 01".split(" ").map((val) => parseInt(val, 16)));
     const rawObject = {
         name: "Hans",
         id: "28930349",

@@ -18,31 +18,43 @@ export default class RpcPreset {
     public constructor(private readonly api: RpcApi, id: number, data?: PresetRow, scheme?: RpcScheme, collection?: RpcCollection) {
         this.id = id;
 
-        this._data = new Promise(async (resolve) => {
+        this._data = new Promise(async (resolve, reject) => {
             if(data) {
                 resolve(data);
             } else {
-                resolve(await api.queue.preset(id));
+                try {
+                    resolve(await api.queue.preset(id));
+                } catch (e) {
+                    reject(e);
+                }
             }
         });
 
-        this._scheme = new Promise(async (resolve) => {
+        this._scheme = new Promise(async (resolve, reject) => {
             if(scheme) {
                 resolve(scheme);
             } else {
-                const row = await this._data;
+                try {
+                    const row = await this._data;
 
-                resolve(await api.queue.scheme(row.scheme));
+                    resolve(await api.queue.scheme(row.scheme));
+                } catch (e) {
+                    reject(e);
+                }
             }
         });
 
-        this._collection = new Promise(async (resolve) => {
+        this._collection = new Promise(async (resolve, reject) => {
             if(collection) {
                 resolve(collection);
             } else {
-                const row = await this._data;
+                try {
+                    const row = await this._data;
 
-                resolve(await api.queue.collection(row.collection));
+                    resolve(await api.queue.collection(row.collection));
+                } catch (e) {
+                    reject(e);
+                }
             }
         });
     }

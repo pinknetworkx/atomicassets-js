@@ -4,7 +4,7 @@ import SerializationState from "../Serialization/State";
 import {ISchema, MappingAttribute} from "./index";
 
 export default class MappingSchema implements ISchema {
-    private readonly reserved = 1;
+    private readonly reserved = 4;
 
     constructor(private readonly attributes: MappingAttribute[]) { }
 

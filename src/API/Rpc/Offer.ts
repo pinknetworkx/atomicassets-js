@@ -14,37 +14,49 @@ export default class RpcOffer {
     constructor(private readonly api: RpcApi, id: number, data?: OfferRow, senderAssets?: AssetRow[], receiverAssets?: AssetRow[]) {
         this.id = id;
 
-        this._data = new Promise(async (resolve) => {
+        this._data = new Promise(async (resolve, reject) => {
             if(data) {
                 resolve(data);
             } else {
-                resolve(await this.api.queue.offer(id));
+                try {
+                    resolve(await this.api.queue.offer(id));
+                } catch (e) {
+                    reject(e);
+                }
             }
         });
 
-        this._senderAssets = new Promise(async (resolve) => {
+        this._senderAssets = new Promise(async (resolve, reject) => {
             if(senderAssets) {
                 resolve(senderAssets);
             } else {
-                const row = await this._data;
-                const inventory = await this.api.queue.account_assets(await row.sender);
+                try {
+                    const row: OfferRow = await this._data;
+                    const inventory: AssetRow[] = await this.api.queue.account_assets(await row.sender);
 
-                resolve(inventory.filter((element) => {
-                    return row.senderAssets.indexOf(element.id) >= 0;
-                }));
+                    resolve(inventory.filter((element) => {
+                        return row.senderAssets.indexOf(element.id) >= 0;
+                    }));
+                } catch (e) {
+                    return reject(e);
+                }
             }
         });
 
-        this._receiverAssets = new Promise(async (resolve) => {
+        this._receiverAssets = new Promise(async (resolve, reject) => {
             if(receiverAssets) {
                 resolve(receiverAssets);
             } else {
-                const row = await this._data;
-                const inventory = await this.api.queue.account_assets(await row.receiver);
+                try {
+                    const row: OfferRow = await this._data;
+                    const inventory: AssetRow[] = await this.api.queue.account_assets(await row.receiver);
 
-                resolve(inventory.filter((element) => {
-                    return row.senderAssets.indexOf(element.id) >= 0;
-                }));
+                    resolve(inventory.filter((element) => {
+                        return row.receiverAssets.indexOf(element.id) >= 0;
+                    }));
+                } catch (e) {
+                    return reject(e);
+                }
             }
         });
     }

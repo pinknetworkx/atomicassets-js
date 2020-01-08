@@ -57,7 +57,18 @@ export default class RpcApi {
     }
 
     public async get_table_rows({
-        code, scope, table, table_key, lower_bound = "", upper_bound = "",
+        code, scope, table, table_key = "", lower_bound = "", upper_bound = "",
+        index_position = 1, key_type = "",
+    }: any): Promise<any> {
+        return await this.fetch_rpc("/v1/chain/get_table_rows", {
+            code, scope, table, table_key,
+            lower_bound, upper_bound, index_position,
+            key_type, limit: 101, reverse: false, show_payer: false,
+        });
+    }
+
+    public async get_all_table_rows({
+        code, scope, table, table_key = "", lower_bound = "", upper_bound = "",
         index_position = 1, key_type = "",
     }: any): Promise<any> {
         let rows: any[] = [];

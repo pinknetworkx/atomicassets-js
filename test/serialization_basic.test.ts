@@ -6,19 +6,19 @@ import {deserialize, serialize} from "../src/Serialization";
 
 describe("Basic Serialization", () => {
     const schema = ObjectSchema([
-        /* 01 */ {name: "name", type: "string", parent: 0},
-        /* 02 */ {name: "img", type: "ipfs", parent: 0},
-        /* 03 */ {name: "rarity1", type: "int16", parent: 0},
-        /* 04 */ {name: "rarity2", type: "uint16", parent: 0},
-        /* 05 */ {name: "rarity3", type: "sint16", parent: 0},
-        /* 06 */ {name: "rarity4", type: "fixed16", parent: 0},
-        /* 07 */ {name: "depth1", type: "int32", parent: 0},
-        /* 08 */ {name: "depth2", type: "uint32", parent: 0},
-        /* 09 */ {name: "depth3", type: "sint32", parent: 0},
-        /* 10 */ {name: "depth4", type: "fixed32", parent: 0},
-        /* 11 */ {name: "wear", type: "float", parent: 0},
-        /* 12 */ {name: "tradeable", type: "bool", parent: 0},
-        /* 13 */ {name: "share", type: "double", parent: 0},
+        /* 04 */ {name: "name", type: "string", parent: 0},
+        /* 05 */ {name: "img", type: "ipfs", parent: 0},
+        /* 06 */ {name: "rarity1", type: "int16", parent: 0},
+        /* 07 */ {name: "rarity2", type: "uint16", parent: 0},
+        /* 08 */ {name: "rarity3", type: "sint16", parent: 0},
+        /* 09 */ {name: "rarity4", type: "fixed16", parent: 0},
+        /* 10 */ {name: "depth1", type: "int32", parent: 0},
+        /* 11 */ {name: "depth2", type: "uint32", parent: 0},
+        /* 12 */ {name: "depth3", type: "sint32", parent: 0},
+        /* 13 */ {name: "depth4", type: "fixed32", parent: 0},
+        /* 14 */ {name: "wear", type: "float", parent: 0},
+        /* 15 */ {name: "tradeable", type: "bool", parent: 0},
+        /* 16 */ {name: "share", type: "double", parent: 0},
     ]);
 
     const encoder = new TextEncoder();
@@ -40,51 +40,51 @@ describe("Basic Serialization", () => {
     };
 
     const serializedName = concat_byte_arrays([
-        packInteger(1),
+        packInteger(4),
         packInteger(rawObject.name.length),
         new Uint8Array(encoder.encode(rawObject.name)),
     ]);
 
     const serializedImage = concat_byte_arrays([
-        packInteger(2),
+        packInteger(5),
         packInteger(base58_decode(rawObject.img).length),
         base58_decode(rawObject.img),
     ]);
 
     const serializedRarity = concat_byte_arrays([
-        packInteger(3),
-        packInteger(534, 2),
-        packInteger(4),
-        packInteger(534, 2),
-        packInteger(5),
-        new Uint8Array([0b11101010, 0b11111011, 0b00000011]), // negative integer
         packInteger(6),
+        packInteger(534, 2),
+        packInteger(7),
+        packInteger(534, 2),
+        packInteger(8),
+        new Uint8Array([0b11101010, 0b11111011, 0b00000011]), // negative integer
+        packInteger(9),
         new Uint8Array([0x2, 0x16].reverse()),
     ]);
 
     const serializedDepth = concat_byte_arrays([
-        packInteger(7),
-        packInteger(signInteger(-1000000, 4), 4),
-        packInteger(8),
-        packInteger(1000000, 4),
-        packInteger(9),
-        packInteger(1000000, 4),
         packInteger(10),
+        packInteger(signInteger(-1000000, 4), 4),
+        packInteger(11),
+        packInteger(1000000, 4),
+        packInteger(12),
+        packInteger(1000000, 4),
+        packInteger(13),
         new Uint8Array([0b11111111, 0b11110000, 0b10111101, 0b11000000].reverse()),
     ]);
 
     const serializedWear = concat_byte_arrays([
-        packInteger(11),
+        packInteger(14),
         new Uint8Array([0x3f, 0x40, 0, 0].reverse()),
     ]);
 
     const serializedTradeable = concat_byte_arrays([
-        packInteger(12),
+        packInteger(15),
         new Uint8Array([1]),
     ]);
 
     const serializedShare = concat_byte_arrays([
-        packInteger(13),
+        packInteger(16),
         hex_decode("4090010000000000").reverse(),
     ]);
 
