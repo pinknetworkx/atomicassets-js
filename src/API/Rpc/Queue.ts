@@ -31,14 +31,13 @@ export default class RpcQueue {
     }
 
     public async offer(id: number, useCache: boolean = true): Promise<OfferRow> {
-        return this.fetch_single_row(this.api.contract, "offers", "id", id, this.api.cache.offer.bind(this.api.cache));
+        return this.fetch_single_row(this.api.contract, "offers", "id", id, this.api.cache.offer.bind(this.api.cache), useCache);
     }
 
     public async account_offers(account: string, useCache: boolean = true): Promise<OfferRow[]> {
-        // TODO
         const rows: any[][] = await Promise.all([
-            this.fetch_all_rows(account, "offers", "sender", account, account, this.api.cache.asset.bind(this.api.cache), useCache),
-            this.fetch_all_rows(account, "offers", "receiver", account, account, this.api.cache.asset.bind(this.api.cache), useCache),
+            this.fetch_all_rows(account, "offers", "offer_sender", account, account, this.api.cache.offer.bind(this.api.cache), useCache),
+            this.fetch_all_rows(account, "offers", "offer_recipient", account, account, this.api.cache.offer.bind(this.api.cache), useCache),
         ]);
 
         return rows[0].concat(rows[1]);
@@ -71,7 +70,7 @@ export default class RpcQueue {
 
                 if(data) {
                     this.elements.shift()();
-                    
+
                     return resolve(data);
                 }
 
