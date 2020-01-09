@@ -32,11 +32,17 @@ export default class RpcOffer {
             } else {
                 try {
                     const row: OfferRow = await this._data;
-                    const inventory: AssetRow[] = await this.api.queue.account_assets(await row.sender);
+                    const inventory: AssetRow[] = await this.api.queue.account_assets(await row.offer_sender);
 
-                    resolve(inventory.filter((element) => {
-                        return row.senderAssets.indexOf(element.id) >= 0;
-                    }));
+                    const offerItems = inventory.filter((element) => {
+                        return row.sender_asset_ids.indexOf(element.id) >= 0;
+                    });
+
+                    if(offerItems.length !== row.sender_asset_ids.length) {
+                        return reject(new Error("user does not own all items anymore"));
+                    }
+
+                    return resolve(offerItems);
                 } catch (e) {
                     return reject(e);
                 }
@@ -49,11 +55,17 @@ export default class RpcOffer {
             } else {
                 try {
                     const row: OfferRow = await this._data;
-                    const inventory: AssetRow[] = await this.api.queue.account_assets(await row.receiver);
+                    const inventory: AssetRow[] = await this.api.queue.account_assets(await row.offer_recipient);
 
-                    resolve(inventory.filter((element) => {
-                        return row.receiverAssets.indexOf(element.id) >= 0;
-                    }));
+                    const offerItems = inventory.filter((element) => {
+                        return row.recipient_asset_ids.indexOf(element.id) >= 0;
+                    });
+
+                    if(offerItems.length !== row.recipient_asset_ids.length) {
+                        return reject(new Error("user does not own all items anymore"));
+                    }
+
+                    return resolve(offerItems);
                 } catch (e) {
                     return reject(e);
                 }

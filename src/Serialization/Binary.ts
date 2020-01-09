@@ -137,3 +137,25 @@ export function concat_byte_arrays(arr: Uint8Array[]) {
 
     return data;
 }
+
+export function int_to_byte_vector(n: any) {
+    const bytes: number[] = [];
+    let num = bigInt(n);
+
+    while(num.notEquals(0)) {
+        bytes.push(num.and(0xFF).toJSNumber());
+        num = num.shiftRight(8);
+    }
+
+    return new Uint8Array(bytes);
+}
+
+export function byte_vector_to_int(bytes: Uint8Array) {
+    let num = bigInt(0);
+
+    for(let i = 0; i < bytes.length; i++) {
+        num = num.plus(bigInt(bytes[i]).shiftLeft(8 * i));
+    }
+
+    return num.toJSNumber();
+}

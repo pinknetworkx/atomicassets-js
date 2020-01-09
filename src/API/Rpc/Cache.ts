@@ -1,8 +1,11 @@
+import {byte_vector_to_int} from "../../Serialization/Binary";
+
 export type AssetRow = any;
 export type PresetRow = any;
 export type SchemeRow = any;
 export type CollectionRow = any;
 export type OfferRow = any;
+export type ConfigRow = any;
 
 export default class RpcCache {
     private readonly assets: {[id: string]: {data: AssetRow, expiration: number}} = {};
@@ -12,14 +15,31 @@ export default class RpcCache {
     private readonly offers: {[id: string]: {data: OfferRow, expiration: number}} = {};
 
     public asset(assetID: string, data?: AssetRow): AssetRow | null {
+        if(data) {
+            data.mutable_serialized_data = new Uint8Array(data.mutable_serialized_data);
+            data.immutable_serialized_data = new Uint8Array(data.immutable_serialized_data);
+            data.backed_core_tokens = data.backed_core_tokens.replace(" WAX", "");
+        }
+
         return this.access<AssetRow>(assetID, this.assets, data);
     }
 
     public preset(presetID: number, data?: PresetRow): PresetRow | null {
+        if(data) {
+            data.mutable_serialized_data = new Uint8Array(data.mutable_serialized_data);
+            data.immutable_serialized_data = new Uint8Array(data.immutable_serialized_data);
+            data.max_supply = byte_vector_to_int(new Uint8Array(data.max_supply));
+            data.issued_supply = byte_vector_to_int(new Uint8Array(data.issued_supply));
+        }
+
         return this.access<PresetRow>(presetID, this.presets, data);
     }
 
     public scheme(scheme: string, data?: SchemeRow): SchemeRow | null {
+        if(data) {
+            data.format = data.format.map((element: string) => JSON.parse(element));
+        }
+
         return this.access<SchemeRow>(scheme, this.schemes, data);
     }
 

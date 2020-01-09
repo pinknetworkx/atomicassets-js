@@ -1,6 +1,7 @@
 import RpcError from "../../Errors/RpcError";
+import {ObjectSchema} from "../../Schema";
 import RpcAsset from "./Asset";
-import RpcCache from "./Cache";
+import RpcCache, {ConfigRow} from "./Cache";
 import RpcOffer from "./Offer";
 import RpcPreset from "./Preset";
 import RpcQueue from "./Queue";
@@ -18,6 +19,9 @@ export default class RpcApi {
 
     private readonly fetchBuiltin: Fetch;
 
+    // tslint:disable-next-line:variable-name
+    private readonly _config: Promise<ConfigRow>;
+
     constructor(endpoint: string, contract: string, args: ApiArgs = {rateLimit: 4}) {
         this.endpoint = endpoint;
         this.contract = contract;
@@ -30,6 +34,29 @@ export default class RpcApi {
 
         this.queue = new RpcQueue(this, args.rateLimit);
         this.cache = new RpcCache();
+
+        this._config = new Promise((async (resolve, reject) => {
+            try {
+                const resp = await this.get_table_rows({
+                    code: this.contract, scope: this.contract, table: "config",
+                });
+
+                if(resp.rows.length !== 1) {
+                    return reject("invalid config");
+                }
+
+                const data = resp.rows[0];
+                data.collection_format = ObjectSchema(data.collection_format.map((element: string) => JSON.parse(element)));
+
+                return resolve(data);
+            } catch (e) {
+                reject(e);
+            }
+        }));
+    }
+
+    public async config() {
+        return await this._config;
     }
 
     public async get_asset(owner: string, id: string): Promise<RpcAsset> {
@@ -63,35 +90,8 @@ export default class RpcApi {
         return await this.fetch_rpc("/v1/chain/get_table_rows", {
             code, scope, table, table_key,
             lower_bound, upper_bound, index_position,
-            key_type, limit: 101, reverse: false, show_payer: false,
+            key_type, limit: 101, reverse: false, show_payer: false, json: true,
         });
-    }
-
-    public async get_all_table_rows({
-        code, scope, table, table_key = "", lower_bound = "", upper_bound = "",
-        index_position = 1, key_type = "",
-    }: any): Promise<any> {
-        let rows: any[] = [];
-        let resp: {more: boolean, rows: any[]} = {more: true, rows: []};
-
-        while(resp.more) {
-            resp = await this.fetch_rpc("/v1/chain/get_table_rows", {
-                code, scope, table, table_key,
-                lower_bound: rows.length === 0 ? lower_bound : rows[rows.length - 1][table_key],
-                upper_bound, index_position,
-                key_type, limit: 101, reverse: false, show_payer: false,
-            });
-
-            // first element is duplicate
-            if(rows.length > 0) {
-                resp.rows.shift();
-            }
-
-            // concat arrays
-            rows = rows.concat(resp.rows);
-        }
-
-        return rows;
     }
 
     public async fetch_rpc(path: string, body: any) {
@@ -99,12 +99,16 @@ export default class RpcApi {
         let json;
 
         try {
+            console.log(path, JSON.stringify(body));
+
             response = await this.fetchBuiltin(this.endpoint + path, {
                 body: JSON.stringify(body),
                 method: "POST",
             });
 
             json = await response.json();
+
+            console.log(JSON.stringify(json));
         } catch (e) {
             e.isFetchError = true;
             throw e;

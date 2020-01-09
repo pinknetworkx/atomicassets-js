@@ -28,19 +28,14 @@ export default class RpcScheme {
         return (await this._data).author;
     }
 
-    public async ischema(): Promise<ISchema> {
-        return ObjectSchema((await this._data).ischema);
-    }
-
-    public async mschema(): Promise<ISchema> {
-        return ObjectSchema((await this._data).mschema);
+    public async format(): Promise<ISchema> {
+        return ObjectSchema((await this._data).format);
     }
 
     public async toObject() {
         return {
             author: await this.author(),
-            ischema: (await this._data).ischema,
-            mschema: (await this._data).mschema,
+            format: (await this._data).format,
         };
     }
 }

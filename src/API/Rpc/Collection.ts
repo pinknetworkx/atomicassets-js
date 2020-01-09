@@ -1,5 +1,6 @@
 import {CollectionRow} from "./Cache";
 import RpcApi from "./index";
+import {deserialize} from "../../Serialization";
 
 export default class RpcCollection {
     public readonly name: string;
@@ -23,23 +24,28 @@ export default class RpcCollection {
         });
     }
 
-    public async owner(): Promise<string> {
-        return (await this._data).owner;
+    public async author(): Promise<string> {
+        return (await this._data).author;
     }
 
-    public async notifiers(): Promise<string[]> {
-        return (await this._data).notifiers;
+    public async authorizedAccounts(): Promise<string[]> {
+        return (await this._data).authorized_accounts;
     }
 
-    public async issuers(): Promise<string[]> {
-        return (await this._data).issuers;
+    public async notifyAccounts(): Promise<string[]> {
+        return (await this._data).notify_accounts;
+    }
+
+    public async data(): Promise<any> {
+        return deserialize((await this._data).serialized_data, (await this.api.config()).collection_format);
     }
 
     public async toObject() {
         return {
-            owner: await this.owner(),
-            notifiers: await this.notifiers(),
-            issuers: await this.issuers(),
+            author: await this.author(),
+            authorizedAccounts: await this.authorizedAccounts(),
+            notifyAccounts: await this.notifyAccounts(),
+            data: await this.data(),
         };
     }
 }

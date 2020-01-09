@@ -3,6 +3,7 @@ import {PresetRow} from "./Cache";
 import RpcCollection from "./Collection";
 import RpcApi from "./index";
 import RpcScheme from "./Scheme";
+import {deserialize} from "../../Serialization";
 
 export default class RpcPreset {
     public readonly id: number;
@@ -37,7 +38,7 @@ export default class RpcPreset {
                 try {
                     const row = await this._data;
 
-                    resolve(await api.queue.scheme(row.scheme));
+                    resolve(new RpcScheme(this.api, row.scheme_name));
                 } catch (e) {
                     reject(e);
                 }
@@ -51,7 +52,7 @@ export default class RpcPreset {
                 try {
                     const row = await this._data;
 
-                    resolve(await api.queue.collection(row.collection));
+                    resolve(new RpcCollection(this.api, row.collection_name));
                 } catch (e) {
                     reject(e);
                 }
@@ -67,22 +68,26 @@ export default class RpcPreset {
         return await this._scheme;
     }
 
-    public async idata(): Promise<object | string> {
+    public async immutableData(): Promise<object | string> {
         const scheme = await this._scheme;
 
         try {
-            return (await scheme.ischema()).deserialize((await this._data).idata);
+            return deserialize((await this._data).immutable_serialized_data, await scheme.format());
         } catch (e) {
+            console.log(e);
+
             return hex_encode((await this._data).idata);
         }
     }
 
-    public async mdata(): Promise<object | string> {
+    public async mutableData(): Promise<object | string> {
         const scheme = await this._scheme;
 
         try {
-            return (await scheme.mschema()).deserialize((await this._data).mdata);
+            return deserialize((await this._data).mutable_serialized_data, await scheme.format());
         } catch (e) {
+            console.log(e);
+
             return hex_encode((await this._data).mdata);
         }
     }
@@ -96,11 +101,11 @@ export default class RpcPreset {
     }
 
     public async maxSupply(): Promise<number> {
-        return (await this._data).maxsupply;
+        return (await this._data).max_supply;
     }
 
     public async circulation(): Promise<number> {
-        return (await this._data).circulation;
+        return (await this._data).issued_supply;
     }
 
     public async toObject(): Promise<object> {
@@ -108,8 +113,8 @@ export default class RpcPreset {
             id: this.id,
             collection: await (await this.collection()).toObject(),
             scheme: await (await this.scheme()).toObject(),
-            idata: await this.idata(),
-            mdata: await this.mdata(),
+            immutableData: await this.immutableData(),
+            mutableData: await this.mutableData(),
             transferable: await this.isTransferable(),
             burnable: await this.isBurnable(),
             maxSupply: await this.maxSupply(),

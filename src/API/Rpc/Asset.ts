@@ -2,6 +2,7 @@ import {hex_encode} from "../../Serialization/Binary";
 import {AssetRow} from "./Cache";
 import RpcApi from "./index";
 import RpcPreset from "./Preset";
+import {deserialize} from "../../Serialization";
 
 export default class RpcAsset {
     public readonly id: string;
@@ -33,7 +34,7 @@ export default class RpcAsset {
                 try {
                     const row = await this._data;
 
-                    resolve(new RpcPreset(api, row.presetid));
+                    resolve(new RpcPreset(api, row.preset_id));
                 } catch (e) {
                     reject(e);
                 }
@@ -45,37 +46,41 @@ export default class RpcAsset {
         return await this._preset;
     }
 
-    public async idata(): Promise<any> {
+    public async backedTokens(): Promise<string> {
+        return (await this._data).backed_core_tokens;
+    }
+
+    public async immutableData(): Promise<any> {
         const preset = await this.preset();
         const scheme = await preset.scheme();
 
         const data = await this._data;
 
-        let pdata = await preset.idata();
+        let pdata = await preset.immutableData();
         if(typeof pdata === "string") {
             pdata = {};
         }
 
         try {
-            return Object.assign({}, pdata, (await scheme.ischema()).deserialize(data.idata));
+            return Object.assign({}, pdata, deserialize(data.immutable_serialized_data, await scheme.format()));
         } catch (e) {
             return hex_encode(data.idata);
         }
     }
 
-    public async mdata(): Promise<any> {
+    public async mutableData(): Promise<any> {
         const preset = await this.preset();
         const scheme = await preset.scheme();
 
         const data = await this._data;
 
-        let pdata = await preset.mdata();
+        let pdata = await preset.mutableData();
         if(typeof pdata === "string") {
             pdata = {};
         }
 
         try {
-            return Object.assign({}, pdata, (await scheme.mschema()).deserialize(data.mdata));
+            return Object.assign({}, pdata, deserialize(data.mutable_serialized_data, await scheme.format()));
         } catch (e) {
             return hex_encode(data.mdata);
         }
@@ -84,8 +89,9 @@ export default class RpcAsset {
     public async toObject(): Promise<object> {
         return {
             id: this.id,
-            idata: await this.idata(),
-            mdata: await this.mdata(),
+            backedTokens: await this.backedTokens(),
+            immutableData: await this.immutableData(),
+            mutableData: await this.mutableData(),
             preset: await (await this.preset()).toObject(),
         };
     }

@@ -2,9 +2,9 @@ import { expect } from "chai";
 
 import {
     base58_decode,
-    base58_encode,
+    base58_encode, byte_vector_to_int,
     hex_decode,
-    hex_encode,
+    hex_encode, int_to_byte_vector,
     packInteger,
     signInteger,
     unpackInteger,
@@ -56,5 +56,9 @@ describe("Binary", () => {
 
     it("base58 decode", () => {
         expect(hex_encode(base58_decode("QmS6AaitSdut3Te4fagW6jgfyKL73A1NBSSt3K38vQP9xf"))).to.equal("122037b8d00f5a5b37181c8fa8a05f7446b2ea06a0bbaaba3f1e95e4e97726a5e67c");
+    });
+
+    it("vector <-> int", () => {
+        expect(byte_vector_to_int(int_to_byte_vector(1000))).to.equal(1000);
     });
 });
