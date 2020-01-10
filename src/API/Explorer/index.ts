@@ -4,7 +4,7 @@ type ApiArgs = {fetch?: Fetch, rateLimit?: number };
 export default class ExplorerApi {
     private readonly endpoint: string;
 
-    constructor(endpoint: string) {
-        this
+    constructor(endpoint: string, args: ApiArgs) {
+        this.endpoint = endpoint;
     }
 }

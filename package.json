@@ -1,11 +1,17 @@
 {
   "name": "atomicassets",
-  "version": "0.0.1",
+  "description": "js module to fetch data from the atomicassets NFT standard",
+  "author": "pink.network",
+  "license": "MIT",
+  "version": "0.1.0",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "prepublish": "npm build-npm",
   "scripts": {
-    "build": "tsc",
+    "build-npm": "tsc",
+    "build-web": "webpack --config webpack.prod.js",
     "lint": "tslint -p tsconfig.json",
-    "test": "mocha -r ts-node/register test/**/*.test.ts",
-    "pack": "webpack --config webpack.prod.js"
+    "test": "mocha -r ts-node/register test/**/*.test.ts"
   },
   "dependencies": {
     "big-integer": "~1.6.48"

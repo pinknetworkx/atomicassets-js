@@ -1,8 +1,8 @@
+import {deserialize} from "../../Serialization";
 import {hex_encode} from "../../Serialization/Binary";
 import {AssetRow} from "./Cache";
 import RpcApi from "./index";
 import RpcPreset from "./Preset";
-import {deserialize} from "../../Serialization";
 
 export default class RpcAsset {
     public readonly id: string;
