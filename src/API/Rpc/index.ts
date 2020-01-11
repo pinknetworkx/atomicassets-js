@@ -99,16 +99,12 @@ export default class RpcApi {
         let json;
 
         try {
-            console.log(path, JSON.stringify(body));
-
             response = await this.fetchBuiltin(this.endpoint + path, {
                 body: JSON.stringify(body),
                 method: "POST",
             });
 
             json = await response.json();
-
-            console.log(JSON.stringify(json));
         } catch (e) {
             e.isFetchError = true;
             throw e;

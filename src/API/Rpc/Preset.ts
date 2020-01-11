@@ -1,9 +1,9 @@
+import {deserialize} from "../../Serialization";
 import {hex_encode} from "../../Serialization/Binary";
 import {PresetRow} from "./Cache";
 import RpcCollection from "./Collection";
 import RpcApi from "./index";
 import RpcScheme from "./Scheme";
-import {deserialize} from "../../Serialization";
 
 export default class RpcPreset {
     public readonly id: number;
@@ -74,8 +74,6 @@ export default class RpcPreset {
         try {
             return deserialize((await this._data).immutable_serialized_data, await scheme.format());
         } catch (e) {
-            console.log(e);
-
             return hex_encode((await this._data).idata);
         }
     }
@@ -86,8 +84,6 @@ export default class RpcPreset {
         try {
             return deserialize((await this._data).mutable_serialized_data, await scheme.format());
         } catch (e) {
-            console.log(e);
-
             return hex_encode((await this._data).mdata);
         }
     }

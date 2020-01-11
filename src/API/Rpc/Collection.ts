@@ -1,6 +1,6 @@
+import {deserialize} from "../../Serialization";
 import {CollectionRow} from "./Cache";
 import RpcApi from "./index";
-import {deserialize} from "../../Serialization";
 
 export default class RpcCollection {
     public readonly name: string;
