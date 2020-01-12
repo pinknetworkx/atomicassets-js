@@ -1,3 +1,4 @@
+import RpcAsset from "./Asset";
 import {AssetRow, OfferRow} from "./Cache";
 import RpcApi from "./index";
 
@@ -7,11 +8,11 @@ export default class RpcOffer {
     // tslint:disable-next-line:variable-name
     private readonly _data: Promise<OfferRow>;
     // tslint:disable-next-line:variable-name
-    private readonly _senderAssets: Promise<AssetRow[]>;
+    private readonly _senderAssets: Promise<RpcAsset[]>;
     // tslint:disable-next-line:variable-name
-    private readonly _receiverAssets: Promise<AssetRow[]>;
+    private readonly _recipientAssets: Promise<RpcAsset[]>;
 
-    constructor(private readonly api: RpcApi, id: number, data?: OfferRow, senderAssets?: AssetRow[], receiverAssets?: AssetRow[]) {
+    constructor(private readonly api: RpcApi, id: number, data?: OfferRow, senderAssets?: RpcAsset[], receiverAssets?: RpcAsset[]) {
         this.id = id;
 
         this._data = new Promise(async (resolve, reject) => {
@@ -34,22 +35,24 @@ export default class RpcOffer {
                     const row: OfferRow = await this._data;
                     const inventory: AssetRow[] = await this.api.queue.account_assets(await row.offer_sender);
 
-                    const offerItems = inventory.filter((element) => {
+                    let offerAssets = inventory.filter((element) => {
                         return row.sender_asset_ids.indexOf(element.id) >= 0;
                     });
 
-                    if(offerItems.length !== row.sender_asset_ids.length) {
+                    if(offerAssets.length !== row.sender_asset_ids.length) {
                         return reject(new Error("user does not own all items anymore"));
                     }
 
-                    return resolve(offerItems);
+                    offerAssets = offerAssets.map((asset) => new RpcAsset(this.api, asset.owner, asset.id, asset));
+
+                    return resolve(offerAssets);
                 } catch (e) {
                     return reject(e);
                 }
             }
         });
 
-        this._receiverAssets = new Promise(async (resolve, reject) => {
+        this._recipientAssets = new Promise(async (resolve, reject) => {
             if(receiverAssets) {
                 resolve(receiverAssets);
             } else {
@@ -57,15 +60,17 @@ export default class RpcOffer {
                     const row: OfferRow = await this._data;
                     const inventory: AssetRow[] = await this.api.queue.account_assets(await row.offer_recipient);
 
-                    const offerItems = inventory.filter((element) => {
+                    let offerAssets = inventory.filter((element) => {
                         return row.recipient_asset_ids.indexOf(element.id) >= 0;
                     });
 
-                    if(offerItems.length !== row.recipient_asset_ids.length) {
+                    if(offerAssets.length !== row.recipient_asset_ids.length) {
                         return reject(new Error("user does not own all items anymore"));
                     }
 
-                    return resolve(offerItems);
+                    offerAssets = offerAssets.map((asset) => new RpcAsset(this.api, asset.owner, asset.id, asset));
+
+                    return resolve(offerAssets);
                 } catch (e) {
                     return reject(e);
                 }
@@ -74,23 +79,23 @@ export default class RpcOffer {
     }
 
     public async sender() {
-        return (await this._data).sender;
+        return (await this._data).offer_sender;
     }
 
-    public async receiver() {
-        return (await this._data).sender;
+    public async recipient() {
+        return (await this._data).offer_recipient;
     }
 
     public async senderAssets() {
         return await this._senderAssets;
     }
 
-    public async receiverAssets() {
-        return await this._receiverAssets;
+    public async recipientAssets() {
+        return await this._recipientAssets;
     }
 
-    public async createdAt() {
-        return (await this._data).created;
+    public async memo() {
+        return (await this._data).memo;
     }
 
     public async toObject(): Promise<object> {
@@ -98,13 +103,13 @@ export default class RpcOffer {
             id: this.id,
             sender: {
                 account: await this.sender(),
-                assets: await this.senderAssets(),
+                assets: await Promise.all((await this.senderAssets()).map(async (asset) => await asset.toObject())),
             },
-            receiver: {
-                account: await this.receiver(),
-                assets: await this.receiverAssets(),
+            recipient: {
+                account: await this.recipient(),
+                assets: await Promise.all((await this.recipientAssets()).map(async (asset) => await asset.toObject())),
             },
-            created: await this.createdAt(),
+            memo: await this.memo(),
         };
     }
 }

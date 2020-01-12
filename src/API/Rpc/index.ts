@@ -76,11 +76,15 @@ export default class RpcApi {
     }
 
     public async get_account_offers(account: string): Promise<RpcOffer[]> {
-        return await this.queue.account_offers(account);
+        return (await this.queue.account_offers(account)).map((offer) => {
+            return new RpcOffer(this, offer.id, offer);
+        });
     }
 
     public async get_account_assets(account: string): Promise<RpcAsset[]> {
-        return await this.queue.account_assets(account);
+        return (await this.queue.account_assets(account)).map((asset) => {
+            return new RpcAsset(this, account, asset.id, asset);
+        });
     }
 
     public async get_table_rows({
