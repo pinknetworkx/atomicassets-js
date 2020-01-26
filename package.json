@@ -1,7 +1,13 @@
 {
   "name": "atomicassets",
   "description": "js module to fetch data from the atomicassets NFT standard",
+  "keywords": ["atomicassets", "nft", "blockchain", "eosio", "pinknetwork"],
   "author": "pink.network",
+  "homepage": "https://atomicassets.io",
+  "bugs": {
+    "url" : "https://github.com/pinknetworkx/atomicassets-js/issues",
+    "email" : "pinknetworkx@gmail.com"
+  },
   "license": "MIT",
   "version": "0.2.0",
   "main": "build/index.js",
