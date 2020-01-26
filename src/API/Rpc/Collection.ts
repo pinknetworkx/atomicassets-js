@@ -40,7 +40,7 @@ export default class RpcCollection {
         return deserialize((await this._data).serialized_data, (await this.api.config()).collection_format);
     }
 
-    public async toObject() {
+    public async toObject(): Promise<object> {
         return {
             author: await this.author(),
             authorizedAccounts: await this.authorizedAccounts(),

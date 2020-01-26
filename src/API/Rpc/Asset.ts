@@ -50,7 +50,7 @@ export default class RpcAsset {
         return (await this._data).backed_core_tokens;
     }
 
-    public async immutableData(): Promise<any> {
+    public async immutableData(): Promise<object | string> {
         const preset = await this.preset();
         const scheme = await preset.scheme();
 
@@ -68,7 +68,7 @@ export default class RpcAsset {
         }
     }
 
-    public async mutableData(): Promise<any> {
+    public async mutableData(): Promise<object | string> {
         const preset = await this.preset();
         const scheme = await preset.scheme();
 

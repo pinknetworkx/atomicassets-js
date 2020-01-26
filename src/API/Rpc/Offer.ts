@@ -78,23 +78,23 @@ export default class RpcOffer {
         });
     }
 
-    public async sender() {
+    public async sender(): Promise<string> {
         return (await this._data).offer_sender;
     }
 
-    public async recipient() {
+    public async recipient(): Promise<string> {
         return (await this._data).offer_recipient;
     }
 
-    public async senderAssets() {
+    public async senderAssets(): Promise<RpcAsset[]> {
         return await this._senderAssets;
     }
 
-    public async recipientAssets() {
+    public async recipientAssets(): Promise<RpcAsset[]> {
         return await this._recipientAssets;
     }
 
-    public async memo() {
+    public async memo(): Promise<string> {
         return (await this._data).memo;
     }
 
