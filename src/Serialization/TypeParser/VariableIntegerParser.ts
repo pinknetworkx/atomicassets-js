@@ -1,21 +1,17 @@
-import {packInteger, signInteger, unpackInteger, unsignInteger} from "../Binary";
+import {packInteger, signInteger, unpackInteger, unsignInteger, zigzag_decode, zigzag_encode} from "../Binary";
 import SerializationState from "../State";
 import {ITypeParser} from "./index";
 
 import bigInt from "big-integer";
 
 export default class VariableIntegerParser implements ITypeParser {
-    constructor(public readonly size: number, private readonly unsigned: boolean, private readonly negative: boolean) { }
+    constructor(public readonly size: number, private readonly unsigned: boolean) { }
 
     public deserialize(state: SerializationState): number | string {
         let n = unpackInteger(state, this.size);
 
         if(!this.unsigned) {
-            n = unsignInteger(n, this.size);
-        }
-
-        if(this.negative) {
-            n = n.negate();
+            n = zigzag_decode(n, this.size);
         }
 
         if(this.size <= 6) {
@@ -28,12 +24,8 @@ export default class VariableIntegerParser implements ITypeParser {
     public serialize(data: any): Uint8Array {
         let n = bigInt(data);
 
-        if(this.negative) {
-            n = n.negate();
-        }
-
         if(!this.unsigned) {
-            n = signInteger(n, this.size);
+            n = zigzag_encode(n, this.size);
         }
 
         return packInteger(n, this.size);

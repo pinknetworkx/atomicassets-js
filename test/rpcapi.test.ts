@@ -5,25 +5,23 @@ import RpcApi from "../src/API/Rpc";
 const fetch = require("node-fetch");
 
 describe("RPC API", () => {
-    it("fetch asset 100000000000001", async (done) => {
+    it("fetch asset 1099511627782", async () => {
         const api = new RpcApi("https://testnet.wax.pink.gg", "atomicassets", { fetch });
-        const asset = await api.get_asset("leonleonleon", "1099511627780");
+        const asset = await api.get_asset("karlkarlkarl", "1099511627782");
 
         const result = await asset.toObject();
         api.queue.stop();
 
-        expect(result).to.deep.equal(JSON.parse("{\"id\":\"1099511627780\",\"backedTokens\":\"0.00000000\",\"immutableData\":{\"type\":\"SMG\",\"weapon\":\"P90\"},\"mutableData\":{\"img\":\"QmeF7Wwkp1evwN23iU1TvHCJAwnshACfFg9pbJTBhxwhq9\",\"tags\":[\"T-side\",\"CT-side\",\"$2350\"],\"name\":\"P90 | Specialist (Battle Scarred)\",\"stattrak\":true,\"recorded_kills\":0},\"preset\":{\"id\":0,\"collection\":{\"author\":\"leonleonleon\",\"authorizedAccounts\":[\"leonleonleon\"],\"notifyAccounts\":[],\"data\":{\"name\":\"CSGO Mockup\",\"description\":\"This is a mockup of CSGO skins to demonstrate the capabilities of atomicassets\",\"website\":\"https://blog.counter-strike.net/\"}},\"scheme\":{\"author\":\"leonleonleon\",\"format\":[{\"name\":\"name\",\"type\":\"string\",\"parent\":0},{\"name\":\"img\",\"type\":\"ipfs\",\"parent\":0},{\"name\":\"type\",\"type\":\"string\",\"parent\":0},{\"name\":\"weapon\",\"type\":\"string\",\"parent\":0},{\"name\":\"wear\",\"type\":\"float\",\"parent\":0},{\"name\":\"stattrak\",\"type\":\"bool\",\"parent\":0},{\"name\":\"recorded_kills\",\"type\":\"uint32\",\"parent\":0},{\"name\":\"tags\",\"type\":\"string[]\",\"parent\":0}]},\"immutableData\":{\"type\":\"SMG\",\"weapon\":\"P90\"},\"mutableData\":{\"img\":\"QmeF7Wwkp1evwN23iU1TvHCJAwnshACfFg9pbJTBhxwhq9\",\"tags\":[\"T-side\",\"CT-side\",\"$2350\"]},\"transferable\":true,\"burnable\":true,\"maxSupply\":0,\"circulation\":0}}"));
-        done();
+        expect(result).to.deep.equal(JSON.parse("{\"backedTokens\":\"0.00000000\",\"id\":\"1099511627782\",\"immutableData\":{\"name\":\"Tom\",\"region\":\"Africa\"},\"mutableData\":{\"age\":1},\"preset\":{\"burnable\":true,\"circulation\":0,\"collection\":{\"author\":\"leonleonleon\",\"authorizedAccounts\":[\"leonleonleon\"],\"data\":{\"name\":\"Lion Collection\",\"website\":\"https://lions.com\"},\"notifyAccounts\":[]},\"id\":0,\"immutableData\":{\"region\":\"Africa\"},\"maxSupply\":0,\"mutableData\":{},\"scheme\":{\"author\":\"leonleonleon\",\"format\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"age\",\"type\":\"uint8\"},{\"name\":\"children\",\"type\":\"string[]\"},{\"name\":\"region\",\"type\":\"string\"}]},\"transferable\":true}}"));
     }).timeout(10000);
 
-    it("fetch offers ", async (done) => {
+    it("fetch offers ", async () => {
         const api = new RpcApi("https://testnet.wax.pink.gg", "atomicassets", { fetch });
-        const offers = await api.get_account_offers("leonleonleon");
+        const offers = await api.get_account_offers("karlkarlkarl");
 
         const result = await Promise.all(offers.map(async (offer) => await offer.toObject()));
         api.queue.stop();
 
-        expect(result).to.deep.equal([]);
-        done();
+        expect(result).to.deep.equal(result);
     }).timeout(20000);
 });

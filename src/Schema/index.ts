@@ -9,7 +9,7 @@ export interface ISchema {
     deserialize(state: SerializationState): Uint8Array;
 }
 
-export type SchemaObject = {name: string, type: string, parent: number};
+export type SchemaObject = {name: string, type: string, parent?: number};
 export type MappingAttribute = {name: string, value: ISchema};
 
 type ObjectLookup = {[id: number]: SchemaObject[]};
@@ -36,6 +36,7 @@ function buildValueSchema(type: string, lookup: ObjectLookup): ISchema {
         return new VectorSchema(buildValueSchema(type.substring(0, type.length - 2), lookup));
     }
 
+    // not supported by the contract currently
     if(type.startsWith("object{") && type.endsWith("}")) {
         const objectID = parseInt(type.substring(7, type.length - 1), 10);
 
@@ -53,11 +54,13 @@ export function ObjectSchema(schema: SchemaObject[]): ISchema {
     const objectLookup: ObjectLookup = {};
 
     for(const schemaObject of schema) {
-        if(typeof objectLookup[schemaObject.parent] === "undefined") {
-            objectLookup[schemaObject.parent] = [];
+        const objectID = typeof schemaObject.parent === "undefined" ? 0 : schemaObject.parent;
+
+        if(typeof objectLookup[objectID] === "undefined") {
+            objectLookup[objectID] = [];
         }
 
-        objectLookup[schemaObject.parent].push(schemaObject);
+        objectLookup[objectID].push(schemaObject);
     }
 
     return buildObjectSchema(0, objectLookup);

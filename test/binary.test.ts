@@ -1,5 +1,6 @@
 import { expect } from "chai";
 
+import bigInt from "big-integer";
 import {
     base58_decode,
     base58_encode, byte_vector_to_int,
@@ -7,7 +8,7 @@ import {
     hex_encode, int_to_byte_vector,
     packInteger,
     signInteger,
-    unpackInteger,
+    unpackInteger, zigzag_decode, zigzag_encode,
 } from "../src/Serialization/Binary";
 import {prepare} from "../src/Serialization/State";
 
@@ -60,5 +61,13 @@ describe("Binary", () => {
 
     it("vector <-> int", () => {
         expect(byte_vector_to_int(int_to_byte_vector(1000))).to.equal(1000);
+    });
+
+    it("zigzag encode", () => {
+        expect(zigzag_encode(6).toJSNumber()).to.equal(12);
+    });
+
+    it("zigzag decode", () => {
+        expect(zigzag_decode(12).toJSNumber()).to.equal(6);
     });
 });

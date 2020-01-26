@@ -36,10 +36,6 @@ export default class RpcCache {
     }
 
     public scheme(scheme: string, data?: SchemeRow): SchemeRow | null {
-        if(data) {
-            data.format = data.format.map((element: string) => JSON.parse(element));
-        }
-
         return this.access<SchemeRow>(scheme, this.schemes, data);
     }
 

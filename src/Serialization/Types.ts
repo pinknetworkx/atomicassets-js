@@ -9,20 +9,15 @@ import VariableIntegerParser from "./TypeParser/VariableIntegerParser";
 
 // tslint:disable:object-literal-sort-keys
 export const ParserTypes: {[id: string]: ITypeParser} = {
-    int8: new VariableIntegerParser(1, false, false),
-    int16: new VariableIntegerParser(2, false, false),
-    int32: new VariableIntegerParser(4, false, false),
-    int64: new VariableIntegerParser(8, false, false),
+    int8: new VariableIntegerParser(1, false),
+    int16: new VariableIntegerParser(2, false),
+    int32: new VariableIntegerParser(4, false),
+    int64: new VariableIntegerParser(8, false),
 
-    sint8: new VariableIntegerParser(1, false, true),
-    sint16: new VariableIntegerParser(2, false, true),
-    sint32: new VariableIntegerParser(4, false, true),
-    sint64: new VariableIntegerParser(8, false, true),
-
-    uint8: new VariableIntegerParser(1, true, false),
-    uint16: new VariableIntegerParser(2, true, false),
-    uint32: new VariableIntegerParser(4, true, false),
-    uint64: new VariableIntegerParser(8, true, false),
+    uint8: new VariableIntegerParser(1, true),
+    uint16: new VariableIntegerParser(2, true),
+    uint32: new VariableIntegerParser(4, true),
+    uint64: new VariableIntegerParser(8, true),
 
     fixed8: new FixedIntegerParser(1),
     fixed16: new FixedIntegerParser(2),

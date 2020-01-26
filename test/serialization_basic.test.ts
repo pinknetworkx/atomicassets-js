@@ -2,7 +2,7 @@ import { expect } from "chai";
 
 import {ObjectSchema} from "../src/Schema";
 import {deserialize, serialize} from "../src/Serialization";
-import {base58_decode, concat_byte_arrays, hex_decode, packInteger, signInteger} from "../src/Serialization/Binary";
+import {base58_decode, concat_byte_arrays, hex_decode, packInteger, signInteger, zigzag_encode} from "../src/Serialization/Binary";
 
 describe("Basic Serialization", () => {
     const schema = ObjectSchema([
@@ -10,11 +10,11 @@ describe("Basic Serialization", () => {
         /* 05 */ {name: "img", type: "ipfs", parent: 0},
         /* 06 */ {name: "rarity1", type: "int16", parent: 0},
         /* 07 */ {name: "rarity2", type: "uint16", parent: 0},
-        /* 08 */ {name: "rarity3", type: "sint16", parent: 0},
+        /* 08 */ {name: "rarity3", type: "int64", parent: 0},
         /* 09 */ {name: "rarity4", type: "fixed16", parent: 0},
         /* 10 */ {name: "depth1", type: "int32", parent: 0},
         /* 11 */ {name: "depth2", type: "uint32", parent: 0},
-        /* 12 */ {name: "depth3", type: "sint32", parent: 0},
+        /* 12 */ {name: "depth3", type: "int64", parent: 0},
         /* 13 */ {name: "depth4", type: "fixed32", parent: 0},
         /* 14 */ {name: "wear", type: "float", parent: 0},
         /* 15 */ {name: "tradeable", type: "bool", parent: 0},
@@ -28,11 +28,11 @@ describe("Basic Serialization", () => {
         img: "QmS6AaitSdut3Te4fagW6jgfyKL73A1NBSSt3K38vQP9xf",
         rarity1: 534,
         rarity2: 534,
-        rarity3: 534,
+        rarity3: "534",
         rarity4: 534,
         depth1: -1000000,
         depth2: 1000000,
-        depth3: -1000000,
+        depth3: "-1000000",
         depth4: -1000000,
         wear: 0.75,
         tradeable: true,
@@ -53,22 +53,22 @@ describe("Basic Serialization", () => {
 
     const serializedRarity = concat_byte_arrays([
         packInteger(6),
-        packInteger(534, 2),
+        packInteger(zigzag_encode(534, 2), 2),
         packInteger(7),
         packInteger(534, 2),
         packInteger(8),
-        new Uint8Array([0b11101010, 0b11111011, 0b00000011]), // negative integer
+        packInteger(zigzag_encode(534, 8), 8),
         packInteger(9),
         new Uint8Array([0x2, 0x16].reverse()),
     ]);
 
     const serializedDepth = concat_byte_arrays([
         packInteger(10),
-        packInteger(signInteger(-1000000, 4), 4),
+        packInteger(zigzag_encode(-1000000, 4), 4),
         packInteger(11),
         packInteger(1000000, 4),
         packInteger(12),
-        packInteger(1000000, 4),
+        packInteger(zigzag_encode(-1000000, 8), 8),
         packInteger(13),
         new Uint8Array([0b11111111, 0b11110000, 0b10111101, 0b11000000].reverse()),
     ]);

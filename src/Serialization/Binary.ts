@@ -101,6 +101,28 @@ export function unsignInteger(input: any, size: number): BigInteger {
     }
 }
 
+export function zigzag_encode(input: any, size = 8): BigInteger {
+    const n = bigInt(input);
+    const result = n.shiftRight(size * 8 - 1).xor(n.shiftLeft(1));
+
+    if(result.greaterOrEquals(bigInt(2).pow(size * 8))) {
+        throw new Error("zigzag encode: number too big");
+    }
+
+    return result;
+}
+
+export function zigzag_decode(input: any, size = 8): BigInteger {
+    const n = bigInt(input);
+    const result = n.shiftRight(1).xor(bigInt(-1).multiply(n.and(1)));
+
+    if(result.greaterOrEquals(bigInt(2).pow((size * 8) - 1))) {
+        throw new Error("zigzag encode: number too big");
+    }
+
+    return result;
+}
+
 const bs58 = new BaseCoder("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
 
 export function base58_decode(data: string): Uint8Array {

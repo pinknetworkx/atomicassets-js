@@ -46,7 +46,7 @@ export default class RpcApi {
                 }
 
                 const data = resp.rows[0];
-                data.collection_format = ObjectSchema(data.collection_format.map((element: string) => JSON.parse(element)));
+                data.collection_format = ObjectSchema(data.collection_format);
 
                 return resolve(data);
             } catch (e) {
