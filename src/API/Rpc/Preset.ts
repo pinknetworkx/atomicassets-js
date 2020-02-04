@@ -16,7 +16,7 @@ export default class RpcPreset {
     // tslint:disable-next-line:variable-name
     private readonly _scheme: Promise<RpcScheme>;
 
-    public constructor(private readonly api: RpcApi, id: number, data?: PresetRow, scheme?: RpcScheme, collection?: RpcCollection) {
+    public constructor(private readonly api: RpcApi, id: number, data?: PresetRow, scheme?: RpcScheme, collection?: RpcCollection, cache: boolean = true) {
         this.id = id;
 
         this._data = new Promise(async (resolve, reject) => {
@@ -24,7 +24,7 @@ export default class RpcPreset {
                 resolve(data);
             } else {
                 try {
-                    resolve(await api.queue.preset(id));
+                    resolve(await api.queue.preset(id, cache));
                 } catch (e) {
                     reject(e);
                 }
@@ -38,7 +38,7 @@ export default class RpcPreset {
                 try {
                     const row = await this._data;
 
-                    resolve(new RpcScheme(this.api, row.scheme_name));
+                    resolve(new RpcScheme(this.api, row.scheme_name, undefined, cache));
                 } catch (e) {
                     reject(e);
                 }
@@ -52,7 +52,7 @@ export default class RpcPreset {
                 try {
                     const row = await this._data;
 
-                    resolve(new RpcCollection(this.api, row.collection_name));
+                    resolve(new RpcCollection(this.api, row.collection_name, undefined, cache));
                 } catch (e) {
                     reject(e);
                 }

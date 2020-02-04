@@ -12,7 +12,7 @@ export default class RpcAsset {
     // tslint:disable-next-line:variable-name
     private readonly _preset: Promise<RpcPreset>;
 
-    public constructor(private readonly api: RpcApi, owner: string, id: string, data?: AssetRow, preset?: RpcPreset) {
+    public constructor(private readonly api: RpcApi, owner: string, id: string, data?: AssetRow, preset?: RpcPreset, cache: boolean = true) {
         this.id = id;
 
         this._data = new Promise(async (resolve, reject) => {
@@ -20,7 +20,7 @@ export default class RpcAsset {
                 resolve(data);
             } else {
                 try {
-                    resolve(await api.queue.asset(owner, id));
+                    resolve(await api.queue.asset(owner, id, cache));
                 } catch (e) {
                     reject(e);
                 }
@@ -34,7 +34,7 @@ export default class RpcAsset {
                 try {
                     const row = await this._data;
 
-                    resolve(new RpcPreset(api, row.preset_id));
+                    resolve(new RpcPreset(api, row.preset_id, undefined, undefined, undefined, cache));
                 } catch (e) {
                     reject(e);
                 }

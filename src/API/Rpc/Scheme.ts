@@ -8,7 +8,7 @@ export default class RpcScheme {
     // tslint:disable-next-line:variable-name
     private readonly _data: Promise<SchemeRow>;
 
-    public constructor(private readonly api: RpcApi, name: string, data?: SchemeRow) {
+    public constructor(private readonly api: RpcApi, name: string, data?: SchemeRow, cache: boolean = true) {
         this.name = name;
 
         this._data = new Promise(async (resolve, reject) => {
@@ -16,7 +16,7 @@ export default class RpcScheme {
                 resolve(data);
             } else {
                 try {
-                    resolve(await api.queue.scheme(name));
+                    resolve(await api.queue.scheme(name, cache));
                 } catch (e) {
                     reject(e);
                 }

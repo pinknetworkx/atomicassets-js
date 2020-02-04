@@ -59,31 +59,31 @@ export default class RpcApi {
         return await this._config;
     }
 
-    public async get_asset(owner: string, id: string): Promise<RpcAsset> {
-        return new RpcAsset(this, owner, id);
+    public async get_asset(owner: string, id: string, cache: boolean = true): Promise<RpcAsset> {
+        return new RpcAsset(this, owner, id, undefined, undefined, cache);
     }
 
-    public async get_preset(id: number): Promise<RpcPreset> {
-        return new RpcPreset(this, id);
+    public async get_preset(id: number, cache: boolean = true): Promise<RpcPreset> {
+        return new RpcPreset(this, id, undefined, undefined, undefined, cache);
     }
 
-    public async get_scheme(name: string): Promise<RpcScheme> {
-        return new RpcScheme(this, name);
+    public async get_scheme(name: string, cache: boolean = true): Promise<RpcScheme> {
+        return new RpcScheme(this, name, undefined, cache);
     }
 
-    public async get_offer(id: number): Promise<RpcOffer> {
-        return new RpcOffer(this, id);
+    public async get_offer(id: number, cache: boolean = true): Promise<RpcOffer> {
+        return new RpcOffer(this, id, undefined, undefined, undefined, cache);
     }
 
-    public async get_account_offers(account: string): Promise<RpcOffer[]> {
+    public async get_account_offers(account: string, cache: boolean = true): Promise<RpcOffer[]> {
         return (await this.queue.account_offers(account)).map((offer) => {
-            return new RpcOffer(this, offer.id, offer);
+            return new RpcOffer(this, offer.id, offer, undefined, undefined, cache);
         });
     }
 
-    public async get_account_assets(account: string): Promise<RpcAsset[]> {
+    public async get_account_assets(account: string, cache: boolean = true): Promise<RpcAsset[]> {
         return (await this.queue.account_assets(account)).map((asset) => {
-            return new RpcAsset(this, account, asset.id, asset);
+            return new RpcAsset(this, account, asset.id, asset, undefined, cache);
         });
     }
 
@@ -101,6 +101,8 @@ export default class RpcApi {
     public async fetch_rpc(path: string, body: any) {
         let response;
         let json;
+
+        // console.log(path, body);
 
         try {
             response = await this.fetchBuiltin(this.endpoint + path, {

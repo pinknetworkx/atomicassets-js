@@ -7,9 +7,7 @@ export default class RpcQueue {
     private elements: any[] = [];
     private interval: any = null;
 
-    constructor(private readonly api: RpcApi, private readonly requestLimit = 4) {
-        this.dequeue();
-    }
+    constructor(private readonly api: RpcApi, private readonly requestLimit = 4) { }
 
     public async asset(owner: string, id: string, useCache: boolean = true): Promise<AssetRow> {
         return this.fetch_single_row(owner, "assets", id, this.api.cache.asset.bind(this.api.cache), useCache);
@@ -50,16 +48,17 @@ export default class RpcQueue {
         return rows[0].concat(rows[1]);
     }
 
-    public stop() {
-        clearInterval(this.interval);
-
-        this.interval = null;
-    }
-
     private dequeue() {
+        if(this.interval) {
+            return;
+        }
+
         this.interval = setInterval(async () => {
             if(this.elements.length > 0) {
                 this.elements.shift()();
+            } else {
+                clearInterval(this.interval);
+                this.interval = null;
             }
         }, Math.ceil(1000 / this.requestLimit));
     }
@@ -80,7 +79,9 @@ export default class RpcQueue {
                 data = useCache ? cache(match) : null;
 
                 if(data) {
-                    this.elements.shift()();
+                    if(this.elements.length > 0) {
+                        this.elements.shift()();
+                    }
 
                     return resolve(data);
                 }
@@ -101,6 +102,8 @@ export default class RpcQueue {
                     return reject(e);
                 }
             });
+
+            this.dequeue();
         });
     }
 
@@ -111,34 +114,40 @@ export default class RpcQueue {
         indexPosition = 1, keyType = "",
     ): Promise<any[]>  {
         return new Promise(async (resolve, reject) => {
-            const resp: {more: boolean, rows: any[]} = await this.api.get_table_rows({
-                code: this.api.contract, scope, table,
-                lower_bound: lowerBound, upper_bound: upperBound, limit: 100,
-                index_position: indexPosition, key_type: keyType,
+            this.elements.push(async () => {
+                const resp: { more: boolean, rows: any[] } = await this.api.get_table_rows({
+                    code: this.api.contract, scope, table,
+                    lower_bound: lowerBound, upper_bound: upperBound, limit: 100,
+                    index_position: indexPosition, key_type: keyType,
+                });
+
+                if(resp.more && indexPosition === 1) {
+                    this.elements.unshift(async () => {
+                        try {
+                            let next = await this.fetch_all_rows(
+                                scope, table, tableKey,
+                                resp.rows[resp.rows.length - 1][tableKey],
+                                upperBound, cache, useCache,
+                            );
+                            next.shift();
+
+                            next = next.map((element) => {
+                                return cache(element[tableKey], element);
+                            });
+
+                            resolve(resp.rows.concat(next));
+                        } catch (e) {
+                            reject(e);
+                        }
+                    });
+
+                    this.dequeue();
+                } else {
+                    resolve(resp.rows);
+                }
             });
 
-            if(resp.more && indexPosition === 1) {
-                this.elements.unshift(async () => {
-                    try {
-                        let next = await this.fetch_all_rows(
-                            scope, table, tableKey,
-                            resp.rows[resp.rows.length - 1][tableKey],
-                            upperBound, cache, useCache,
-                        );
-                        next.shift();
-
-                        next = next.map((element) => {
-                            return cache(element[tableKey], element);
-                        });
-
-                        resolve(resp.rows.concat(next));
-                    } catch (e) {
-                        reject(e);
-                    }
-                });
-            } else {
-                resolve(resp.rows);
-            }
+            this.dequeue();
         });
     }
 }

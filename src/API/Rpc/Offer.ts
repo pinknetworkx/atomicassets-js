@@ -12,7 +12,7 @@ export default class RpcOffer {
     // tslint:disable-next-line:variable-name
     private readonly _recipientAssets: Promise<RpcAsset[]>;
 
-    constructor(private readonly api: RpcApi, id: number, data?: OfferRow, senderAssets?: RpcAsset[], receiverAssets?: RpcAsset[]) {
+    constructor(private readonly api: RpcApi, id: number, data?: OfferRow, senderAssets?: RpcAsset[], receiverAssets?: RpcAsset[], cache: boolean = true) {
         this.id = id;
 
         this._data = new Promise(async (resolve, reject) => {
@@ -20,7 +20,7 @@ export default class RpcOffer {
                 resolve(data);
             } else {
                 try {
-                    resolve(await this.api.queue.offer(id));
+                    resolve(await this.api.queue.offer(id, cache));
                 } catch (e) {
                     reject(e);
                 }
@@ -33,7 +33,7 @@ export default class RpcOffer {
             } else {
                 try {
                     const row: OfferRow = await this._data;
-                    const inventory: AssetRow[] = await this.api.queue.account_assets(await row.offer_sender);
+                    const inventory: AssetRow[] = await this.api.queue.account_assets(await row.offer_sender, cache);
 
                     let offerAssets = inventory.filter((element) => {
                         return row.sender_asset_ids.indexOf(element.id) >= 0;
@@ -58,7 +58,7 @@ export default class RpcOffer {
             } else {
                 try {
                     const row: OfferRow = await this._data;
-                    const inventory: AssetRow[] = await this.api.queue.account_assets(await row.offer_recipient);
+                    const inventory: AssetRow[] = await this.api.queue.account_assets(await row.offer_recipient, cache);
 
                     let offerAssets = inventory.filter((element) => {
                         return row.recipient_asset_ids.indexOf(element.id) >= 0;

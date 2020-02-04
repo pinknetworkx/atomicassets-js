@@ -23,7 +23,12 @@ import {RpcApi} from "atomicassets"
 const fetch = require("node-fetch");
 
 // init RPC Api
-const api = new RpcApi("https://wax.pink.gg", "atomicassets", {fetch});
+// node: standard rpc node which will be used to fetch data (no v1 or v2 history needed)
+// contract: account name where the contract is deployed
+// options:
+// - fetch: either node-fetch module or the browser equivalent
+// - rateLimit: defines how much requests per second can be made to not exceed the rate limit of the node
+const api = new RpcApi("https://wax.pink.gg", "atomicassets", {fetch, rateLimit: 4});
 
 /* YOUR CODE HERE */
 
@@ -58,6 +63,8 @@ const schema = ObjectSchema([
     {"name": "arr1", "type": "int32[]"}, // you can add [] to define a type array
 ]);
 
+// the object which will be serialized does not need to have all attributes
+// and only the ones who are set, are transferred
 const rawObject = {
     "attr1": -5843
 };
@@ -83,17 +90,19 @@ It is recommended to use the Explorer API for production or application which ne
 
 #### Methods
 
-* `async get_asset(owner: string, id: string): Promise<RpcAsset>`
+Caching can be disabled by explicitly setting cache to false
+
+* `async get_asset(owner: string, id: string, cache: boolean = true): Promise<RpcAsset>`
   * gets data about a specific asset owned by owner
-* `async get_preset(id: number): Promise<RpcPreset>`
+* `async get_preset(id: number, cache: boolean = true): Promise<RpcPreset>`
   * gets a specific preset by id
-* `async get_scheme(name: string): Promise<RpcScheme>`
+* `async get_scheme(name: string, cache: boolean = true): Promise<RpcScheme>`
   * get a scheme by its name
-* `async get_offer(id: number): Promise<RpcOffer>`
+* `async get_offer(id: number, cache: boolean = true): Promise<RpcOffer>`
   * gets an offer by its id
-* `async get_account_offers(account: string): Promise<RpcOffer[]>`
+* `async get_account_offers(account: string, cache: boolean = true): Promise<RpcOffer[]>`
   * get all offers which are sent or received by an account
-* `async get_account_assets(account: string): Promise<RpcAsset[]>`
+* `async get_account_assets(account: string, cache: boolean = true): Promise<RpcAsset[]>`
   * gets the inventory of a specific account
   
 #### Classes

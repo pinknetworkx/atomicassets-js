@@ -47,17 +47,17 @@ export default class RpcCache {
         return this.access<OfferRow>(offerID, this.offers, data);
     }
 
-    private access<T>(identifier: string | number, cache: {[id: string]: {expiration: number, data: T}}, data?: T): T | null {
+    private access<T>(identifier: string | number, cache: {[id: string]: {expiration: number, data: T}}, data?: T): T | undefined {
         if(data) {
             cache[String(identifier)] = {expiration: Date.now() + 15 * 60 * 1000, data};
 
             return data;
         }
 
-        if(typeof this.assets[String(identifier)] === "undefined" || this.assets[String(identifier)].expiration >= Date.now()) {
-            return null;
+        if(typeof cache[String(identifier)] === "undefined" || cache[String(identifier)].expiration < Date.now()) {
+            return undefined;
         }
 
-        return this.assets[String(identifier)].data;
+        return cache[String(identifier)].data;
     }
 }

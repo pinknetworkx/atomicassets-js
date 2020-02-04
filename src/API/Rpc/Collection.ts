@@ -8,7 +8,7 @@ export default class RpcCollection {
     // tslint:disable-next-line:variable-name
     private readonly _data: Promise<CollectionRow>;
 
-    public constructor(private readonly api: RpcApi, name: string, data?: CollectionRow) {
+    public constructor(private readonly api: RpcApi, name: string, data?: CollectionRow, cache: boolean = true) {
         this.name = name;
 
         this._data = new Promise(async (resolve, reject) => {
@@ -16,7 +16,7 @@ export default class RpcCollection {
                 resolve(data);
             } else {
                 try {
-                    resolve(await api.queue.collection(name));
+                    resolve(await api.queue.collection(name, cache));
                 } catch (e) {
                     reject(e);
                 }
