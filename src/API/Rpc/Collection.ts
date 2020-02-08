@@ -1,3 +1,4 @@
+import {ObjectSchema} from "../../Schema";
 import {deserialize} from "../../Serialization";
 import {CollectionRow} from "./Cache";
 import RpcApi from "./index";
@@ -37,7 +38,7 @@ export default class RpcCollection {
     }
 
     public async data(): Promise<any> {
-        return deserialize((await this._data).serialized_data, (await this.api.config()).collection_format);
+        return deserialize((await this._data).serialized_data, ObjectSchema((await this.api.config()).collection_format));
     }
 
     public async toObject(): Promise<object> {

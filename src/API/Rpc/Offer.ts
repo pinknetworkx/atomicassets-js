@@ -3,7 +3,7 @@ import {AssetRow, OfferRow} from "./Cache";
 import RpcApi from "./index";
 
 export default class RpcOffer {
-    public readonly id: number;
+    public readonly id: string;
 
     // tslint:disable-next-line:variable-name
     private readonly _data: Promise<OfferRow>;
@@ -12,7 +12,7 @@ export default class RpcOffer {
     // tslint:disable-next-line:variable-name
     private readonly _recipientAssets: Promise<RpcAsset[]>;
 
-    constructor(private readonly api: RpcApi, id: number, data?: OfferRow, senderAssets?: RpcAsset[], receiverAssets?: RpcAsset[], cache: boolean = true) {
+    constructor(private readonly api: RpcApi, id: string, data?: OfferRow, senderAssets?: RpcAsset[], receiverAssets?: RpcAsset[], cache: boolean = true) {
         this.id = id;
 
         this._data = new Promise(async (resolve, reject) => {
@@ -33,9 +33,9 @@ export default class RpcOffer {
             } else {
                 try {
                     const row: OfferRow = await this._data;
-                    const inventory: AssetRow[] = await this.api.queue.account_assets(await row.offer_sender, cache);
+                    const inventory: AssetRow[] = await this.api.queue.account_assets(row.offer_sender, cache);
 
-                    let offerAssets = inventory.filter((element) => {
+                    const offerAssets = inventory.filter((element) => {
                         return row.sender_asset_ids.indexOf(element.id) >= 0;
                     });
 
@@ -43,9 +43,7 @@ export default class RpcOffer {
                         return reject(new Error("user does not own all items anymore"));
                     }
 
-                    offerAssets = offerAssets.map((asset) => new RpcAsset(this.api, asset.owner, asset.id, asset));
-
-                    return resolve(offerAssets);
+                    return resolve(offerAssets.map((asset) => new RpcAsset(this.api, row.offer_sender, asset.id, asset)));
                 } catch (e) {
                     return reject(e);
                 }
@@ -58,9 +56,9 @@ export default class RpcOffer {
             } else {
                 try {
                     const row: OfferRow = await this._data;
-                    const inventory: AssetRow[] = await this.api.queue.account_assets(await row.offer_recipient, cache);
 
-                    let offerAssets = inventory.filter((element) => {
+                    const inventory: AssetRow[] = await this.api.queue.account_assets(row.offer_recipient, cache);
+                    const offerAssets = inventory.filter((element) => {
                         return row.recipient_asset_ids.indexOf(element.id) >= 0;
                     });
 
@@ -68,9 +66,7 @@ export default class RpcOffer {
                         return reject(new Error("user does not own all items anymore"));
                     }
 
-                    offerAssets = offerAssets.map((asset) => new RpcAsset(this.api, asset.owner, asset.id, asset));
-
-                    return resolve(offerAssets);
+                    return resolve(offerAssets.map((asset) => new RpcAsset(this.api, row.offer_recipient, asset.id, asset)));
                 } catch (e) {
                     return reject(e);
                 }

@@ -31,9 +31,6 @@ const fetch = require("node-fetch");
 const api = new RpcApi("https://wax.pink.gg", "atomicassets", {fetch, rateLimit: 4});
 
 /* YOUR CODE HERE */
-
-// stop fetch queue
-api.queue.stop();
 ```
 
 ### Serialization
@@ -117,6 +114,7 @@ The method `toObject` returns a JavaScript object representation of the class.
 * `async backedTokens(): Promise<string>`
 * `async immutableData(): Promise<object | string>`
 * `async mutableData(): Promise<object | string>`
+* `async data(): Promise<object | string>`
 * `async toObject(): Promise<object>`
 
 ##### RpcPreset

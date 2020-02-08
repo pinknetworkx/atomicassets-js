@@ -6,7 +6,7 @@ import RpcApi from "./index";
 import RpcScheme from "./Scheme";
 
 export default class RpcPreset {
-    public readonly id: number;
+    public readonly id: string;
 
     // tslint:disable-next-line:variable-name
     private readonly _data: Promise<PresetRow>;
@@ -16,7 +16,7 @@ export default class RpcPreset {
     // tslint:disable-next-line:variable-name
     private readonly _scheme: Promise<RpcScheme>;
 
-    public constructor(private readonly api: RpcApi, id: number, data?: PresetRow, scheme?: RpcScheme, collection?: RpcCollection, cache: boolean = true) {
+    public constructor(private readonly api: RpcApi, id: string, data?: PresetRow, scheme?: RpcScheme, collection?: RpcCollection, cache: boolean = true) {
         this.id = id;
 
         this._data = new Promise(async (resolve, reject) => {
@@ -74,7 +74,7 @@ export default class RpcPreset {
         try {
             return deserialize((await this._data).immutable_serialized_data, await scheme.format());
         } catch (e) {
-            return hex_encode((await this._data).idata);
+            return hex_encode((await this._data).immutable_serialized_data);
         }
     }
 
@@ -84,7 +84,7 @@ export default class RpcPreset {
         try {
             return deserialize((await this._data).mutable_serialized_data, await scheme.format());
         } catch (e) {
-            return hex_encode((await this._data).mdata);
+            return hex_encode((await this._data).mutable_serialized_data);
         }
     }
 

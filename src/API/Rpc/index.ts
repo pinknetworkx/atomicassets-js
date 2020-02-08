@@ -45,33 +45,46 @@ export default class RpcApi {
                     return reject("invalid config");
                 }
 
-                const data = resp.rows[0];
-                data.collection_format = ObjectSchema(data.collection_format);
-
-                return resolve(data);
+                return resolve(resp.rows[0]);
             } catch (e) {
                 reject(e);
             }
         }));
     }
 
-    public async config() {
+    public async config(): Promise<ConfigRow> {
         return await this._config;
     }
 
     public async get_asset(owner: string, id: string, cache: boolean = true): Promise<RpcAsset> {
+        if(!cache) {
+            this.cache.asset(id, null);
+        }
+
         return new RpcAsset(this, owner, id, undefined, undefined, cache);
     }
 
-    public async get_preset(id: number, cache: boolean = true): Promise<RpcPreset> {
+    public async get_preset(id: string, cache: boolean = true): Promise<RpcPreset> {
+        if(!cache) {
+            this.cache.preset(id, null);
+        }
+
         return new RpcPreset(this, id, undefined, undefined, undefined, cache);
     }
 
     public async get_scheme(name: string, cache: boolean = true): Promise<RpcScheme> {
+        if(!cache) {
+            this.cache.scheme(name, null);
+        }
+
         return new RpcScheme(this, name, undefined, cache);
     }
 
-    public async get_offer(id: number, cache: boolean = true): Promise<RpcOffer> {
+    public async get_offer(id: string, cache: boolean = true): Promise<RpcOffer> {
+        if(!cache) {
+            this.cache.offer(id, null);
+        }
+
         return new RpcOffer(this, id, undefined, undefined, undefined, cache);
     }
 

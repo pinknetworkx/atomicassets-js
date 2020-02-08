@@ -47,7 +47,7 @@ export default class RpcAsset {
     }
 
     public async backedTokens(): Promise<string> {
-        return (await this._data).backed_core_tokens;
+        return (await this._data).backed_core_amount;
     }
 
     public async immutableData(): Promise<object | string> {
@@ -64,7 +64,7 @@ export default class RpcAsset {
         try {
             return Object.assign({}, pdata, deserialize(data.immutable_serialized_data, await scheme.format()));
         } catch (e) {
-            return hex_encode(data.idata);
+            return hex_encode(data.immutable_serialized_data);
         }
     }
 
@@ -82,8 +82,24 @@ export default class RpcAsset {
         try {
             return Object.assign({}, pdata, deserialize(data.mutable_serialized_data, await scheme.format()));
         } catch (e) {
-            return hex_encode(data.mdata);
+            return hex_encode(data.mutable_serialized_data);
         }
+    }
+
+    public async data(): Promise<object> {
+        const mutableData = await this.mutableData();
+        const immutableData = await this.immutableData();
+
+        let data = {};
+        if(typeof mutableData === "object") {
+            data = Object.assign(mutableData);
+        }
+
+        if(typeof immutableData === "object") {
+            data = Object.assign(immutableData);
+        }
+
+        return data;
     }
 
     public async toObject(): Promise<object> {

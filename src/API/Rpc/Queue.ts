@@ -17,7 +17,7 @@ export default class RpcQueue {
         return this.fetch_all_rows(account, "assets", "id", "", "", this.api.cache.asset.bind(this.api.cache), useCache);
     }
 
-    public async preset(id: number, useCache: boolean = true): Promise<PresetRow> {
+    public async preset(id: string, useCache: boolean = true): Promise<PresetRow> {
         return this.fetch_single_row(this.api.contract, "presets", id, this.api.cache.preset.bind(this.api.cache), useCache);
     }
 
@@ -29,7 +29,7 @@ export default class RpcQueue {
         return this.fetch_single_row(this.api.contract, "collections", name, this.api.cache.collection.bind(this.api.cache), useCache);
     }
 
-    public async offer(id: number, useCache: boolean = true): Promise<OfferRow> {
+    public async offer(id: string, useCache: boolean = true): Promise<OfferRow> {
         return this.fetch_single_row(this.api.contract, "offers", id, this.api.cache.offer.bind(this.api.cache), useCache);
     }
 
@@ -67,8 +67,8 @@ export default class RpcQueue {
         scope: string, table: string, match: any,
         cache: any = null, useCache = true,
         indexPosition = 1, keyType = "",
-    ) {
-        let data = useCache ? cache(match) : null;
+    ): Promise<any> {
+        let data = cache(match, useCache ? undefined : false);
 
         return new Promise((resolve, reject) => {
             if(data) {
@@ -76,7 +76,7 @@ export default class RpcQueue {
             }
 
             this.elements.push(async () => {
-                data = useCache ? cache(match) : null;
+                data = cache(match, useCache ? undefined : false);
 
                 if(data) {
                     if(this.elements.length > 0) {
