@@ -68,24 +68,16 @@ export default class RpcPreset {
         return await this._scheme;
     }
 
-    public async immutableData(): Promise<object | string> {
+    public async immutableData(): Promise<object> {
         const scheme = await this._scheme;
 
-        try {
-            return deserialize((await this._data).immutable_serialized_data, await scheme.format());
-        } catch (e) {
-            return hex_encode((await this._data).immutable_serialized_data);
-        }
+        return deserialize((await this._data).immutable_serialized_data, await scheme.format());
     }
 
-    public async mutableData(): Promise<object | string> {
+    public async mutableData(): Promise<object> {
         const scheme = await this._scheme;
 
-        try {
-            return deserialize((await this._data).mutable_serialized_data, await scheme.format());
-        } catch (e) {
-            return hex_encode((await this._data).mutable_serialized_data);
-        }
+        return deserialize((await this._data).mutable_serialized_data, await scheme.format());
     }
 
     public async isTransferable(): Promise<boolean> {

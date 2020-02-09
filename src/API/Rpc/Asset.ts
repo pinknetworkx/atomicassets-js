@@ -1,5 +1,5 @@
+import bigInt from "big-integer";
 import {deserialize} from "../../Serialization";
-import {hex_encode} from "../../Serialization/Binary";
 import {AssetRow} from "./Cache";
 import RpcApi from "./index";
 import RpcPreset from "./Preset";
@@ -47,7 +47,7 @@ export default class RpcAsset {
     }
 
     public async backedTokens(): Promise<string> {
-        return (await this._data).backed_core_amount;
+        return bigInt((await this._data).backed_core_amount).divide(this.api.precision).toString();
     }
 
     public async immutableData(): Promise<object | string> {
@@ -55,17 +55,9 @@ export default class RpcAsset {
         const scheme = await preset.scheme();
 
         const data = await this._data;
+        const pdata = await preset.immutableData();
 
-        let pdata = await preset.immutableData();
-        if(typeof pdata === "string") {
-            pdata = {};
-        }
-
-        try {
-            return Object.assign({}, pdata, deserialize(data.immutable_serialized_data, await scheme.format()));
-        } catch (e) {
-            return hex_encode(data.immutable_serialized_data);
-        }
+        return Object.assign({}, pdata, deserialize(data.immutable_serialized_data, await scheme.format()));
     }
 
     public async mutableData(): Promise<object | string> {
@@ -73,33 +65,16 @@ export default class RpcAsset {
         const scheme = await preset.scheme();
 
         const data = await this._data;
+        const pdata = await preset.mutableData();
 
-        let pdata = await preset.mutableData();
-        if(typeof pdata === "string") {
-            pdata = {};
-        }
-
-        try {
-            return Object.assign({}, pdata, deserialize(data.mutable_serialized_data, await scheme.format()));
-        } catch (e) {
-            return hex_encode(data.mutable_serialized_data);
-        }
+        return Object.assign({}, pdata, deserialize(data.mutable_serialized_data, await scheme.format()));
     }
 
     public async data(): Promise<object> {
         const mutableData = await this.mutableData();
         const immutableData = await this.immutableData();
 
-        let data = {};
-        if(typeof mutableData === "object") {
-            data = Object.assign(mutableData);
-        }
-
-        if(typeof immutableData === "object") {
-            data = Object.assign(immutableData);
-        }
-
-        return data;
+        return Object.assign({}, mutableData, immutableData);
     }
 
     public async toObject(): Promise<object> {

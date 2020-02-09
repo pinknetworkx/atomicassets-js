@@ -5,17 +5,17 @@ import RpcApi from "../src/API/Rpc";
 const fetch = require("node-fetch");
 
 describe("RPC API", () => {
-    const api = new RpcApi("https://testnet.wax.pink.gg", "atomicassets", {
+    const api = new RpcApi("https://testnet.wax.pink.gg", "atomicassets", "WAX", 8, {
         fetch, rateLimit: 4,
     });
 
     const exampleAsset = {
-        owner: "karlkarlkarl",
-        id: "1099511627782",
+        owner: "leonleonleon",
+        id: "1099511627780",
     };
 
-    it("fetch asset 1099511627782", async () => {
-        const asset = await api.get_asset(exampleAsset.owner, exampleAsset.id);
+    it("fetch asset " + exampleAsset.id, async () => {
+        const asset = await api.getAsset(exampleAsset.owner, exampleAsset.id);
 
         const result = await asset.toObject();
 
@@ -23,7 +23,7 @@ describe("RPC API", () => {
     }).timeout(10000);
 
     it("test caching", async () => {
-        const asset = await api.get_asset(exampleAsset.owner, exampleAsset.id);
+        const asset = await api.getAsset(exampleAsset.owner, exampleAsset.id);
 
         const result = await asset.toObject();
 
@@ -31,7 +31,7 @@ describe("RPC API", () => {
     }).timeout(10000);
 
     it("fetch offers ", async () => {
-        const offers = await api.get_account_offers(exampleAsset.owner);
+        const offers = await api.getAccountOffers(exampleAsset.owner);
 
         const result = await Promise.all(offers.map(async (offer) => await offer.toObject()));
 

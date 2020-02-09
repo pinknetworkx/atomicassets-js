@@ -87,7 +87,7 @@ export default class RpcQueue {
                 }
 
                 try {
-                    const resp = await this.api.get_table_rows({
+                    const resp = await this.api.getTableRows({
                         code: this.api.contract, table, scope,
                         limit: 1, lower_bound: match, upper_bound: match,
                         index_position: indexPosition, key_type: keyType,
@@ -115,7 +115,7 @@ export default class RpcQueue {
     ): Promise<any[]>  {
         return new Promise(async (resolve, reject) => {
             this.elements.push(async () => {
-                const resp: { more: boolean, rows: any[] } = await this.api.get_table_rows({
+                const resp: { more: boolean, rows: any[] } = await this.api.getTableRows({
                     code: this.api.contract, scope, table,
                     lower_bound: lowerBound, upper_bound: upperBound, limit: 100,
                     index_position: indexPosition, key_type: keyType,

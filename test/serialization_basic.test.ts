@@ -2,7 +2,7 @@ import { expect } from "chai";
 
 import {ObjectSchema} from "../src/Schema";
 import {deserialize, serialize} from "../src/Serialization";
-import {base58_decode, concat_byte_arrays, hex_decode, packInteger, signInteger, zigzag_encode} from "../src/Serialization/Binary";
+import {base58_decode, concat_byte_arrays, hex_decode, varint_encode, zigzag_encode} from "../src/Serialization/Binary";
 
 describe("Basic Serialization", () => {
     const schema = ObjectSchema([
@@ -40,51 +40,51 @@ describe("Basic Serialization", () => {
     };
 
     const serializedName = concat_byte_arrays([
-        packInteger(4),
-        packInteger(rawObject.name.length),
+        varint_encode(4),
+        varint_encode(rawObject.name.length),
         new Uint8Array(encoder.encode(rawObject.name)),
     ]);
 
     const serializedImage = concat_byte_arrays([
-        packInteger(5),
-        packInteger(base58_decode(rawObject.img).length),
+        varint_encode(5),
+        varint_encode(base58_decode(rawObject.img).length),
         base58_decode(rawObject.img),
     ]);
 
     const serializedRarity = concat_byte_arrays([
-        packInteger(6),
-        packInteger(zigzag_encode(534, 2), 2),
-        packInteger(7),
-        packInteger(534, 2),
-        packInteger(8),
-        packInteger(zigzag_encode(534, 8), 8),
-        packInteger(9),
+        varint_encode(6),
+        varint_encode(zigzag_encode(534)),
+        varint_encode(7),
+        varint_encode(534),
+        varint_encode(8),
+        varint_encode(zigzag_encode(534)),
+        varint_encode(9),
         new Uint8Array([0x2, 0x16].reverse()),
     ]);
 
     const serializedDepth = concat_byte_arrays([
-        packInteger(10),
-        packInteger(zigzag_encode(-1000000, 4), 4),
-        packInteger(11),
-        packInteger(1000000, 4),
-        packInteger(12),
-        packInteger(zigzag_encode(-1000000, 8), 8),
-        packInteger(13),
+        varint_encode(10),
+        varint_encode(zigzag_encode(-1000000)),
+        varint_encode(11),
+        varint_encode(1000000),
+        varint_encode(12),
+        varint_encode(zigzag_encode(-1000000)),
+        varint_encode(13),
         new Uint8Array([0b11111111, 0b11110000, 0b10111101, 0b11000000].reverse()),
     ]);
 
     const serializedWear = concat_byte_arrays([
-        packInteger(14),
+        varint_encode(14),
         new Uint8Array([0x3f, 0x40, 0, 0].reverse()),
     ]);
 
     const serializedTradeable = concat_byte_arrays([
-        packInteger(15),
+        varint_encode(15),
         new Uint8Array([1]),
     ]);
 
     const serializedShare = concat_byte_arrays([
-        packInteger(16),
+        varint_encode(16),
         hex_decode("4090010000000000").reverse(),
     ]);
 

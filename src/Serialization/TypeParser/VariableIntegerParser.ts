@@ -1,4 +1,6 @@
-import {packInteger, signInteger, unpackInteger, unsignInteger, zigzag_decode, zigzag_encode} from "../Binary";
+import DeserializationError from "../../Errors/DeserializationError";
+import SerializationError from "../../Errors/SerializationError";
+import {varint_decode, varint_encode, zigzag_decode, zigzag_encode} from "../Binary";
 import SerializationState from "../State";
 import {ITypeParser} from "./index";
 
@@ -8,10 +10,14 @@ export default class VariableIntegerParser implements ITypeParser {
     constructor(public readonly size: number, private readonly unsigned: boolean) { }
 
     public deserialize(state: SerializationState): number | string {
-        let n = unpackInteger(state, this.size);
+        let n = varint_decode(state);
 
         if(!this.unsigned) {
-            n = zigzag_decode(n, this.size);
+            n = zigzag_decode(n);
+        }
+
+        if(n.greaterOrEquals(bigInt(2).pow(this.size * 8 - (this.unsigned ? 0 : 1)))) {
+            throw new DeserializationError("number '" + n.toString() + "' too large for given type");
         }
 
         if(this.size <= 6) {
@@ -24,10 +30,14 @@ export default class VariableIntegerParser implements ITypeParser {
     public serialize(data: any): Uint8Array {
         let n = bigInt(data);
 
-        if(!this.unsigned) {
-            n = zigzag_encode(n, this.size);
+        if(n.greaterOrEquals(bigInt(2).pow(this.size * 8 - (this.unsigned ? 0 : 1)))) {
+            throw new SerializationError("number '" + n.toString() + "' too large for given type");
         }
 
-        return packInteger(n, this.size);
+        if(!this.unsigned) {
+            n = zigzag_encode(n);
+        }
+
+        return varint_encode(n);
     }
 }

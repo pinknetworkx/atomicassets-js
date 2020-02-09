@@ -1,6 +1,6 @@
 import {ISchema} from "../Schema";
 import MappingSchema from "../Schema/MappingSchema";
-import {concat_byte_arrays, packInteger} from "./Binary";
+import {concat_byte_arrays, varint_encode} from "./Binary";
 import SerializationState from "./State";
 
 export function serialize(object: any, schema: ISchema): Uint8Array {
@@ -16,7 +16,7 @@ export function serialize(object: any, schema: ISchema): Uint8Array {
 
 export function deserialize(data: Uint8Array, schema: ISchema): any {
     if(schema instanceof MappingSchema) {
-        data = concat_byte_arrays([data, packInteger(0)]);
+        data = concat_byte_arrays([data, varint_encode(0)]);
     }
 
     const state = new SerializationState(data, 0);

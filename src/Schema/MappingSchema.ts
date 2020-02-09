@@ -1,5 +1,5 @@
 import SchemaError from "../Errors/SchemaError";
-import {concat_byte_arrays, packInteger, unpackInteger} from "../Serialization/Binary";
+import {concat_byte_arrays, varint_decode, varint_encode} from "../Serialization/Binary";
 import SerializationState from "../Serialization/State";
 import {ISchema, MappingAttribute} from "./index";
 
@@ -12,7 +12,7 @@ export default class MappingSchema implements ISchema {
         const object: any = {};
 
         while(state.position < state.data.length) {
-            const identifier = unpackInteger(state);
+            const identifier = varint_decode(state);
 
             if(identifier.equals(0)) {
                 break;
@@ -36,11 +36,11 @@ export default class MappingSchema implements ISchema {
                 continue;
             }
 
-            data.push(packInteger(i + this.reserved));
+            data.push(varint_encode(i + this.reserved));
             data.push(attribute.value.serialize(object[attribute.name]));
         }
 
-        data.push(packInteger(0));
+        data.push(varint_encode(0));
 
         return concat_byte_arrays(data);
     }

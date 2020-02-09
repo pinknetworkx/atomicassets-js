@@ -6,49 +6,49 @@ import {
     base58_encode, byte_vector_to_int,
     hex_decode,
     hex_encode, int_to_byte_vector,
-    packInteger,
-    signInteger,
-    unpackInteger, zigzag_decode, zigzag_encode,
+    integer_sign,
+    varint_decode,
+    varint_encode, zigzag_decode, zigzag_encode,
 } from "../src/Serialization/Binary";
 import {prepare} from "../src/Serialization/State";
 
 describe("Binary", () => {
     it("sign negative integer", () => {
-        expect(Number(signInteger(BigInt(-534), 2))).to.equal(65002);
+        expect(Number(integer_sign(BigInt(-534), 2))).to.equal(65002);
     });
 
     it("sign positive integer", () => {
-        expect(Number(signInteger(BigInt(534), 2))).to.equal(534);
+        expect(Number(integer_sign(BigInt(534), 2))).to.equal(534);
     });
 
     it("pack integer below 127", () => {
-        expect(packInteger(BigInt(5))).to.deep.equal(new Uint8Array([0b00000101]));
+        expect(varint_encode(BigInt(5))).to.deep.equal(new Uint8Array([0b00000101]));
     });
 
     it("unpack integer below 127", () => {
         const data = new Uint8Array([0b00000101]);
 
-        expect(unpackInteger(prepare(data)).toJSNumber()).to.equal(5);
+        expect(varint_decode(prepare(data)).toJSNumber()).to.equal(5);
     });
 
     it("pack 2 bytes", () => {
-        expect(packInteger(BigInt(230))).to.deep.equal(new Uint8Array([0b11100110, 0b00000001]));
+        expect(varint_encode(BigInt(230))).to.deep.equal(new Uint8Array([0b11100110, 0b00000001]));
     });
 
     it("unpack 2 bytes", () => {
         const data = new Uint8Array([0b11100110, 0b00000001]);
 
-        expect(unpackInteger(prepare(data)).toJSNumber()).to.equal(230);
+        expect(varint_decode(prepare(data)).toJSNumber()).to.equal(230);
     });
 
     it("pack max integer", () => {
-        expect(packInteger(BigInt(4294867286), 4)).to.deep.equal(new Uint8Array([0b11010110, 0b11110010, 0b11111001, 0b11111111, 0b00001111]));
+        expect(varint_encode(BigInt(4294867286))).to.deep.equal(new Uint8Array([0b11010110, 0b11110010, 0b11111001, 0b11111111, 0b00001111]));
     });
 
     it("unpack max integer", () => {
         const data = new Uint8Array([0b11010110, 0b11110010, 0b11111001, 0b11111111, 0b00001111]);
 
-        expect(unpackInteger(prepare(data), 4).toJSNumber()).to.equal(4294867286);
+        expect(varint_decode(prepare(data)).toJSNumber()).to.equal(4294867286);
     });
 
     it("base58 encode", () => {

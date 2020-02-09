@@ -1,11 +1,11 @@
 import DeserializationError from "../../Errors/DeserializationError";
-import {concat_byte_arrays, packInteger, unpackInteger} from "../Binary";
+import {concat_byte_arrays, varint_decode, varint_encode} from "../Binary";
 import SerializationState from "../State";
 import {ITypeParser} from "./index";
 
 export default class VariableParser implements ITypeParser {
     public deserialize(state: SerializationState): any {
-        const length = unpackInteger(state).toJSNumber();
+        const length = varint_decode(state).toJSNumber();
         state.position += length;
 
         const data = state.data.slice(state.position - length, state.position);
@@ -18,6 +18,6 @@ export default class VariableParser implements ITypeParser {
     }
 
     public serialize(data: any): Uint8Array {
-        return concat_byte_arrays([packInteger(data.length), data]);
+        return concat_byte_arrays([varint_encode(data.length), data]);
     }
 }

@@ -1,6 +1,8 @@
 # AtomicAssets JavaScript
 
-JS Library to read data from the atomicassets NFT standard
+JS Library to read data from the atomicassets NFT standard.
+
+Contract / General Documentation can be found on [https://github.com/pinknetworkx/atomicassets-contracts/wiki](https://github.com/pinknetworkx/atomicassets-contracts/wiki)
 
 ## Usage
 
@@ -14,6 +16,8 @@ $ npm install atomicassets
 
 ### Initialize
 
+Web library can be found in the `dist` folder
+
 ```javascript
 // standard import
 const {RpcApi} = require("atomicassets");
@@ -25,11 +29,21 @@ const fetch = require("node-fetch");
 // init RPC Api
 // node: standard rpc node which will be used to fetch data (no v1 or v2 history needed)
 // contract: account name where the contract is deployed
+// coreToken: Core token of the blockchain
+// precision: Precision of the core token
 // options:
 // - fetch: either node-fetch module or the browser equivalent
 // - rateLimit: defines how much requests per second can be made to not exceed the rate limit of the node
-const api = new RpcApi("https://wax.pink.gg", "atomicassets", {fetch, rateLimit: 4});
+const api = new RpcApi("https://wax.pink.gg", "atomicassets", "WAX", 8, {fetch, rateLimit: 4});
 
+// fetch preset data
+const preset = await api.getPreset("13456720837456");
+
+// create the action to mint an asset
+const action = api.action.mintasset(
+    [{actor: "pinknetworkx", permission: "active"}],
+    "pinknetworkx", preset.id, "pinknetworkx", {"attr1": 10}, {"attr2": 20}
+)
 /* YOUR CODE HERE */
 ```
 
@@ -38,6 +52,8 @@ const api = new RpcApi("https://wax.pink.gg", "atomicassets", {fetch, rateLimit:
 AtomicAssets uses serialization to store data on the blockchain more efficiently. 
 The API classes will handle this for you but if you need to manually parse the data,
 the library provides you a serialize and deserialize function
+
+More information can be found [here](https://github.com/pinknetworkx/atomicassets-contracts/wiki/Serialization)
 
 ```javascript
 import {serialize, deserialize, ObjectSchema} from "atomicassets"
@@ -80,49 +96,58 @@ There are two methods available to fetch data from the blockchain.
 * **RpcAPI**: uses only native nodeos calls
 * **ExplorerAPI**: uses an hosted API which proves simple and fast REST API endpoints
 
+### RpcActionGenerator
+
+Both APIs have a `action` attribute which contains a helper class to construct contract actions 
+which can be pushed on chain with eosjs. See an example on top of the page.
+
+Detailed information about each action can be found [here](https://github.com/pinknetworkx/atomicassets-contracts/wiki/Actions)
+
 ### RpcApi
 
 This api only uses native nodeos api calls to fetch data about NFTs. 
-It is recommended to use the Explorer API for production or application which need fast load times.
+It is recommended to use the Explorer API for production or applications which require fast load times.
 
 #### Methods
 
 Caching can be disabled by explicitly setting cache to false
 
-* `async get_asset(owner: string, id: string, cache: boolean = true): Promise<RpcAsset>`
+* `async getAsset(owner: string, id: string, cache: boolean = true): Promise<RpcAsset>`
   * gets data about a specific asset owned by owner
-* `async get_preset(id: number, cache: boolean = true): Promise<RpcPreset>`
+* `async getPreset(id: string, cache: boolean = true): Promise<RpcPreset>`
   * gets a specific preset by id
-* `async get_scheme(name: string, cache: boolean = true): Promise<RpcScheme>`
+* `async getScheme(name: string, cache: boolean = true): Promise<RpcScheme>`
   * get a scheme by its name
-* `async get_offer(id: number, cache: boolean = true): Promise<RpcOffer>`
+* `async getCollection(name: string, cache: boolean = true): Promise<RpcCollection>`
   * gets an offer by its id
-* `async get_account_offers(account: string, cache: boolean = true): Promise<RpcOffer[]>`
+* `async getOffer(id: string, cache: boolean = true): Promise<RpcOffer>`
+  * gets an offer by its id
+* `async getAccountOffers(account: string, cache: boolean = true): Promise<RpcOffer[]>`
   * get all offers which are sent or received by an account
-* `async get_account_assets(account: string, cache: boolean = true): Promise<RpcAsset[]>`
-  * gets the inventory of a specific account
+* `async getAccountAssets(account: string, cache: boolean = true): Promise<RpcAsset[]>`
+  * gets the complete inventory of a specific account (may take long for bigger inventories)
   
-#### Classes
+#### Types
 
 These classes represent table rows of the contract and consist of getter methods
 which return the deserialized data.
-The method `toObject` returns a JavaScript object representation of the class. 
+The method `toObject` returns a JavaScript object representation of the class.
 
 ##### RpcAsset
 
 * `async preset(): Promise<RpcPreset>`
 * `async backedTokens(): Promise<string>`
-* `async immutableData(): Promise<object | string>`
-* `async mutableData(): Promise<object | string>`
-* `async data(): Promise<object | string>`
+* `async immutableData(): Promise<object>`
+* `async mutableData(): Promise<object>`
+* `async data(): Promise<object>`
 * `async toObject(): Promise<object>`
 
 ##### RpcPreset
 
 * `async collection(): Promise<RpcCollection>`
 * `async scheme(): Promise<RpcScheme>`
-* `async immutableData(): Promise<object | string>`
-* `async mutableData(): Promise<object | string>`
+* `async immutableData(): Promise<object>`
+* `async mutableData(): Promise<object>`
 * `async isTransferable(): Promise<boolean>`
 * `async isBurnable(): Promise<boolean>`
 * `async maxSupply(): Promise<number>`

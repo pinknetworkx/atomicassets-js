@@ -1,4 +1,4 @@
-import {signInteger, unsignInteger} from "../Binary";
+import {integer_sign, integer_unsign} from "../Binary";
 import SerializationState from "../State";
 import FixedParser from "./FixedParser";
 
@@ -14,7 +14,7 @@ export default class FixedIntegerParser extends FixedParser {
             n = n.plus(byte);
         }
 
-        n = unsignInteger(n, this.size);
+        n = integer_unsign(n, this.size);
 
         if(this.size <= 6) {
             return n.toJSNumber();
@@ -27,7 +27,7 @@ export default class FixedIntegerParser extends FixedParser {
         let n: BigInteger = bigInt(data);
         const buffer: number[] = [];
 
-        n = signInteger(n, this.size);
+        n = integer_sign(n, this.size);
 
         for(let i = 0; i < this.size; i++) {
             buffer.push(n.and(0xFF).toJSNumber());

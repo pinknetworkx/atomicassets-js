@@ -5,7 +5,7 @@ import SerializationState from "./State";
 import bigInt, {BigInteger} from "big-integer";
 import BaseCoder from "./Coders/Base";
 
-export function packInteger(input: any, maxSize: number = 8): Uint8Array {
+export function varint_encode(input: any): Uint8Array {
     const bytes: number[] = [];
     let n = bigInt(input);
 
@@ -13,47 +13,27 @@ export function packInteger(input: any, maxSize: number = 8): Uint8Array {
         throw new SerializationError("cant pack negative integer");
     }
 
-    if(maxSize > 8) {
-        throw new SerializationError("cant pack integer greater than 64bit");
-    }
+    for(let i = 0; true; i++) {
+        const byte = n.and(0x7F);
 
-    if(n.greaterOrEquals(bigInt(2).pow(maxSize * 8))) {
-        throw new SerializationError("integer too large");
-    }
+        n = n.shiftRight(7);
 
-    for(let i = 0; i < maxSize + 1; i++) {
-        let byte;
-
-        if(i === maxSize) {
-            byte = n.and(0xFF);
-            n = n.shiftRight(8);
-
+        if(n.equals(0)) {
             bytes.push(byte.toJSNumber());
-        } else {
-            byte = n.and(0x7F);
-            n = n.shiftRight(7);
 
-            if(n.equals(0)) {
-                bytes.push(byte.toJSNumber());
-
-                break;
-            }
-
-            bytes.push(byte.toJSNumber() + 128);
+            break;
         }
+
+        bytes.push(byte.toJSNumber() + 128);
     }
 
     return new Uint8Array(bytes);
 }
 
-export function unpackInteger(state: SerializationState, maxSize: number = 8): BigInteger {
+export function varint_decode(state: SerializationState): BigInteger {
     let result: BigInteger = bigInt(0);
 
-    if(maxSize > 8) {
-        throw new DeserializationError("cant unpack integer greater than 64bit");
-    }
-
-    for(let i = 0; i < maxSize + 1; i++) {
+    for(let i = 0; true; i++) {
         if(state.position >= state.data.length) {
             throw new DeserializationError("failed to unpack integer");
         }
@@ -61,7 +41,7 @@ export function unpackInteger(state: SerializationState, maxSize: number = 8): B
         const byte = bigInt(state.data[state.position]);
         state.position += 1;
 
-        if(byte.lesser(128) || i === maxSize) {
+        if(byte.lesser(128)) {
             result = result.plus(byte.shiftLeft(7 * i));
 
             break;
@@ -73,7 +53,7 @@ export function unpackInteger(state: SerializationState, maxSize: number = 8): B
     return result;
 }
 
-export function signInteger(input: any, size: number): BigInteger {
+export function integer_sign(input: any, size: number): BigInteger {
     const n = bigInt(input);
 
     if(n.greaterOrEquals(bigInt(2).pow(8 * size - 1))) {
@@ -87,7 +67,7 @@ export function signInteger(input: any, size: number): BigInteger {
     }
 }
 
-export function unsignInteger(input: any, size: number): BigInteger {
+export function integer_unsign(input: any, size: number): BigInteger {
     const n = bigInt(input);
 
     if(n.greater(bigInt(2).pow(8 * size))) {
@@ -101,26 +81,24 @@ export function unsignInteger(input: any, size: number): BigInteger {
     }
 }
 
-export function zigzag_encode(input: any, size = 8): BigInteger {
+export function zigzag_encode(input: any): BigInteger {
     const n = bigInt(input);
-    const result = n.shiftRight(size * 8 - 1).xor(n.shiftLeft(1));
 
-    if(result.greaterOrEquals(bigInt(2).pow(size * 8))) {
-        throw new Error("zigzag encode: number too big");
+    if (n.lesserOrEquals(0)) {
+        return n.plus(1).multiply(-2).plus(1);
+    } else {
+        return n.multiply(2);
     }
-
-    return result;
 }
 
-export function zigzag_decode(input: any, size = 8): BigInteger {
+export function zigzag_decode(input: any): BigInteger {
     const n = bigInt(input);
-    const result = n.shiftRight(1).xor(bigInt(-1).multiply(n.and(1)));
 
-    if(result.greaterOrEquals(bigInt(2).pow((size * 8) - 1))) {
-        throw new Error("zigzag encode: number too big");
+    if (n.mod(2).equals(0)) {
+        return n.divmod(2).quotient;
+    } else {
+        return n.divmod(2).quotient.multiply(-1).minus(1);
     }
-
-    return result;
 }
 
 const bs58 = new BaseCoder("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");

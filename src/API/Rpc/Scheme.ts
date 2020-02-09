@@ -32,6 +32,10 @@ export default class RpcScheme {
         return ObjectSchema((await this._data).format);
     }
 
+    public async rawFormat() {
+        return (await this._data).format;
+    }
+
     public async toObject() {
         return {
             author: await this.author(),

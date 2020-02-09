@@ -33,7 +33,6 @@ export default class RpcCache {
         if(data) {
             data.mutable_serialized_data = new Uint8Array(data.mutable_serialized_data);
             data.immutable_serialized_data = new Uint8Array(data.immutable_serialized_data);
-            data.backed_core_tokens = data.backed_core_tokens.split(" ")[0];
         }
 
         return this.access<AssetRow>(assetID, this.assets, data);
