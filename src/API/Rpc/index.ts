@@ -2,7 +2,7 @@ import ActionGenerator from "../../Actions/Generator";
 import RpcActionGenerator from "../../Actions/Rpc";
 import RpcError from "../../Errors/RpcError";
 import RpcAsset from "./Asset";
-import RpcCache, {ConfigRow} from "./Cache";
+import RpcCache, {IConfigRow} from "./Cache";
 import RpcCollection from "./Collection";
 import RpcOffer from "./Offer";
 import RpcPreset from "./Preset";
@@ -19,19 +19,15 @@ export default class RpcApi {
 
     public readonly endpoint: string;
     public readonly contract: string;
-    public readonly coreToken: string;
-    public readonly precision: number;
 
     private readonly fetchBuiltin: Fetch;
 
     // tslint:disable-next-line:variable-name
-    private readonly _config: Promise<ConfigRow>;
+    private readonly _config: Promise<IConfigRow>;
 
-    constructor(endpoint: string, contract: string, coreToken: string, precision: number, args: ApiArgs = {rateLimit: 4}) {
+    constructor(endpoint: string, contract: string, args: ApiArgs = {rateLimit: 4}) {
         this.endpoint = endpoint;
         this.contract = contract;
-        this.coreToken = coreToken;
-        this.precision = precision;
 
         if (args.fetch) {
             this.fetchBuiltin = args.fetch;
@@ -60,7 +56,7 @@ export default class RpcApi {
         }));
     }
 
-    public async config(): Promise<ConfigRow> {
+    public async config(): Promise<IConfigRow> {
         return await this._config;
     }
 
@@ -69,7 +65,7 @@ export default class RpcApi {
             this.cache.asset(id, null);
         }
 
-        return new RpcAsset(this, owner, id, undefined, undefined, cache);
+        return new RpcAsset(this, owner, id, undefined, undefined, undefined, undefined, cache);
     }
 
     public async getPreset(id: string, cache: boolean = true): Promise<RpcPreset> {
@@ -88,12 +84,12 @@ export default class RpcApi {
         return new RpcCollection(this, name, undefined,  cache);
     }
 
-    public async getScheme(name: string, cache: boolean = true): Promise<RpcScheme> {
+    public async getScheme(collection: string, name: string, cache: boolean = true): Promise<RpcScheme> {
         if(!cache) {
             this.cache.scheme(name, null);
         }
 
-        return new RpcScheme(this, name, undefined, cache);
+        return new RpcScheme(this, collection, name, undefined, cache);
     }
 
     public async getOffer(id: string, cache: boolean = true): Promise<RpcOffer> {
@@ -105,14 +101,14 @@ export default class RpcApi {
     }
 
     public async getAccountOffers(account: string, cache: boolean = true): Promise<RpcOffer[]> {
-        return (await this.queue.account_offers(account)).map((offer) => {
-            return new RpcOffer(this, offer.id, offer, undefined, undefined, cache);
+        return (await this.queue.account_offers(account)).map((offerRow) => {
+            return new RpcOffer(this, offerRow.offer_id, offerRow, undefined, undefined, cache);
         });
     }
 
     public async getAccountAssets(account: string, cache: boolean = true): Promise<RpcAsset[]> {
-        return (await this.queue.account_assets(account)).map((asset) => {
-            return new RpcAsset(this, account, asset.id, asset, undefined, cache);
+        return (await this.queue.account_assets(account)).map((assetRow) => {
+            return new RpcAsset(this, account, assetRow.asset_id, assetRow, undefined, undefined, undefined, cache);
         });
     }
 

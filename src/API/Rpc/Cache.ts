@@ -1,67 +1,59 @@
-import {byte_vector_to_int} from "../../Serialization/Binary";
-
 export type SchemeFormat = Array<{name: string, type: string}>;
 
-export type AssetRow = {
-    id: string, preset_id: string, ram_payer: string, backed_core_amount: string,
-    immutable_serialized_data: Uint8Array, mutable_serialized_data: Uint8Array,
-};
-export type PresetRow = {
-    scheme_name: string, collection_name: string,
-    transferable: boolean, burnable: boolean,
-    max_supply: number, issued_supply: number,
-    mutable_serialized_data: Uint8Array,
-    immutable_serialized_data: Uint8Array,
-};
-export type SchemeRow = {scheme_name: string, author: string, format: SchemeFormat};
-export type CollectionRow = {collection_name: string, author: string, authorized_accounts: string[], notify_accounts: string[], serialized_data: Uint8Array};
-export type OfferRow = {
-    id: string, offer_sender: string, offer_recipient: string,
-    sender_asset_ids: string[], recipient_asset_ids: string[],
-    memo: string,
-};
-export type ConfigRow = {offer_counter: string, collection_format: SchemeFormat};
+export interface ICollectionRow {
+    collection_name: string;
+    author: string;
+    allow_notify: boolean;
+    authorized_accounts: string[];
+    notify_accounts: string[];
+    market_fee: number;
+    serialized_data: Uint8Array;
+}
+
+export interface ISchemeRow {
+    scheme_name: string;
+    format: SchemeFormat;
+}
+
+export interface IPresetRow {
+    preset_id: number;
+    collection_name: string;
+    scheme_name: string;
+    transferable: boolean;
+    burnable: boolean;
+    max_supply: number;
+    issued_supply: number;
+    immutable_serialized_data: Uint8Array;
+}
+
+export interface IAssetRow {
+    asset_id: string;
+    collection_name: string;
+    scheme_name: string;
+    preset_id: string;
+    ram_payer: string;
+    backed_tokens: string[];
+    immutable_serialized_data: Uint8Array;
+    mutable_serialized_data: Uint8Array;
+}
+
+export interface IOfferRow {
+    offer_id: string;
+    offer_sender: string;
+    offer_recipient: string;
+    sender_asset_ids: string[];
+    recipient_asset_ids: string[];
+    memo: string;
+}
+
+export interface IConfigRow {
+    asset_counter: string;
+    offer_counter: string;
+    collection_format: SchemeFormat;
+}
 
 export default class RpcCache {
-    private readonly assets: {[id: string]: {data: AssetRow, expiration: number, updated: number}} = {};
-    private readonly presets: {[id: string]: {data: PresetRow, expiration: number, updated: number}} = {};
-    private readonly schemes: {[id: string]: {data: SchemeRow, expiration: number, updated: number}} = {};
-    private readonly collections: {[id: string]: {data: CollectionRow, expiration: number, updated: number}} = {};
-    private readonly offers: {[id: string]: {data: OfferRow, expiration: number, updated: number}} = {};
-
-    public asset(assetID: string, data?: any | null | false): AssetRow | undefined {
-        if(data) {
-            data.mutable_serialized_data = new Uint8Array(data.mutable_serialized_data);
-            data.immutable_serialized_data = new Uint8Array(data.immutable_serialized_data);
-        }
-
-        return this.access<AssetRow>(assetID, this.assets, data);
-    }
-
-    public preset(presetID: string, data?: any | null | false): PresetRow | undefined {
-        if(data) {
-            data.mutable_serialized_data = new Uint8Array(data.mutable_serialized_data);
-            data.immutable_serialized_data = new Uint8Array(data.immutable_serialized_data);
-            data.max_supply = byte_vector_to_int(new Uint8Array(data.max_supply));
-            data.issued_supply = byte_vector_to_int(new Uint8Array(data.issued_supply));
-        }
-
-        return this.access<PresetRow>(presetID, this.presets, data);
-    }
-
-    public scheme(scheme: string, data?: any | null | false): SchemeRow | undefined {
-        return this.access<SchemeRow>(scheme, this.schemes, data);
-    }
-
-    public collection(collection: string, data?: any | null | false): CollectionRow | undefined {
-        return this.access<CollectionRow>(collection, this.collections, data);
-    }
-
-    public offer(offerID: string, data?: any | null | false): OfferRow | undefined {
-        return this.access<OfferRow>(offerID, this.offers, data);
-    }
-
-    private access<T>(
+    private static access<T>(
         identifier: string | number,
         cache: {[id: string]: {expiration: number, updated: number, data: T}},
         data?: T | null | false,
@@ -88,5 +80,40 @@ export default class RpcCache {
         }
 
         return cache[String(identifier)].data;
+    }
+
+    private readonly assets: {[id: string]: {data: IAssetRow, expiration: number, updated: number}} = {};
+    private readonly presets: {[id: string]: {data: IPresetRow, expiration: number, updated: number}} = {};
+    private readonly schemes: {[id: string]: {data: ISchemeRow, expiration: number, updated: number}} = {};
+    private readonly collections: {[id: string]: {data: ICollectionRow, expiration: number, updated: number}} = {};
+    private readonly offers: {[id: string]: {data: IOfferRow, expiration: number, updated: number}} = {};
+
+    public asset(assetID: string, data?: any | null | false): IAssetRow | undefined {
+        if(data) {
+            data.mutable_serialized_data = new Uint8Array(data.mutable_serialized_data);
+            data.immutable_serialized_data = new Uint8Array(data.immutable_serialized_data);
+        }
+
+        return RpcCache.access<IAssetRow>(assetID, this.assets, data);
+    }
+
+    public preset(presetID: string, data?: any | null | false): IPresetRow | undefined {
+        if(data) {
+            data.immutable_serialized_data = new Uint8Array(data.immutable_serialized_data);
+        }
+
+        return RpcCache.access<IPresetRow>(presetID, this.presets, data);
+    }
+
+    public scheme(scheme: string, data?: any | null | false): ISchemeRow | undefined {
+        return RpcCache.access<ISchemeRow>(scheme, this.schemes, data);
+    }
+
+    public collection(collection: string, data?: any | null | false): ICollectionRow | undefined {
+        return RpcCache.access<ICollectionRow>(collection, this.collections, data);
+    }
+
+    public offer(offerID: string, data?: any | null | false): IOfferRow | undefined {
+        return RpcCache.access<IOfferRow>(offerID, this.offers, data);
     }
 }

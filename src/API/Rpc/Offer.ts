@@ -1,18 +1,18 @@
 import RpcAsset from "./Asset";
-import {AssetRow, OfferRow} from "./Cache";
+import {IAssetRow, IOfferRow} from "./Cache";
 import RpcApi from "./index";
 
 export default class RpcOffer {
     public readonly id: string;
 
     // tslint:disable-next-line:variable-name
-    private readonly _data: Promise<OfferRow>;
+    private readonly _data: Promise<IOfferRow>;
     // tslint:disable-next-line:variable-name
-    private readonly _senderAssets: Promise<RpcAsset[]>;
+    private readonly _senderAssets: Promise<Array<string | RpcAsset>>;
     // tslint:disable-next-line:variable-name
-    private readonly _recipientAssets: Promise<RpcAsset[]>;
+    private readonly _recipientAssets: Promise<Array<string | RpcAsset>>;
 
-    constructor(private readonly api: RpcApi, id: string, data?: OfferRow, senderAssets?: RpcAsset[], receiverAssets?: RpcAsset[], cache: boolean = true) {
+    constructor(private readonly api: RpcApi, id: string, data?: IOfferRow, senderAssets?: RpcAsset[], receiverAssets?: RpcAsset[], cache: boolean = true) {
         this.id = id;
 
         this._data = new Promise(async (resolve, reject) => {
@@ -32,18 +32,14 @@ export default class RpcOffer {
                 resolve(senderAssets);
             } else {
                 try {
-                    const row: OfferRow = await this._data;
-                    const inventory: AssetRow[] = await this.api.queue.account_assets(row.offer_sender, cache);
+                    const row: IOfferRow = await this._data;
+                    const inventory: IAssetRow[] = await this.api.queue.account_assets(row.offer_sender, cache);
 
-                    const offerAssets = inventory.filter((element) => {
-                        return row.sender_asset_ids.indexOf(element.id) >= 0;
-                    });
+                    return resolve(row.sender_asset_ids.map((assetID) => {
+                        const asset = inventory.find((assetRow) => assetRow.asset_id === assetID);
 
-                    if(offerAssets.length !== row.sender_asset_ids.length) {
-                        return reject(new Error("user does not own all items anymore"));
-                    }
-
-                    return resolve(offerAssets.map((asset) => new RpcAsset(this.api, row.offer_sender, asset.id, asset)));
+                        return asset ? new RpcAsset(this.api, row.offer_sender, assetID, asset, undefined, undefined, undefined, cache) : assetID;
+                    }));
                 } catch (e) {
                     return reject(e);
                 }
@@ -55,18 +51,14 @@ export default class RpcOffer {
                 resolve(receiverAssets);
             } else {
                 try {
-                    const row: OfferRow = await this._data;
+                    const row: IOfferRow = await this._data;
+                    const inventory: IAssetRow[] = await this.api.queue.account_assets(row.offer_recipient, cache);
 
-                    const inventory: AssetRow[] = await this.api.queue.account_assets(row.offer_recipient, cache);
-                    const offerAssets = inventory.filter((element) => {
-                        return row.recipient_asset_ids.indexOf(element.id) >= 0;
-                    });
+                    return resolve(row.recipient_asset_ids.map((assetID) => {
+                        const asset = inventory.find((assetRow) => assetRow.asset_id === assetID);
 
-                    if(offerAssets.length !== row.recipient_asset_ids.length) {
-                        return reject(new Error("user does not own all items anymore"));
-                    }
-
-                    return resolve(offerAssets.map((asset) => new RpcAsset(this.api, row.offer_recipient, asset.id, asset)));
+                        return asset ? new RpcAsset(this.api, row.offer_recipient, assetID, asset, undefined, undefined, undefined, cache) : assetID;
+                    }));
                 } catch (e) {
                     return reject(e);
                 }
@@ -82,11 +74,11 @@ export default class RpcOffer {
         return (await this._data).offer_recipient;
     }
 
-    public async senderAssets(): Promise<RpcAsset[]> {
+    public async senderAssets(): Promise<Array<RpcAsset | string>> {
         return await this._senderAssets;
     }
 
-    public async recipientAssets(): Promise<RpcAsset[]> {
+    public async recipientAssets(): Promise<Array<RpcAsset | string>> {
         return await this._recipientAssets;
     }
 
@@ -96,14 +88,14 @@ export default class RpcOffer {
 
     public async toObject(): Promise<object> {
         return {
-            id: this.id,
+            offer_id: this.id,
             sender: {
                 account: await this.sender(),
-                assets: await Promise.all((await this.senderAssets()).map(async (asset) => await asset.toObject())),
+                assets: await Promise.all((await this.senderAssets()).map(async (asset) => typeof asset === "string" ? asset : await asset.toObject())),
             },
             recipient: {
                 account: await this.recipient(),
-                assets: await Promise.all((await this.recipientAssets()).map(async (asset) => await asset.toObject())),
+                assets: await Promise.all((await this.recipientAssets()).map(async (asset) => typeof asset === "string" ? asset : await asset.toObject())),
             },
             memo: await this.memo(),
         };

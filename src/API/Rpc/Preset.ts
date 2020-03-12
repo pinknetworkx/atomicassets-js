@@ -1,6 +1,6 @@
 import {deserialize} from "../../Serialization";
 import {hex_encode} from "../../Serialization/Binary";
-import {PresetRow} from "./Cache";
+import {IPresetRow} from "./Cache";
 import RpcCollection from "./Collection";
 import RpcApi from "./index";
 import RpcScheme from "./Scheme";
@@ -9,14 +9,14 @@ export default class RpcPreset {
     public readonly id: string;
 
     // tslint:disable-next-line:variable-name
-    private readonly _data: Promise<PresetRow>;
+    private readonly _data: Promise<IPresetRow>;
 
     // tslint:disable-next-line:variable-name
     private readonly _collection: Promise<RpcCollection>;
     // tslint:disable-next-line:variable-name
     private readonly _scheme: Promise<RpcScheme>;
 
-    public constructor(private readonly api: RpcApi, id: string, data?: PresetRow, scheme?: RpcScheme, collection?: RpcCollection, cache: boolean = true) {
+    public constructor(private readonly api: RpcApi, id: string, data?: IPresetRow, scheme?: RpcScheme, collection?: RpcCollection, cache: boolean = true) {
         this.id = id;
 
         this._data = new Promise(async (resolve, reject) => {
@@ -38,7 +38,7 @@ export default class RpcPreset {
                 try {
                     const row = await this._data;
 
-                    resolve(new RpcScheme(this.api, row.scheme_name, undefined, cache));
+                    resolve(new RpcScheme(this.api, row.collection_name, row.scheme_name, undefined, cache));
                 } catch (e) {
                     reject(e);
                 }
@@ -74,12 +74,6 @@ export default class RpcPreset {
         return deserialize((await this._data).immutable_serialized_data, await scheme.format());
     }
 
-    public async mutableData(): Promise<object> {
-        const scheme = await this._scheme;
-
-        return deserialize((await this._data).mutable_serialized_data, await scheme.format());
-    }
-
     public async isTransferable(): Promise<boolean> {
         return !!(await this._data).transferable;
     }
@@ -98,11 +92,11 @@ export default class RpcPreset {
 
     public async toObject(): Promise<object> {
         return {
-            id: this.id,
+            preset_id: this.id,
+
             collection: await (await this.collection()).toObject(),
             scheme: await (await this.scheme()).toObject(),
             immutableData: await this.immutableData(),
-            mutableData: await this.mutableData(),
             transferable: await this.isTransferable(),
             burnable: await this.isBurnable(),
             maxSupply: await this.maxSupply(),

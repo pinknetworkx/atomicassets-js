@@ -29,22 +29,20 @@ const fetch = require("node-fetch");
 // init RPC Api
 // node: standard rpc node which will be used to fetch data (no v1 or v2 history needed)
 // contract: account name where the contract is deployed
-// coreToken: Core token of the blockchain
-// precision: Precision of the core token
 // options:
 // - fetch: either node-fetch module or the browser equivalent
 // - rateLimit: defines how much requests per second can be made to not exceed the rate limit of the node
-const api = new RpcApi("https://wax.pink.gg", "atomicassets", "WAX", 8, {fetch, rateLimit: 4});
+const api = new RpcApi("https://testnet.wax.pink.gg", "atomicassets", {fetch, rateLimit: 4});
 
 // fetch preset data
-const preset = await api.getPreset("13456720837456");
+const asset = await api.getAsset("leonleonleon", "1099511627786");
 
 // create the action to mint an asset
-const action = api.action.mintasset(
+const actions = api.action.mintasset(
     [{actor: "pinknetworkx", permission: "active"}],
-    "pinknetworkx", preset.id, "pinknetworkx", {"attr1": 10}, {"attr2": 20}
+    "collection", "scheme", -1, "pinknetworkx", {"name": "test"}, {"species": "test2"}
 )
-/* YOUR CODE HERE */
+
 ```
 
 ### Serialization
@@ -116,7 +114,7 @@ Caching can be disabled by explicitly setting cache to false
   * gets data about a specific asset owned by owner
 * `async getPreset(id: string, cache: boolean = true): Promise<RpcPreset>`
   * gets a specific preset by id
-* `async getScheme(name: string, cache: boolean = true): Promise<RpcScheme>`
+* `async getScheme(collection: string, name: string, cache: boolean = true): Promise<RpcScheme>`
   * get a scheme by its name
 * `async getCollection(name: string, cache: boolean = true): Promise<RpcCollection>`
   * gets an offer by its id
@@ -135,8 +133,10 @@ The method `toObject` returns a JavaScript object representation of the class.
 
 ##### RpcAsset
 
-* `async preset(): Promise<RpcPreset>`
-* `async backedTokens(): Promise<string>`
+* `async collection(): Promise<RpcCollection>`
+* `async scheme(): Promise<RpcScheme>`
+* `async preset(): Promise<RpcPreset | null>`
+* `async backedTokens(): Promise<string[]>`
 * `async immutableData(): Promise<object>`
 * `async mutableData(): Promise<object>`
 * `async data(): Promise<object>`
@@ -147,7 +147,6 @@ The method `toObject` returns a JavaScript object representation of the class.
 * `async collection(): Promise<RpcCollection>`
 * `async scheme(): Promise<RpcScheme>`
 * `async immutableData(): Promise<object>`
-* `async mutableData(): Promise<object>`
 * `async isTransferable(): Promise<boolean>`
 * `async isBurnable(): Promise<boolean>`
 * `async maxSupply(): Promise<number>`
@@ -155,22 +154,25 @@ The method `toObject` returns a JavaScript object representation of the class.
 * `async toObject(): Promise<object>`
 
 ##### RpcScheme
-* `async author(): Promise<string>`
 * `async format(): Promise<ISchema>`
 * `async toObject(): Promise<object>`
 
 ##### RpcCollection
 * `async author(): Promise<string>`
+* `async allowNotify(): Promise<boolean>`
 * `async authorizedAccounts(): Promise<string[]>`
 * `async notifyAccounts(): Promise<string[]>`
+* `async marketFee(): Promise<number>`
 * `async data(): Promise<any>`
 * `async toObject(): Promise<object>`
 
 ##### RpcOffer
 * `async sender(): Promise<string>`
 * `async recipient(): Promise<string>`
-* `async senderAssets(): Promise<RpcAsset[]>`
-* `async recipientAssets(): Promise<RpcAsset[]>`
+* `async senderAssets(): Promise<Array<RpcAsset | string>>`
+  * if element is a string, the asset is not owned by the sender anymore and the offer is invalid
+* `async recipientAssets(): Promise<Array<RpcAsset | string>>`
+  * if element is a string, the asset is not owned by the recipient anymore and the offer is invalid
 * `async memo(): Promise<string>`
 * `async toObject(): Promise<object>`
 

@@ -1,17 +1,18 @@
 import { expect } from "chai";
 import RpcApi from "../src/API/Rpc";
+import RpcAsset from "../src/API/Rpc/Asset";
 
 // tslint:disable-next-line:no-var-requires
 const fetch = require("node-fetch");
 
 describe("RPC API", () => {
-    const api = new RpcApi("https://testnet.wax.pink.gg", "atomicassets", "WAX", 8, {
+    const api = new RpcApi("https://testnet.wax.pink.gg", "atomicassets",  {
         fetch, rateLimit: 4,
     });
 
     const exampleAsset = {
         owner: "leonleonleon",
-        id: "1099511627780",
+        id: "1099511627786",
     };
 
     it("fetch asset " + exampleAsset.id, async () => {
@@ -34,6 +35,14 @@ describe("RPC API", () => {
         const offers = await api.getAccountOffers(exampleAsset.owner);
 
         const result = await Promise.all(offers.map(async (offer) => await offer.toObject()));
+
+        expect(result).to.deep.equal(result);
+    }).timeout(20000);
+
+    it("fetch assets ", async () => {
+        const assets = await api.getAccountAssets(exampleAsset.owner);
+
+        const result = await Promise.all(assets.map(async (asset) => await asset.toObject()));
 
         expect(result).to.deep.equal(result);
     }).timeout(20000);

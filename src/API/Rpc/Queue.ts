@@ -1,5 +1,5 @@
 import RpcError from "../../Errors/RpcError";
-import {AssetRow, CollectionRow, OfferRow, PresetRow, SchemeRow} from "./Cache";
+import {IAssetRow, ICollectionRow, IOfferRow, IPresetRow, ISchemeRow} from "./Cache";
 import RpcApi from "./index";
 import RpcOffer from "./Offer";
 
@@ -9,31 +9,31 @@ export default class RpcQueue {
 
     constructor(private readonly api: RpcApi, private readonly requestLimit = 4) { }
 
-    public async asset(owner: string, id: string, useCache: boolean = true): Promise<AssetRow> {
+    public async asset(owner: string, id: string, useCache: boolean = true): Promise<IAssetRow> {
         return this.fetch_single_row(owner, "assets", id, this.api.cache.asset.bind(this.api.cache), useCache);
     }
 
-    public async account_assets(account: string, useCache: boolean = true): Promise<AssetRow[]> {
+    public async account_assets(account: string, useCache: boolean = true): Promise<IAssetRow[]> {
         return this.fetch_all_rows(account, "assets", "id", "", "", this.api.cache.asset.bind(this.api.cache), useCache);
     }
 
-    public async preset(id: string, useCache: boolean = true): Promise<PresetRow> {
+    public async preset(id: string, useCache: boolean = true): Promise<IPresetRow> {
         return this.fetch_single_row(this.api.contract, "presets", id, this.api.cache.preset.bind(this.api.cache), useCache);
     }
 
-    public async scheme(name: string, useCache: boolean = true): Promise<SchemeRow> {
-        return this.fetch_single_row(this.api.contract, "schemes", name, this.api.cache.scheme.bind(this.api.cache), useCache);
+    public async scheme(collection: string, name: string, useCache: boolean = true): Promise<ISchemeRow> {
+        return this.fetch_single_row(collection, "schemes", name, this.api.cache.scheme.bind(this.api.cache), useCache);
     }
 
-    public async collection(name: string, useCache: boolean = true): Promise<CollectionRow> {
+    public async collection(name: string, useCache: boolean = true): Promise<ICollectionRow> {
         return this.fetch_single_row(this.api.contract, "collections", name, this.api.cache.collection.bind(this.api.cache), useCache);
     }
 
-    public async offer(id: string, useCache: boolean = true): Promise<OfferRow> {
+    public async offer(id: string, useCache: boolean = true): Promise<IOfferRow> {
         return this.fetch_single_row(this.api.contract, "offers", id, this.api.cache.offer.bind(this.api.cache), useCache);
     }
 
-    public async account_offers(account: string, useCache: boolean = true): Promise<OfferRow[]> {
+    public async account_offers(account: string, useCache: boolean = true): Promise<IOfferRow[]> {
         const rows: any[][] = await Promise.all([
             this.fetch_all_rows(
                 this.api.contract, "offers", "offer_sender", account, account,

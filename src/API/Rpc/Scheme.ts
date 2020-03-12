@@ -1,14 +1,14 @@
 import {ISchema, ObjectSchema} from "../../Schema";
-import {SchemeRow} from "./Cache";
+import {ISchemeRow} from "./Cache";
 import RpcApi from "./index";
 
 export default class RpcScheme {
     public readonly name: string;
 
     // tslint:disable-next-line:variable-name
-    private readonly _data: Promise<SchemeRow>;
+    private readonly _data: Promise<ISchemeRow>;
 
-    public constructor(private readonly api: RpcApi, name: string, data?: SchemeRow, cache: boolean = true) {
+    public constructor(private readonly api: RpcApi, collection: string, name: string, data?: ISchemeRow, cache: boolean = true) {
         this.name = name;
 
         this._data = new Promise(async (resolve, reject) => {
@@ -16,16 +16,12 @@ export default class RpcScheme {
                 resolve(data);
             } else {
                 try {
-                    resolve(await api.queue.scheme(name, cache));
+                    resolve(await api.queue.scheme(collection, name, cache));
                 } catch (e) {
                     reject(e);
                 }
             }
         });
-    }
-
-    public async author(): Promise<string> {
-        return (await this._data).author;
     }
 
     public async format(): Promise<ISchema> {
@@ -38,7 +34,7 @@ export default class RpcScheme {
 
     public async toObject() {
         return {
-            author: await this.author(),
+            scheme_name: this.name,
             format: (await this._data).format,
         };
     }
