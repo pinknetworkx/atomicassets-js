@@ -62,7 +62,7 @@ export default class RpcActionGenerator extends ActionGenerator {
         collection_name: string, scheme_name: string, preset_id: string,
         new_owner: string, immutable_data: object, mutable_data: object,
     ) {
-        const preset = await this.api.getPreset(preset_id);
+        const preset = await this.api.getPreset(collection_name, preset_id);
 
         const immutable_attribute_map = RpcActionGenerator.toAttributeMap(immutable_data, await (await preset.scheme()).rawFormat());
         const mutable_attribute_map = RpcActionGenerator.toAttributeMap(mutable_data, await (await preset.scheme()).rawFormat());

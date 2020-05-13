@@ -68,12 +68,12 @@ export default class RpcApi {
         return new RpcAsset(this, owner, id, undefined, undefined, undefined, undefined, cache);
     }
 
-    public async getPreset(id: string, cache: boolean = true): Promise<RpcPreset> {
+    public async getPreset(collection: string, id: string, cache: boolean = true): Promise<RpcPreset> {
         if(!cache) {
             this.cache.preset(id, null);
         }
 
-        return new RpcPreset(this, id, undefined, undefined, undefined, cache);
+        return new RpcPreset(this, collection, id, undefined, undefined, cache);
     }
 
     public async getCollection(name: string, cache: boolean = true) {
@@ -82,6 +82,18 @@ export default class RpcApi {
         }
 
         return new RpcCollection(this, name, undefined,  cache);
+    }
+
+    public async getCollectionPresets(collection: string, cache: boolean = true): Promise<RpcPreset[]> {
+        return (await this.queue.collection_presets(collection)).map((presetRow) => {
+            return new RpcPreset(this, collection, String(presetRow.preset_id), presetRow, undefined, cache);
+        });
+    }
+
+    public async getCollectionsSchemes(collection: string, cache: boolean = true): Promise<RpcScheme[]> {
+        return (await this.queue.collection_schemes(collection)).map((schemeRow) => {
+            return new RpcScheme(this, collection, schemeRow.scheme_name, undefined, cache);
+        });
     }
 
     public async getScheme(collection: string, name: string, cache: boolean = true): Promise<RpcScheme> {

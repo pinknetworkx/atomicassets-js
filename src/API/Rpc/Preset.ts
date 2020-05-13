@@ -1,7 +1,5 @@
 import {deserialize} from "../../Serialization";
-import {hex_encode} from "../../Serialization/Binary";
 import {IPresetRow} from "./Cache";
-import RpcCollection from "./Collection";
 import RpcApi from "./index";
 import RpcScheme from "./Scheme";
 
@@ -12,11 +10,9 @@ export default class RpcPreset {
     private readonly _data: Promise<IPresetRow>;
 
     // tslint:disable-next-line:variable-name
-    private readonly _collection: Promise<RpcCollection>;
-    // tslint:disable-next-line:variable-name
     private readonly _scheme: Promise<RpcScheme>;
 
-    public constructor(private readonly api: RpcApi, id: string, data?: IPresetRow, scheme?: RpcScheme, collection?: RpcCollection, cache: boolean = true) {
+    public constructor(private readonly api: RpcApi, collection: string, id: string, data?: IPresetRow, scheme?: RpcScheme, cache: boolean = true) {
         this.id = id;
 
         this._data = new Promise(async (resolve, reject) => {
@@ -24,7 +20,7 @@ export default class RpcPreset {
                 resolve(data);
             } else {
                 try {
-                    resolve(await api.queue.preset(id, cache));
+                    resolve(await api.queue.preset(collection, id, cache));
                 } catch (e) {
                     reject(e);
                 }
@@ -38,30 +34,12 @@ export default class RpcPreset {
                 try {
                     const row = await this._data;
 
-                    resolve(new RpcScheme(this.api, row.collection_name, row.scheme_name, undefined, cache));
+                    resolve(new RpcScheme(this.api, collection, row.scheme_name, undefined, cache));
                 } catch (e) {
                     reject(e);
                 }
             }
         });
-
-        this._collection = new Promise(async (resolve, reject) => {
-            if(collection) {
-                resolve(collection);
-            } else {
-                try {
-                    const row = await this._data;
-
-                    resolve(new RpcCollection(this.api, row.collection_name, undefined, cache));
-                } catch (e) {
-                    reject(e);
-                }
-            }
-        });
-    }
-
-    public async collection(): Promise<RpcCollection> {
-        return await this._collection;
     }
 
     public async scheme(): Promise<RpcScheme> {
@@ -93,8 +71,6 @@ export default class RpcPreset {
     public async toObject(): Promise<object> {
         return {
             preset_id: this.id,
-
-            collection: await (await this.collection()).toObject(),
             scheme: await (await this.scheme()).toObject(),
             immutableData: await this.immutableData(),
             transferable: await this.isTransferable(),

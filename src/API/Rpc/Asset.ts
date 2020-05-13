@@ -1,4 +1,3 @@
-import bigInt from "big-integer";
 import {deserialize} from "../../Serialization";
 import {IAssetRow} from "./Cache";
 import RpcCollection from "./Collection";
@@ -53,7 +52,7 @@ export default class RpcAsset {
                         return resolve(null);
                     }
 
-                    resolve(new RpcPreset(api, row.preset_id, undefined, undefined, undefined, cache));
+                    resolve(new RpcPreset(api, row.collection_name, row.preset_id, undefined, undefined, cache));
                 } catch (e) {
                     reject(e);
                 }

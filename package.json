@@ -9,7 +9,7 @@
     "email" : "pinknetworkx@gmail.com"
   },
   "license": "MIT",
-  "version": "0.4.3",
+  "version": "0.5.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "prepublish": "npm build-npm",
