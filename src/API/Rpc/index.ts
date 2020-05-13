@@ -32,8 +32,7 @@ export default class RpcApi {
         if (args.fetch) {
             this.fetchBuiltin = args.fetch;
         } else {
-            // @ts-ignore
-            this.fetchBuiltin = window.fetch;
+            this.fetchBuiltin = (global as any).fetch;
         }
 
         this.queue = new RpcQueue(this, args.rateLimit);
@@ -129,7 +128,9 @@ export default class RpcApi {
         let json;
 
         try {
-            response = await this.fetchBuiltin(this.endpoint + path, {
+            const f = this.fetchBuiltin;
+
+            response = await f(this.endpoint + path, {
                 body: JSON.stringify(body),
                 method: "POST",
             });
