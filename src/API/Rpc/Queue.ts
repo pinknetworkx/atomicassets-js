@@ -1,7 +1,6 @@
 import RpcError from "../../Errors/RpcError";
 import {IAssetRow, ICollectionRow, IOfferRow, IPresetRow, ISchemeRow} from "./Cache";
 import RpcApi from "./index";
-import RpcOffer from "./Offer";
 
 export default class RpcQueue {
     private elements: any[] = [];

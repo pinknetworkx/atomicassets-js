@@ -32,7 +32,8 @@ export default class RpcApi {
         if (args.fetch) {
             this.fetchBuiltin = args.fetch;
         } else {
-            this.fetchBuiltin = (global as any).fetch;
+            // @ts-ignore
+            this.fetchBuiltin = window.fetch;
         }
 
         this.queue = new RpcQueue(this, args.rateLimit);

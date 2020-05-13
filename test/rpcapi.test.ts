@@ -11,8 +11,8 @@ describe("RPC API", () => {
     });
 
     const exampleAsset = {
-        owner: "leonleonleon",
-        id: "1099511627786",
+        owner: "evilmikehere",
+        id: "1099511627799",
     };
 
     it("fetch asset " + exampleAsset.id, async () => {
@@ -20,7 +20,7 @@ describe("RPC API", () => {
 
         const result = await asset.toObject();
 
-        expect(result).to.deep.equal(result);
+        expect(result).to.deep.equal({});
     }).timeout(10000);
 
     it("test caching", async () => {
