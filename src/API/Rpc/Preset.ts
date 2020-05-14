@@ -1,5 +1,6 @@
 import {deserialize} from "../../Serialization";
 import {IPresetRow} from "./Cache";
+import RpcCollection from "./Collection";
 import RpcApi from "./index";
 import RpcScheme from "./Scheme";
 

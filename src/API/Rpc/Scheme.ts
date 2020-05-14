@@ -35,6 +35,10 @@ export default class RpcScheme {
         });
     }
 
+    public async collection(): Promise<RpcCollection> {
+        return await this._collection;
+    }
+
     public async format(): Promise<ISchema> {
         return ObjectSchema((await this._data).format);
     }

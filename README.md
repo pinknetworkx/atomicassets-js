@@ -118,6 +118,10 @@ Caching can be disabled by explicitly setting cache to false
   * get a scheme by its name
 * `async getCollection(name: string, cache: boolean = true): Promise<RpcCollection>`
   * gets an offer by its id
+* `async getCollectionPresets(collection: string, cache: boolean = true): Promise<RpcPresets[]>`
+  * gets all presets of a collection
+* `async getCollectionSchemes(collection: string, cache: boolean = true): Promise<RpcSchemes[]>`
+  * gets all schemes of a collection
 * `async getOffer(id: string, cache: boolean = true): Promise<RpcOffer>`
   * gets an offer by its id
 * `async getAccountOffers(account: string, cache: boolean = true): Promise<RpcOffer[]>`
@@ -154,6 +158,7 @@ The method `toObject` returns a JavaScript object representation of the class.
 * `async toObject(): Promise<object>`
 
 ##### RpcScheme
+* `async collection(): Promise<ISchema>`
 * `async format(): Promise<ISchema>`
 * `async toObject(): Promise<object>`
 
