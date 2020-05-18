@@ -39,8 +39,8 @@ export interface IAssetRow {
 
 export interface IOfferRow {
     offer_id: string;
-    offer_sender: string;
-    offer_recipient: string;
+    sender: string;
+    recipient: string;
     sender_asset_ids: string[];
     recipient_asset_ids: string[];
     memo: string;

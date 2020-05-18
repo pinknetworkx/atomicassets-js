@@ -30,7 +30,7 @@ export default class RpcCollection {
     }
 
     public async allowNotify(): Promise<boolean> {
-        return !!(await this._data).allow_notify;
+        return (await this._data).allow_notify;
     }
 
     public async authorizedAccounts(): Promise<string[]> {

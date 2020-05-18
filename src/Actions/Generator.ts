@@ -29,28 +29,18 @@ export default class ActionGenerator {
         return this._pack(authorization, "addnotifyacc", {collection_name, account_to_add});
     }
 
-    public async admincoledit(authorization: EosioAuthorizationObject[], collection_format_extension: Format[]) {
-        return this._pack(authorization, "admincoledit", {collection_format_extension});
+    public async announcedepo(authorization: EosioAuthorizationObject[], owner: string, symbol_to_announce: string) {
+        return this._pack(authorization, "announcedepo", {owner, symbol_to_announce});
     }
 
-    public async backsymbol(
-        authorization: EosioAuthorizationObject[], ram_payer: string, owner: string, asset_id: string, symbol_to_announce: string,
-        token_contract: string, quantity: string,
+    public async backasset(
+        authorization: EosioAuthorizationObject[], payer: string, asset_owner: string, asset_id: string, token_to_back: string,
     ) {
-        const actions = this._pack(authorization, "backsymbol", {ram_payer, owner, asset_id, symbol_to_announce});
-
-        actions.push({
-            account: token_contract,
-            name: "transfer",
-            authorization,
-            data: {from: ram_payer, to: this.contract, quantity: quantity + " " + symbol_to_announce},
-        });
-
-        return actions;
+        return this._pack(authorization, "backasset", {payer, asset_owner, asset_id, token_to_back});
     }
 
-    public async burnasset(authorization: EosioAuthorizationObject[], owner: string, asset_id: string) {
-        return this._pack(authorization, "burnasset", {owner, asset_id});
+    public async burnasset(authorization: EosioAuthorizationObject[], asset_owner: string, asset_id: string) {
+        return this._pack(authorization, "burnasset", {asset_owner, asset_id});
     }
 
     public async canceloffer(authorization: EosioAuthorizationObject[], offer_id: string) {
@@ -104,9 +94,15 @@ export default class ActionGenerator {
 
     public async mintasset(
         authorization: EosioAuthorizationObject[], authorized_minter: string, collection_name: string, scheme_name: string, preset_id: string,
-        new_owner: string, immutable_data: AttributeMap, mutable_data: AttributeMap,
+        new_asset_owner: string, immutable_data: AttributeMap, mutable_data: AttributeMap, tokens_to_back: string[],
     ) {
-        return this._pack(authorization, "mintasset", {authorized_minter, collection_name, scheme_name, preset_id, new_owner, immutable_data, mutable_data});
+        return this._pack(authorization, "mintasset", {
+            authorized_minter, collection_name, scheme_name, preset_id, new_asset_owner, immutable_data, mutable_data, tokens_to_back,
+        });
+    }
+
+    public async payofferram(authorization: EosioAuthorizationObject[], payer: string, offer_id: string) {
+        return this._pack(authorization, "payofferram", {payer, offer_id});
     }
 
     public async remcolauth(authorization: EosioAuthorizationObject[], collection_name: string, account_to_remove: string) {
@@ -119,9 +115,9 @@ export default class ActionGenerator {
 
     public async setassetdata(
         authorization: EosioAuthorizationObject[], authorized_editor: string,
-        owner: string, asset_id: string, new_mutable_data: AttributeMap,
+        asset_owner: string, asset_id: string, new_mutable_data: AttributeMap,
     ) {
-        return this._pack(authorization, "setassetdata", {authorized_editor, owner, asset_id, new_mutable_data});
+        return this._pack(authorization, "setassetdata", {authorized_editor, asset_owner, asset_id, new_mutable_data});
     }
 
     public async setcoldata(authorization: EosioAuthorizationObject[], collection_name: string, data: AttributeMap) {
@@ -134,6 +130,10 @@ export default class ActionGenerator {
 
     public async transfer(authorization: EosioAuthorizationObject[], account_from: string, account_to: string, asset_ids: string[], memo: string) {
         return this._pack(authorization, "transfer", {from: account_from, to: account_to, asset_ids, memo});
+    }
+
+    public async withdraw(authorization: EosioAuthorizationObject[], owner: string, token_to_withdraw: string) {
+        return this._pack(authorization, "withdraw", {owner, token_to_withdraw});
     }
 
     protected _pack(authorization: EosioAuthorizationObject[], name: string, data: any): EosioActionObject[] {

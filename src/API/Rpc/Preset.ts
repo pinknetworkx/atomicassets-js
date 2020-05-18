@@ -1,6 +1,5 @@
 import {deserialize} from "../../Serialization";
 import {IPresetRow} from "./Cache";
-import RpcCollection from "./Collection";
 import RpcApi from "./index";
 import RpcScheme from "./Scheme";
 
@@ -54,11 +53,11 @@ export default class RpcPreset {
     }
 
     public async isTransferable(): Promise<boolean> {
-        return !!(await this._data).transferable;
+        return (await this._data).transferable;
     }
 
     public async isBurnable(): Promise<boolean> {
-        return !!(await this._data).burnable;
+        return (await this._data).burnable;
     }
 
     public async maxSupply(): Promise<number> {

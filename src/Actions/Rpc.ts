@@ -60,7 +60,7 @@ export default class RpcActionGenerator extends ActionGenerator {
     public async mintasset(
         authorization: EosioAuthorizationObject[], authorized_minter: string,
         collection_name: string, scheme_name: string, preset_id: string,
-        new_owner: string, immutable_data: object, mutable_data: object,
+        new_owner: string, immutable_data: object, mutable_data: object, tokens_to_back: string[],
     ) {
         const preset = await this.api.getPreset(collection_name, preset_id);
 
@@ -69,7 +69,7 @@ export default class RpcActionGenerator extends ActionGenerator {
 
         return super.mintasset(
             authorization, authorized_minter, collection_name, scheme_name, preset_id,
-            new_owner, immutable_attribute_map, mutable_attribute_map,
+            new_owner, immutable_attribute_map, mutable_attribute_map, tokens_to_back,
         );
     }
 

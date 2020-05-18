@@ -33,12 +33,12 @@ export default class RpcOffer {
             } else {
                 try {
                     const row: IOfferRow = await this._data;
-                    const inventory: IAssetRow[] = await this.api.queue.account_assets(row.offer_sender, cache);
+                    const inventory: IAssetRow[] = await this.api.queue.account_assets(row.sender, cache);
 
                     return resolve(row.sender_asset_ids.map((assetID) => {
                         const asset = inventory.find((assetRow) => assetRow.asset_id === assetID);
 
-                        return asset ? new RpcAsset(this.api, row.offer_sender, assetID, asset, undefined, undefined, undefined, cache) : assetID;
+                        return asset ? new RpcAsset(this.api, row.sender, assetID, asset, undefined, undefined, undefined, cache) : assetID;
                     }));
                 } catch (e) {
                     return reject(e);
@@ -52,12 +52,12 @@ export default class RpcOffer {
             } else {
                 try {
                     const row: IOfferRow = await this._data;
-                    const inventory: IAssetRow[] = await this.api.queue.account_assets(row.offer_recipient, cache);
+                    const inventory: IAssetRow[] = await this.api.queue.account_assets(row.recipient, cache);
 
                     return resolve(row.recipient_asset_ids.map((assetID) => {
                         const asset = inventory.find((assetRow) => assetRow.asset_id === assetID);
 
-                        return asset ? new RpcAsset(this.api, row.offer_recipient, assetID, asset, undefined, undefined, undefined, cache) : assetID;
+                        return asset ? new RpcAsset(this.api, row.recipient, assetID, asset, undefined, undefined, undefined, cache) : assetID;
                     }));
                 } catch (e) {
                     return reject(e);
@@ -67,11 +67,11 @@ export default class RpcOffer {
     }
 
     public async sender(): Promise<string> {
-        return (await this._data).offer_sender;
+        return (await this._data).sender;
     }
 
     public async recipient(): Promise<string> {
-        return (await this._data).offer_recipient;
+        return (await this._data).recipient;
     }
 
     public async senderAssets(): Promise<Array<RpcAsset | string>> {
