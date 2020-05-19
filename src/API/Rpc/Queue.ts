@@ -1,5 +1,5 @@
 import RpcError from "../../Errors/RpcError";
-import {IAssetRow, ICollectionRow, IOfferRow, IPresetRow, ISchemeRow} from "./Cache";
+import {IAssetRow, ICollectionRow, IOfferRow, ISchemaRow, ITemplateRow} from "./Cache";
 import RpcApi from "./index";
 
 export default class RpcQueue {
@@ -16,20 +16,20 @@ export default class RpcQueue {
         return this.fetch_all_rows("assets", account,"id", "", "", this.api.cache.asset.bind(this.api.cache), useCache);
     }
 
-    public async preset(collection: string, id: string, useCache: boolean = true): Promise<IPresetRow> {
-        return this.fetch_single_row("presets", collection, id, this.api.cache.preset.bind(this.api.cache), useCache);
+    public async template(collection: string, id: string, useCache: boolean = true): Promise<ITemplateRow> {
+        return this.fetch_single_row("templates", collection, id, this.api.cache.template.bind(this.api.cache), useCache);
     }
 
-    public async collection_presets(collection: string, useCache: boolean = true): Promise<IPresetRow[]> {
-        return this.fetch_all_rows("presets", collection, "preset_id", "", "", this.api.cache.preset.bind(this.api.cache), useCache);
+    public async collection_templates(collection: string, useCache: boolean = true): Promise<ITemplateRow[]> {
+        return this.fetch_all_rows("templates", collection, "template_id", "", "", this.api.cache.template.bind(this.api.cache), useCache);
     }
 
-    public async scheme(collection: string, name: string, useCache: boolean = true): Promise<ISchemeRow> {
-        return this.fetch_single_row("schemes", collection, name, this.api.cache.scheme.bind(this.api.cache), useCache);
+    public async schema(collection: string, name: string, useCache: boolean = true): Promise<ISchemaRow> {
+        return this.fetch_single_row("schemas", collection, name, this.api.cache.schema.bind(this.api.cache), useCache);
     }
 
-    public async collection_schemes(collection: string, useCache: boolean = true): Promise<ISchemeRow[]> {
-        return this.fetch_all_rows("schemes", collection, "scheme_name", "", "", this.api.cache.scheme.bind(this.api.cache), useCache);
+    public async collection_schemas(collection: string, useCache: boolean = true): Promise<ISchemaRow[]> {
+        return this.fetch_all_rows("schemas", collection, "schema_name", "", "", this.api.cache.schema.bind(this.api.cache), useCache);
     }
 
     public async collection(name: string, useCache: boolean = true): Promise<ICollectionRow> {

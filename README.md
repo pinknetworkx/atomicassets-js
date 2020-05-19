@@ -34,7 +34,6 @@ const fetch = require("node-fetch");
 // - rateLimit: defines how much requests per second can be made to not exceed the rate limit of the node
 const api = new RpcApi("https://testnet.wax.pink.gg", "atomicassets", {fetch, rateLimit: 4});
 
-// fetch preset data
 const asset = await api.getAsset("leonleonleon", "1099511627786");
 
 // create the action to mint an asset
@@ -112,14 +111,14 @@ Caching can be disabled by explicitly setting cache to false
 
 * `async getAsset(owner: string, id: string, cache: boolean = true): Promise<RpcAsset>`
   * gets data about a specific asset owned by owner
-* `async getPreset(id: string, cache: boolean = true): Promise<RpcPreset>`
-  * gets a specific preset by id
+* `async getTemplate(id: string, cache: boolean = true): Promise<RpcTemplate>`
+  * gets a specific template by id
 * `async getScheme(collection: string, name: string, cache: boolean = true): Promise<RpcScheme>`
   * get a scheme by its name
 * `async getCollection(name: string, cache: boolean = true): Promise<RpcCollection>`
   * gets an offer by its id
-* `async getCollectionPresets(collection: string, cache: boolean = true): Promise<RpcPresets[]>`
-  * gets all presets of a collection
+* `async getCollectionTemplates(collection: string, cache: boolean = true): Promise<RpcTemplates[]>`
+  * gets all templates of a collection
 * `async getCollectionSchemes(collection: string, cache: boolean = true): Promise<RpcSchemes[]>`
   * gets all schemes of a collection
 * `async getOffer(id: string, cache: boolean = true): Promise<RpcOffer>`
@@ -138,15 +137,15 @@ The method `toObject` returns a JavaScript object representation of the class.
 ##### RpcAsset
 
 * `async collection(): Promise<RpcCollection>`
-* `async scheme(): Promise<RpcScheme>`
-* `async preset(): Promise<RpcPreset | null>`
+* `async schema(): Promise<RpcSchema>`
+* `async template(): Promise<RpcTemplate | null>`
 * `async backedTokens(): Promise<string[]>`
 * `async immutableData(): Promise<object>`
 * `async mutableData(): Promise<object>`
 * `async data(): Promise<object>`
 * `async toObject(): Promise<object>`
 
-##### RpcPreset
+##### RpcTemplate
 
 * `async collection(): Promise<RpcCollection>`
 * `async scheme(): Promise<RpcScheme>`
@@ -157,7 +156,7 @@ The method `toObject` returns a JavaScript object representation of the class.
 * `async circulation(): Promise<number>`
 * `async toObject(): Promise<object>`
 
-##### RpcScheme
+##### RpcSchema
 * `async collection(): Promise<ISchema>`
 * `async format(): Promise<ISchema>`
 * `async toObject(): Promise<object>`

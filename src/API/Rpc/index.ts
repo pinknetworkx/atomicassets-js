@@ -5,9 +5,9 @@ import RpcAsset from "./Asset";
 import RpcCache, {IConfigRow} from "./Cache";
 import RpcCollection from "./Collection";
 import RpcOffer from "./Offer";
-import RpcPreset from "./Preset";
 import RpcQueue from "./Queue";
-import RpcScheme from "./Scheme";
+import RpcSchema from "./Schema";
+import RpcTemplate from "./Template";
 
 type Fetch = (input?: Request | string, init?: RequestInit) => Promise<Response>;
 type ApiArgs = {fetch?: Fetch, rateLimit?: number };
@@ -68,12 +68,12 @@ export default class RpcApi {
         return new RpcAsset(this, owner, id, undefined, undefined, undefined, undefined, cache);
     }
 
-    public async getPreset(collection: string, id: string, cache: boolean = true): Promise<RpcPreset> {
+    public async getTemplate(collection: string, id: string, cache: boolean = true): Promise<RpcTemplate> {
         if(!cache) {
-            this.cache.preset(id, null);
+            this.cache.template(id, null);
         }
 
-        return new RpcPreset(this, collection, id, undefined, undefined, cache);
+        return new RpcTemplate(this, collection, id, undefined, undefined, cache);
     }
 
     public async getCollection(name: string, cache: boolean = true) {
@@ -84,24 +84,24 @@ export default class RpcApi {
         return new RpcCollection(this, name, undefined,  cache);
     }
 
-    public async getCollectionPresets(collection: string, cache: boolean = true): Promise<RpcPreset[]> {
-        return (await this.queue.collection_presets(collection)).map((presetRow) => {
-            return new RpcPreset(this, collection, String(presetRow.preset_id), presetRow, undefined, cache);
+    public async getCollectionTemplates(collection: string, cache: boolean = true): Promise<RpcTemplate[]> {
+        return (await this.queue.collection_templates(collection)).map((templateRow) => {
+            return new RpcTemplate(this, collection, String(templateRow.template_id), templateRow, undefined, cache);
         });
     }
 
-    public async getCollectionsSchemes(collection: string, cache: boolean = true): Promise<RpcScheme[]> {
-        return (await this.queue.collection_schemes(collection)).map((schemeRow) => {
-            return new RpcScheme(this, collection, schemeRow.scheme_name, undefined, cache);
+    public async getCollectionsSchemas(collection: string, cache: boolean = true): Promise<RpcSchema[]> {
+        return (await this.queue.collection_schemas(collection)).map((schemaRow) => {
+            return new RpcSchema(this, collection, schemaRow.schema_name, undefined, cache);
         });
     }
 
-    public async getScheme(collection: string, name: string, cache: boolean = true): Promise<RpcScheme> {
+    public async getSchema(collection: string, name: string, cache: boolean = true): Promise<RpcSchema> {
         if(!cache) {
-            this.cache.scheme(name, null);
+            this.cache.schema(name, null);
         }
 
-        return new RpcScheme(this, collection, name, undefined, cache);
+        return new RpcSchema(this, collection, name, undefined, cache);
     }
 
     public async getOffer(id: string, cache: boolean = true): Promise<RpcOffer> {

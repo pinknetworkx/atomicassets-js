@@ -61,43 +61,47 @@ export default class ActionGenerator {
         return this._pack(authorization, "createoffer", {sender, recipient, sender_asset_ids, recipient_asset_ids, memo});
     }
 
-    public async createpreset(
-        authorization: EosioAuthorizationObject[], authorized_creator: string, collection_name: string, scheme_name: string,
+    public async createtempl(
+        authorization: EosioAuthorizationObject[], authorized_creator: string, collection_name: string, schema_name: string,
         transferable: boolean, burnable: boolean, max_supply: string, immutable_data: AttributeMap,
     ) {
-        return this._pack(authorization, "createpreset", {
-            authorized_creator, collection_name, scheme_name, transferable, burnable, max_supply, immutable_data,
+        return this._pack(authorization, "createtempl", {
+            authorized_creator, collection_name, schema_name, transferable, burnable, max_supply, immutable_data,
         });
     }
 
-    public async createscheme(
+    public async createschema(
         authorization: EosioAuthorizationObject[], authorized_creator: string,
-        collection_name: string, scheme_name: string, scheme_format: Format[],
+        collection_name: string, schema_name: string, schema_format: Format[],
     ) {
-        return this._pack(authorization, "createscheme", {authorized_creator, collection_name, scheme_name, scheme_format});
+        return this._pack(authorization, "createschema", {authorized_creator, collection_name, schema_name, schema_format});
     }
 
     public async declineoffer(authorization: EosioAuthorizationObject[], offer_id: string) {
         return this._pack(authorization, "declineoffer", {offer_id});
     }
 
-    public async extendscheme(
+    public async extendschema(
         authorization: EosioAuthorizationObject[], authorized_editor: string,
-        collection_name: string, scheme_name: string, scheme_format_extension: Format[],
+        collection_name: string, schema_name: string, schema_format_extension: Format[],
     ) {
-        return this._pack(authorization, "extendscheme", {authorized_editor, collection_name, scheme_name, scheme_format_extension});
+        return this._pack(authorization, "extendschema", {authorized_editor, collection_name, schema_name, schema_format_extension});
     }
 
     public async forbidnotify(authorization: EosioAuthorizationObject[], collection_name: string) {
         return this._pack(authorization, "forbidnotify", {collection_name});
     }
 
+    public async locktemplate(authorization: EosioAuthorizationObject[], authorized_editor: string, collection_name: string, template_id: number) {
+        return this._pack(authorization, "locktemplate", {authorized_editor, collection_name, template_id});
+    }
+
     public async mintasset(
-        authorization: EosioAuthorizationObject[], authorized_minter: string, collection_name: string, scheme_name: string, preset_id: string,
+        authorization: EosioAuthorizationObject[], authorized_minter: string, collection_name: string, schema_name: string, template_id: string,
         new_asset_owner: string, immutable_data: AttributeMap, mutable_data: AttributeMap, tokens_to_back: string[],
     ) {
         return this._pack(authorization, "mintasset", {
-            authorized_minter, collection_name, scheme_name, preset_id, new_asset_owner, immutable_data, mutable_data, tokens_to_back,
+            authorized_minter, collection_name, schema_name, template_id, new_asset_owner, immutable_data, mutable_data, tokens_to_back,
         });
     }
 

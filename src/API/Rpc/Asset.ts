@@ -2,8 +2,8 @@ import {deserialize} from "../../Serialization";
 import {IAssetRow} from "./Cache";
 import RpcCollection from "./Collection";
 import RpcApi from "./index";
-import RpcPreset from "./Preset";
-import RpcScheme from "./Scheme";
+import RpcSchema from "./Schema";
+import RpcTemplate from "./Template";
 
 export default class RpcAsset {
     public readonly id: string;
@@ -11,11 +11,11 @@ export default class RpcAsset {
     // tslint:disable-next-line:variable-name
     private readonly _data: Promise<IAssetRow>;
     // tslint:disable-next-line:variable-name
-    private readonly _preset: Promise<RpcPreset | null>;
+    private readonly _template: Promise<RpcTemplate | null>;
     // tslint:disable-next-line:variable-name
     private readonly _collection: Promise<RpcCollection>;
     // tslint:disable-next-line:variable-name
-    private readonly _scheme: Promise<RpcScheme>;
+    private readonly _schema: Promise<RpcSchema>;
 
     public constructor(
         private readonly api: RpcApi,
@@ -23,8 +23,8 @@ export default class RpcAsset {
         id: string,
         data?: IAssetRow,
         collection?: RpcCollection,
-        scheme?: RpcScheme,
-        preset?: RpcPreset,
+        schema?: RpcSchema,
+        template?: RpcTemplate,
         cache: boolean = true,
     ) {
         this.id = id;
@@ -41,18 +41,18 @@ export default class RpcAsset {
             }
         });
 
-        this._preset = new Promise(async (resolve, reject) => {
-            if(preset) {
-                resolve(preset);
+        this._template = new Promise(async (resolve, reject) => {
+            if(template) {
+                resolve(template);
             } else {
                 try {
                     const row = await this._data;
 
-                    if(Number(row.preset_id) < 0) {
+                    if(Number(row.template_id) < 0) {
                         return resolve(null);
                     }
 
-                    resolve(new RpcPreset(api, row.collection_name, row.preset_id, undefined, undefined, cache));
+                    resolve(new RpcTemplate(api, row.collection_name, row.template_id, undefined, undefined, cache));
                 } catch (e) {
                     reject(e);
                 }
@@ -73,14 +73,14 @@ export default class RpcAsset {
             }
         });
 
-        this._scheme = new Promise(async (resolve, reject) => {
-            if(scheme) {
-                resolve(scheme);
+        this._schema = new Promise(async (resolve, reject) => {
+            if(schema) {
+                resolve(schema);
             } else {
                 try {
                     const row = await this._data;
 
-                    resolve(new RpcScheme(api, row.collection_name, row.scheme_name, undefined, cache));
+                    resolve(new RpcSchema(api, row.collection_name, row.schema_name, undefined, cache));
                 } catch (e) {
                     reject(e);
                 }
@@ -88,16 +88,16 @@ export default class RpcAsset {
         });
     }
 
-    public async preset(): Promise<RpcPreset | null> {
-        return await this._preset;
+    public async template(): Promise<RpcTemplate | null> {
+        return await this._template;
     }
 
     public async collection(): Promise<RpcCollection> {
         return await this._collection;
     }
 
-    public async scheme(): Promise<RpcScheme> {
-        return await this._scheme;
+    public async schema(): Promise<RpcSchema> {
+        return await this._schema;
     }
 
     public async backedTokens(): Promise<string[]> {
@@ -105,40 +105,40 @@ export default class RpcAsset {
     }
 
     public async immutableData(): Promise<object> {
-        const scheme = await this.scheme();
+        const schema = await this.schema();
         const row = await this._data;
 
-        return deserialize(row.immutable_serialized_data, await scheme.format());
+        return deserialize(row.immutable_serialized_data, await schema.format());
     }
 
     public async mutableData(): Promise<object> {
-        const scheme = await this.scheme();
+        const schema = await this.schema();
         const row = await this._data;
 
-        return deserialize(row.mutable_serialized_data, await scheme.format());
+        return deserialize(row.mutable_serialized_data, await schema.format());
     }
 
     public async data(): Promise<object> {
         const mutableData = await this.mutableData();
         const immutableData = await this.immutableData();
 
-        const preset = await this.preset();
-        const presetData = preset ? await preset.immutableData() : {};
+        const template = await this.template();
+        const templateData = template ? await template.immutableData() : {};
 
-        return Object.assign({}, mutableData, immutableData, presetData);
+        return Object.assign({}, mutableData, immutableData, templateData);
     }
 
     public async toObject(): Promise<object> {
-        const preset = await this.preset();
+        const template = await this.template();
         const collection = await this.collection();
-        const scheme = await this.scheme();
+        const schema = await this.schema();
 
         return {
             asset_id: this.id,
 
             collection: await collection.toObject(),
-            scheme: await scheme.toObject(),
-            preset: preset ? await preset.toObject() : null,
+            schema: await schema.toObject(),
+            template: template ? await template.toObject() : null,
 
             backedTokens: await this.backedTokens(),
             immutableData: await this.immutableData(),

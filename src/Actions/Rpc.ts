@@ -1,23 +1,23 @@
 import RpcApi from "../API/Rpc";
-import {SchemeFormat} from "../API/Rpc/Cache";
+import {SchemaFormat} from "../API/Rpc/Cache";
 import SerializationError from "../Errors/SerializationError";
 import ActionGenerator, {AttributeMap, EosioAuthorizationObject} from "./Generator";
 
 /* tslint:disable:variable-name */
 
 export default class RpcActionGenerator extends ActionGenerator {
-    private static toAttributeMap(obj: any, scheme: SchemeFormat): AttributeMap {
+    private static toAttributeMap(obj: any, schema: SchemaFormat): AttributeMap {
         const types: {[id: string]: string} = {};
         const result: AttributeMap = [];
 
-        for(const row of scheme) {
+        for(const row of schema) {
             types[row.name] = row.type;
         }
 
         const keys = Object.keys(obj);
         for(const key of keys) {
             if(typeof types[key] !== "undefined") {
-                throw new SerializationError("field not defined in scheme");
+                throw new SerializationError("field not defined in schema");
             }
 
             result.push({key, value: [types[key], obj[key]]});
@@ -42,33 +42,33 @@ export default class RpcActionGenerator extends ActionGenerator {
         );
     }
 
-    public async createpreset(
+    public async createtempl(
         authorization: EosioAuthorizationObject[], authorized_creator: string,
-        collection_name: string, scheme_name: string,
+        collection_name: string, schema_name: string,
         transferable: boolean, burnable: boolean, max_supply: string, immutable_data: object,
     ) {
-        const scheme = await this.api.getScheme(collection_name, scheme_name);
+        const schema = await this.api.getSchema(collection_name, schema_name);
 
-        const immutable_attribute_map = RpcActionGenerator.toAttributeMap(immutable_data, await scheme.rawFormat());
+        const immutable_attribute_map = RpcActionGenerator.toAttributeMap(immutable_data, await schema.rawFormat());
 
-        return super.createpreset(
-            authorization, authorized_creator, collection_name, scheme_name,
+        return super.createtempl(
+            authorization, authorized_creator, collection_name, schema_name,
             transferable, burnable, max_supply, immutable_attribute_map,
         );
     }
 
     public async mintasset(
         authorization: EosioAuthorizationObject[], authorized_minter: string,
-        collection_name: string, scheme_name: string, preset_id: string,
+        collection_name: string, schema_name: string, template_id: string,
         new_owner: string, immutable_data: object, mutable_data: object, tokens_to_back: string[],
     ) {
-        const preset = await this.api.getPreset(collection_name, preset_id);
+        const template = await this.api.getTemplate(collection_name, template_id);
 
-        const immutable_attribute_map = RpcActionGenerator.toAttributeMap(immutable_data, await (await preset.scheme()).rawFormat());
-        const mutable_attribute_map = RpcActionGenerator.toAttributeMap(mutable_data, await (await preset.scheme()).rawFormat());
+        const immutable_attribute_map = RpcActionGenerator.toAttributeMap(immutable_data, await (await template.schema()).rawFormat());
+        const mutable_attribute_map = RpcActionGenerator.toAttributeMap(mutable_data, await (await template.schema()).rawFormat());
 
         return super.mintasset(
-            authorization, authorized_minter, collection_name, scheme_name, preset_id,
+            authorization, authorized_minter, collection_name, schema_name, template_id,
             new_owner, immutable_attribute_map, mutable_attribute_map, tokens_to_back,
         );
     }
@@ -77,9 +77,9 @@ export default class RpcActionGenerator extends ActionGenerator {
         authorization: EosioAuthorizationObject[], authorized_editor: string, owner: string, asset_id: string, mutable_data: object,
     ) {
         const asset = await this.api.getAsset(owner, asset_id);
-        const scheme = await asset.scheme();
+        const schema = await asset.schema();
 
-        const mutable_attribute_map = RpcActionGenerator.toAttributeMap(mutable_data, await scheme.rawFormat());
+        const mutable_attribute_map = RpcActionGenerator.toAttributeMap(mutable_data, await schema.rawFormat());
 
         return super.setassetdata(authorization, authorized_editor, owner, asset_id, mutable_attribute_map);
     }

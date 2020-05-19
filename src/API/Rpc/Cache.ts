@@ -1,4 +1,4 @@
-export type SchemeFormat = Array<{name: string, type: string}>;
+export type SchemaFormat = Array<{name: string, type: string}>;
 
 export interface ICollectionRow {
     collection_name: string;
@@ -10,15 +10,15 @@ export interface ICollectionRow {
     serialized_data: Uint8Array;
 }
 
-export interface ISchemeRow {
-    scheme_name: string;
-    format: SchemeFormat;
+export interface ISchemaRow {
+    schema_name: string;
+    format: SchemaFormat;
 }
 
-export interface IPresetRow {
-    preset_id: number;
+export interface ITemplateRow {
+    template_id: number;
     collection_name: string;
-    scheme_name: string;
+    schema_name: string;
     transferable: boolean;
     burnable: boolean;
     max_supply: number;
@@ -29,8 +29,8 @@ export interface IPresetRow {
 export interface IAssetRow {
     asset_id: string;
     collection_name: string;
-    scheme_name: string;
-    preset_id: string;
+    schema_name: string;
+    template_id: string;
     ram_payer: string;
     backed_tokens: string[];
     immutable_serialized_data: Uint8Array;
@@ -49,7 +49,7 @@ export interface IOfferRow {
 export interface IConfigRow {
     asset_counter: string;
     offer_counter: string;
-    collection_format: SchemeFormat;
+    collection_format: SchemaFormat;
 }
 
 export default class RpcCache {
@@ -83,8 +83,8 @@ export default class RpcCache {
     }
 
     private readonly assets: {[id: string]: {data: IAssetRow, expiration: number, updated: number}} = {};
-    private readonly presets: {[id: string]: {data: IPresetRow, expiration: number, updated: number}} = {};
-    private readonly schemes: {[id: string]: {data: ISchemeRow, expiration: number, updated: number}} = {};
+    private readonly templates: {[id: string]: {data: ITemplateRow, expiration: number, updated: number}} = {};
+    private readonly schemas: {[id: string]: {data: ISchemaRow, expiration: number, updated: number}} = {};
     private readonly collections: {[id: string]: {data: ICollectionRow, expiration: number, updated: number}} = {};
     private readonly offers: {[id: string]: {data: IOfferRow, expiration: number, updated: number}} = {};
 
@@ -97,16 +97,16 @@ export default class RpcCache {
         return RpcCache.access<IAssetRow>(assetID, this.assets, data);
     }
 
-    public preset(presetID: string, data?: any | null | false): IPresetRow | undefined {
+    public template(templateID: string, data?: any | null | false): ITemplateRow | undefined {
         if(data) {
             data.immutable_serialized_data = new Uint8Array(data.immutable_serialized_data);
         }
 
-        return RpcCache.access<IPresetRow>(presetID, this.presets, data);
+        return RpcCache.access<ITemplateRow>(templateID, this.templates, data);
     }
 
-    public scheme(scheme: string, data?: any | null | false): ISchemeRow | undefined {
-        return RpcCache.access<ISchemeRow>(scheme, this.schemes, data);
+    public schema(schema: string, data?: any | null | false): ISchemaRow | undefined {
+        return RpcCache.access<ISchemaRow>(schema, this.schemas, data);
     }
 
     public collection(collection: string, data?: any | null | false): ICollectionRow | undefined {

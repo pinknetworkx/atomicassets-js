@@ -1,18 +1,18 @@
 import {deserialize} from "../../Serialization";
-import {IPresetRow} from "./Cache";
+import {ITemplateRow} from "./Cache";
 import RpcApi from "./index";
-import RpcScheme from "./Scheme";
+import RpcSchema from "./Schema";
 
-export default class RpcPreset {
+export default class RpcTemplate {
     public readonly id: string;
 
     // tslint:disable-next-line:variable-name
-    private readonly _data: Promise<IPresetRow>;
+    private readonly _data: Promise<ITemplateRow>;
 
     // tslint:disable-next-line:variable-name
-    private readonly _scheme: Promise<RpcScheme>;
+    private readonly _schema: Promise<RpcSchema>;
 
-    public constructor(private readonly api: RpcApi, collection: string, id: string, data?: IPresetRow, scheme?: RpcScheme, cache: boolean = true) {
+    public constructor(private readonly api: RpcApi, collection: string, id: string, data?: ITemplateRow, schema?: RpcSchema, cache: boolean = true) {
         this.id = id;
 
         this._data = new Promise(async (resolve, reject) => {
@@ -20,21 +20,21 @@ export default class RpcPreset {
                 resolve(data);
             } else {
                 try {
-                    resolve(await api.queue.preset(collection, id, cache));
+                    resolve(await api.queue.template(collection, id, cache));
                 } catch (e) {
                     reject(e);
                 }
             }
         });
 
-        this._scheme = new Promise(async (resolve, reject) => {
-            if(scheme) {
-                resolve(scheme);
+        this._schema = new Promise(async (resolve, reject) => {
+            if(schema) {
+                resolve(schema);
             } else {
                 try {
                     const row = await this._data;
 
-                    resolve(new RpcScheme(this.api, collection, row.scheme_name, undefined, cache));
+                    resolve(new RpcSchema(this.api, collection, row.schema_name, undefined, cache));
                 } catch (e) {
                     reject(e);
                 }
@@ -42,14 +42,14 @@ export default class RpcPreset {
         });
     }
 
-    public async scheme(): Promise<RpcScheme> {
-        return await this._scheme;
+    public async schema(): Promise<RpcSchema> {
+        return await this._schema;
     }
 
     public async immutableData(): Promise<object> {
-        const scheme = await this._scheme;
+        const schema = await this._schema;
 
-        return deserialize((await this._data).immutable_serialized_data, await scheme.format());
+        return deserialize((await this._data).immutable_serialized_data, await schema.format());
     }
 
     public async isTransferable(): Promise<boolean> {
@@ -70,8 +70,8 @@ export default class RpcPreset {
 
     public async toObject(): Promise<object> {
         return {
-            preset_id: this.id,
-            scheme: await (await this.scheme()).toObject(),
+            template_id: this.id,
+            schema: await (await this.schema()).toObject(),
             immutableData: await this.immutableData(),
             transferable: await this.isTransferable(),
             burnable: await this.isBurnable(),
