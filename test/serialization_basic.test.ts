@@ -6,19 +6,19 @@ import {base58_decode, concat_byte_arrays, hex_decode, varint_encode, zigzag_enc
 
 describe("Basic Serialization", () => {
     const schema = ObjectSchema([
-        /* 04 */ {name: "name", type: "string", parent: 0},
-        /* 05 */ {name: "img", type: "ipfs", parent: 0},
-        /* 06 */ {name: "rarity1", type: "int16", parent: 0},
-        /* 07 */ {name: "rarity2", type: "uint16", parent: 0},
-        /* 08 */ {name: "rarity3", type: "int64", parent: 0},
-        /* 09 */ {name: "rarity4", type: "fixed16", parent: 0},
-        /* 10 */ {name: "depth1", type: "int32", parent: 0},
-        /* 11 */ {name: "depth2", type: "uint32", parent: 0},
-        /* 12 */ {name: "depth3", type: "int64", parent: 0},
-        /* 13 */ {name: "depth4", type: "fixed32", parent: 0},
-        /* 14 */ {name: "wear", type: "float", parent: 0},
-        /* 15 */ {name: "tradeable", type: "bool", parent: 0},
-        /* 16 */ {name: "share", type: "double", parent: 0},
+        /* 04 */ {name: "name", type: "string"},
+        /* 05 */ {name: "img", type: "ipfs"},
+        /* 06 */ {name: "rarity1", type: "int16"},
+        /* 07 */ {name: "rarity2", type: "uint16"},
+        /* 08 */ {name: "rarity3", type: "int64"},
+        /* 09 */ {name: "rarity4", type: "fixed16"},
+        /* 10 */ {name: "depth1", type: "int32"},
+        /* 11 */ {name: "depth2", type: "uint32"},
+        /* 12 */ {name: "depth3", type: "int64"},
+        /* 13 */ {name: "depth4", type: "fixed32"},
+        /* 14 */ {name: "wear", type: "float"},
+        /* 15 */ {name: "tradeable", type: "bool"},
+        /* 16 */ {name: "share", type: "double"},
     ]);
 
     const encoder = new TextEncoder();

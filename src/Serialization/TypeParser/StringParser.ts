@@ -3,7 +3,7 @@ import VariableParser from "./VariableParser";
 
 export default class StringParser extends VariableParser {
     public deserialize(state: SerializationState): any {
-        return String.fromCharCode.apply(null, super.deserialize(state));
+        return new TextDecoder().decode(super.deserialize(state));
     }
 
     public serialize(data: string): Uint8Array {
