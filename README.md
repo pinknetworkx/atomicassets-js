@@ -118,10 +118,12 @@ options
 * **sort**: asc | desc
 
 `async getAsset(id: string): Promise<ApiAsset>`
+
 `async getAssetLogs(id: string, page: number = 1, limit: number = 100): Promise<ApiLog[]>`
 
 ##### Collections
 `async getCollections(options, page: number = 1, limit: number = 100): Promise<ApiCollection[]>`
+
 options
 * **author**: string
 * **match**: search for input in name
@@ -131,10 +133,12 @@ options
 * **sort**: asc | desc
 
 `async getCollection(name: string): Promise<ApiCollection>`
+
 `async getCollectionLogs(name: string, page: number = 1, limit: number = 100): Promise<ApiLog[]>`
 
 ##### Schemas
 `async getSchemas(options, page: number = 1, limit: number = 100): Promise<ApiSchema[]>`
+
 options
 * **collection_name**: string
 * **match**: search for input in name
@@ -143,10 +147,12 @@ options
 * **sort**: asc | desc
 
 `async getSchema(collection: string, name: string): Promise<ApiSchema>`
+
 `async getSchemaLogs(collection: string, name: string, page: number = 1, limit: number = 100): Promise<ApiLog[]>`
 
 ##### Templates
 `async getTemplates(options, page: number = 1, limit: number = 100): Promise<ApiTemplate[]>`
+
 options
 * **collection_name**: string
 * **schema_name**: string
@@ -155,10 +161,12 @@ options
 * **sort**: asc | desc
 
 `async getTemplate(collection: string, id: string): Promise<ApiTemplate>`
+
 `async getTemplateLogs(collection: string, id: string, page: number = 1, limit: number = 100): Promise<ApiLog[]>`
 
 ##### Trading
 `async getTransfers(options, page: number = 1, limit: number = 100): Promise<ApiTransfe[]>`
+
 options
 * **account**: string
 * **sender**: string
@@ -167,6 +175,7 @@ options
 * **sort**: asc | desc
 
 `async getOffers(options, page: number = 1, limit: number = 100): Promise<ApiOffer[]>`
+
 options
 * **account**: notified account
 * **sender**: sender of offer
@@ -217,38 +226,39 @@ const actions = api.action.mintasset(
 Caching can be disabled by explicitly setting cache to false
 
 `async getAsset(owner: string, id: string, cache: boolean = true): Promise<RpcAsset>`
+
 *Gets data about a specific asset owned by owner*
 
-
 `async getTemplate(id: string, cache: boolean = true): Promise<RpcTemplate>`
+
 *Gets a specific template by id*
 
-
 `async getScheme(collection: string, name: string, cache: boolean = true): Promise<RpcScheme>`
+
 *Get a scheme by its name*
 
-
 `async getCollection(name: string, cache: boolean = true): Promise<RpcCollection>`
-*Gets an offer by its id*
 
+*Gets an offer by its id*
 
 `async getCollectionTemplates(collection: string, cache: boolean = true): Promise<RpcTemplates[]>`
+
 *Gets all templates of a collection*
 
-
 `async getCollectionSchemes(collection: string, cache: boolean = true): Promise<RpcSchemes[]>`
+
 *Gets all schemes of a collection*
 
-
 `async getOffer(id: string, cache: boolean = true): Promise<RpcOffer>`
+
 *Gets an offer by its id*
 
-
 `async getAccountOffers(account: string, cache: boolean = true): Promise<RpcOffer[]>`
+
 *Get all offers which are sent or received by an account*
 
-
 `async getAccountAssets(account: string, cache: boolean = true): Promise<RpcAsset[]>`
+
 *Gets the complete inventory of a specific account (may take long for bigger inventories)*
   
 #### RpcActionGenerator
@@ -267,47 +277,78 @@ The method `toObject` returns a JavaScript object representation of the class.
 ##### RpcAsset
 
 `async collection(): Promise<RpcCollection>`
+
 `async schema(): Promise<RpcSchema>`
+
 `async template(): Promise<RpcTemplate | null>`
+
 `async backedTokens(): Promise<string[]>`
+
 `async immutableData(): Promise<object>`
+
 `async mutableData(): Promise<object>`
+
 `async data(): Promise<object>`
+
 `async toObject(): Promise<object>`
+
 
 ##### RpcTemplate
 
 `async collection(): Promise<RpcCollection>`
+
 `async scheme(): Promise<RpcScheme>`
+
 `async immutableData(): Promise<object>`
+
 `async isTransferable(): Promise<boolean>`
+
 `async isBurnable(): Promise<boolean>`
+
 `async maxSupply(): Promise<number>`
+
 `async circulation(): Promise<number>`
+
 `async toObject(): Promise<object>`
+
 
 ##### RpcSchema
 `async collection(): Promise<ISchema>`
+
 `async format(): Promise<ISchema>`
+
 `async toObject(): Promise<object>`
+
 
 ##### RpcCollection
 `async author(): Promise<string>`
+
 `async allowNotify(): Promise<boolean>`
+
 `async authorizedAccounts(): Promise<string[]>`
+
 `async notifyAccounts(): Promise<string[]>`
+
 `async marketFee(): Promise<number>`
+
 `async data(): Promise<any>`
+
 `async toObject(): Promise<object>`
+
 
 ##### RpcOffer
 `async sender(): Promise<string>`
+
 `async recipient(): Promise<string>`
+
 `async senderAssets(): Promise<Array<RpcAsset | string>>`
+
 *If element is a string, the asset is not owned by the sender anymore and the offer is invalid*
 
 `async recipientAssets(): Promise<Array<RpcAsset | string>>`
+
 *If element is a string, the asset is not owned by the recipient anymore and the offer is invalid*
 
 `async memo(): Promise<string>`
+
 `async toObject(): Promise<object>`
