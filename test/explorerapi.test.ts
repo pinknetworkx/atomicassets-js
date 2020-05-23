@@ -13,8 +13,10 @@ describe('Explorer API', () => {
     };
 
     it('fetch asset ' + exampleAsset.id, async () => {
-        const asset = await api.getAsset(exampleAsset.id);
+        const assets = await api.getAssets({
+            owner: exampleAsset.owner
+        });
 
-        expect(asset).to.deep.equal(asset);
+        expect(assets).to.deep.equal(assets);
     }).timeout(10000);
 });
