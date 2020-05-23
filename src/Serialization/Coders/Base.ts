@@ -7,7 +7,9 @@ export default class BaseCoder {
     private readonly iFACTOR: number;
 
     constructor(private readonly ALPHABET: string) {
-        if (ALPHABET.length >= 255) { throw new TypeError("Alphabet too long"); }
+        if (ALPHABET.length >= 255) {
+            throw new TypeError('Alphabet too long');
+        }
         this.BASE_MAP = new Uint8Array(256);
 
         for (let j = 0; j < this.BASE_MAP.length; j++) {
@@ -17,7 +19,9 @@ export default class BaseCoder {
         for (let i = 0; i < ALPHABET.length; i++) {
             const x = ALPHABET.charAt(i);
             const xc = x.charCodeAt(0);
-            if (this.BASE_MAP[xc] !== 255) { throw new TypeError(x + " is ambiguous"); }
+            if (this.BASE_MAP[xc] !== 255) {
+                throw new TypeError(x + ' is ambiguous');
+            }
             this.BASE_MAP[xc] = i;
         }
 
@@ -27,8 +31,10 @@ export default class BaseCoder {
         this.iFACTOR = Math.log(256) / Math.log(this.BASE); // log(256) / log(BASE), rounded up
     }
 
-    public encode(source: Uint8Array): string {
-        if (source.length === 0) { return ""; }
+    encode(source: Uint8Array): string {
+        if (source.length === 0) {
+            return '';
+        }
         // Skip & count leading zeroes.
         let zeroes = 0;
         let length = 0;
@@ -53,7 +59,9 @@ export default class BaseCoder {
                 b58[it1] = (carry % this.BASE) >>> 0;
                 carry = (carry / this.BASE) >>> 0;
             }
-            if (carry !== 0) { throw new Error("Non-zero carry"); }
+            if (carry !== 0) {
+                throw new Error('Non-zero carry');
+            }
             length = i;
             pbegin++;
         }
@@ -66,23 +74,31 @@ export default class BaseCoder {
 
         // Translate the result into a string.
         let str = this.LEADER.repeat(zeroes);
-        for (; it2 < size; ++it2) { str += this.ALPHABET.charAt(b58[it2]); }
+        for (; it2 < size; ++it2) {
+            str += this.ALPHABET.charAt(b58[it2]);
+        }
 
         return str;
     }
 
-    public decode(source: string) {
+    decode(source: string): Uint8Array {
         const buffer = this.decodeUnsafe(source);
-        if (buffer) { return buffer; }
+        if (buffer) {
+            return buffer;
+        }
 
-        throw new Error("Non-base" + this.BASE + " character");
+        throw new Error('Non-base' + this.BASE + ' character');
     }
 
     private decodeUnsafe(source: string): Uint8Array {
-        if (source.length === 0) { return new Uint8Array(0); }
+        if (source.length === 0) {
+            return new Uint8Array(0);
+        }
         let psz = 0;
         // Skip leading spaces.
-        if (source[psz] === " ") { return new Uint8Array(0); }
+        if (source[psz] === ' ') {
+            return new Uint8Array(0);
+        }
 
         // Skip and count leading '1's.
         let zeroes = 0;
@@ -93,7 +109,7 @@ export default class BaseCoder {
         }
 
         // Allocate enough space in big-endian base256 representation.
-        const size = (((source.length - psz) * this.FACTOR) + 1) >>> 0 ;// log(58) / log(256), rounded up.
+        const size = (((source.length - psz) * this.FACTOR) + 1) >>> 0; // log(58) / log(256), rounded up.
         const b256 = new Uint8Array(size);
 
         // Process the characters.
@@ -101,20 +117,26 @@ export default class BaseCoder {
             // Decode character
             let carry = this.BASE_MAP[source.charCodeAt(psz)];
             // Invalid character
-            if (carry === 255) { return new Uint8Array(0); }
+            if (carry === 255) {
+                return new Uint8Array(0);
+            }
             let i = 0;
             for (let it3 = size - 1; (carry !== 0 || i < length) && (it3 !== -1); it3--, i++) {
                 carry += (this.BASE * b256[it3]) >>> 0;
                 b256[it3] = (carry % 256) >>> 0;
                 carry = (carry / 256) >>> 0;
             }
-            if (carry !== 0) { throw new Error("Non-zero carry"); }
+            if (carry !== 0) {
+                throw new Error('Non-zero carry');
+            }
             length = i;
             psz++;
         }
 
         // Skip trailing spaces.
-        if (source[psz] === " ") { return new Uint8Array(0); }
+        if (source[psz] === ' ') {
+            return new Uint8Array(0);
+        }
         // Skip leading zeroes in b256.
         let it4 = size - length;
         while (it4 !== size && b256[it4] === 0) {

@@ -1,5 +1,5 @@
 export default class RpcError extends Error {
-    public json: any;
+    json: any;
 
     constructor(json: any) {
         if (json.error && json.error.details && json.error.details.length && json.error.details[0].message) {

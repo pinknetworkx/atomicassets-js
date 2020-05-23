@@ -1,20 +1,21 @@
-import SchemaError from "../Errors/SchemaError";
-import {concat_byte_arrays, varint_decode, varint_encode} from "../Serialization/Binary";
-import SerializationState from "../Serialization/State";
-import {ISchema, MappingAttribute} from "./index";
+import SchemaError from '../Errors/SchemaError';
+import { concat_byte_arrays, varint_decode, varint_encode } from '../Serialization/Binary';
+import SerializationState from '../Serialization/State';
+import { ISchema, MappingAttribute } from './index';
 
 export default class MappingSchema implements ISchema {
     private readonly reserved = 4;
 
-    constructor(private readonly attributes: MappingAttribute[]) { }
+    constructor(private readonly attributes: MappingAttribute[]) {
+    }
 
-    public deserialize(state: SerializationState): any {
+    deserialize(state: SerializationState): any {
         const object: any = {};
 
-        while(state.position < state.data.length) {
+        while (state.position < state.data.length) {
             const identifier = varint_decode(state);
 
-            if(identifier.equals(0)) {
+            if (identifier.equals(0)) {
                 break;
             }
 
@@ -26,13 +27,13 @@ export default class MappingSchema implements ISchema {
         return object;
     }
 
-    public serialize(object: any): Uint8Array {
+    serialize(object: any): Uint8Array {
         const data: Uint8Array[] = [];
 
-        for(let i = 0; i < this.attributes.length; i++) {
+        for (let i = 0; i < this.attributes.length; i++) {
             const attribute = this.attributes[i];
 
-            if(typeof object[attribute.name] === "undefined") {
+            if (typeof object[attribute.name] === 'undefined') {
                 continue;
             }
 
@@ -48,8 +49,8 @@ export default class MappingSchema implements ISchema {
     private getAttribute(identifier: number): MappingAttribute {
         const attributeID = identifier - this.reserved;
 
-        if(attributeID >= this.attributes.length) {
-            throw new SchemaError("attribute does not exists");
+        if (attributeID >= this.attributes.length) {
+            throw new SchemaError('attribute does not exists');
         }
 
         return this.attributes[Number(attributeID)];

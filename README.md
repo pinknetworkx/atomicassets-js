@@ -18,6 +18,32 @@ $ npm install atomicassets
 
 Web library can be found in the `dist` folder
 
+#### Example Explorer API
+```javascript
+// standard import
+const {ExplorerApi} = require("atomicassets");
+// ES6 import
+import {ExplorerApi} from "atomicassets"
+// node fetch or fetch browser module
+const fetch = require("node-fetch");
+
+// init Explorer Api
+// endpoint: server where atomicassets api is deployed
+// namespace: used namespace for the API
+// options:
+// - fetch: either node-fetch module or the browser equivalent
+const api = new ExplorerApi("https://wax-test.api.atomicassets.io", "atomicassets", {fetch});
+
+const asset = await api.getAsset("1099511627786");
+
+// create the action to mint an asset
+const actions = (await api.action).mintasset(
+    [{actor: "pinknetworkx", permission: "active"}],
+    "collection", "scheme", -1, "pinknetworkx", {"name": "test"}, {"species": "test2"}
+)
+```
+
+#### Example RPC API
 ```javascript
 // standard import
 const {RpcApi} = require("atomicassets");
@@ -41,7 +67,6 @@ const actions = api.action.mintasset(
     [{actor: "pinknetworkx", permission: "active"}],
     "collection", "scheme", -1, "pinknetworkx", {"name": "test"}, {"species": "test2"}
 )
-
 ```
 
 ### Serialization
@@ -52,6 +77,7 @@ the library provides you a serialize and deserialize function
 
 More information can be found [here](https://github.com/pinknetworkx/atomicassets-contracts/wiki/Serialization)
 
+#### Example
 ```javascript
 import {serialize, deserialize, ObjectSchema} from "atomicassets"
 
@@ -90,19 +116,100 @@ const deserializedData = deserialize(serializedData, schema);
 
 There are two methods available to fetch data from the blockchain.
 
-* **RpcAPI**: uses only native nodeos calls
 * **ExplorerAPI**: uses an hosted API which proves simple and fast REST API endpoints
+* **RpcAPI**: uses only native nodeos calls
 
-### RpcActionGenerator
+### Explorer API
 
-Both APIs have a `action` attribute which contains a helper class to construct contract actions 
-which can be pushed on chain with eosjs. See an example on top of the page.
+The explorer API uses [atomicassets-api](https://github.com/pinknetworkx/atomicassets-api) to query data about the NFTs. 
+A documentation of each endpoint and its responses can be found [here](https://wax-test.api.atomicassets.io/atomicassets/docs/#/).
+It is recommended to self-host the API for the best performance.
 
-Detailed information about each action can be found [here](https://github.com/pinknetworkx/atomicassets-contracts/wiki/Actions)
+#### Methods
+
+##### Config
+* `async getConfig(): Promise<ApiConfig>`
+
+##### Assets
+* `async getAssets(options, page: number = 1, limit: number = 100): Promise<ApiAsset[]>`
+  * options
+    * **owner**: string
+    * **collection_name**: string
+    * **schema_name**: string
+    * **template_id**: number
+    * **match**: search for input in name
+    * **authorized_account**: string
+    * **order**: field which is used to sort result
+    * **sort**: asc | desc
+* `async getAsset(id: string): Promise<ApiAsset>`
+* `async getAssetLogs(id: string, page: number = 1, limit: number = 100): Promise<ApiLog[]>`
+
+##### Collections
+* `async getCollections(options, page: number = 1, limit: number = 100): Promise<ApiCollection[]>`
+  * options
+    * **author**: string
+    * **match**: search for input in name
+    * **authorized_account**: string
+    * **notify_account**: string
+    * **order**: field which is used to sort result
+    * **sort**: asc | desc
+* `async getCollection(name: string): Promise<ApiCollection>`
+* `async getCollectionLogs(name: string, page: number = 1, limit: number = 100): Promise<ApiLog[]>`
+
+##### Schemas
+* `async getSchemas(options, page: number = 1, limit: number = 100): Promise<ApiSchema[]>`
+  * options
+    * **collection_name**: string
+    * **match**: search for input in name
+    * **authorized_account**: string
+    * **order**: field which is used to sort result
+    * **sort**: asc | desc
+* `async getSchema(collection: string, name: string): Promise<ApiSchema>`
+* `async getSchemaLogs(collection: string, name: string, page: number = 1, limit: number = 100): Promise<ApiLog[]>`
+
+##### Templates
+* `async getTemplates(options, page: number = 1, limit: number = 100): Promise<ApiTemplate[]>`
+  * options
+    * **collection_name**: string
+    * **schema_name**: string
+    * **authorized_account**: string
+    * **order**: field which is used to sort result
+    * **sort**: asc | desc
+* `async getTemplate(collection: string, id: string): Promise<ApiTemplate>`
+* `async getTemplateLogs(collection: string, id: string, page: number = 1, limit: number = 100): Promise<ApiLog[]>`
+
+##### Trading
+* `async getTransfers(options, page: number = 1, limit: number = 100): Promise<ApiTransfe[]>`
+  * options
+    * **account**: string
+    * **sender**: string
+    * **recipient**: string
+    * **order**: field which is used to sort result
+    * **sort**: asc | desc
+* `async getOffers(options, page: number = 1, limit: number = 100): Promise<ApiOffer[]>`
+  * options
+    * **account**: notified account
+    * **sender**: sender of offer
+    * **recipient**: recipient of offer
+    * **order**: field which is used to sort result
+    * **sort**: asc | desc
+* `async getOffer(id: string): Promise<ApiOffer>`
+
+#### ExplorerActionGenerator
+
+The Explorer API has an `action` attribute which contains a helper class to construct contract actions 
+which can be pushed on chain with eosjs. 
+
+Detailed information about each action can be found [here](https://github.com/pinknetworkx/atomicassets-contracts/wiki/Actions) 
+
+#### Types
+
+Each method returns the unmodified response from the API call. For more information look at the Models 
+on [the documentation](https://wax-test.api.atomicassets.io/atomicassets/docs/#/)
 
 ### RpcApi
 
-This api only uses native nodeos api calls to fetch data about NFTs. 
+This API only uses native nodeos api calls to fetch data about NFTs. 
 It is recommended to use the Explorer API for production or applications which require fast load times.
 
 #### Methods
@@ -128,6 +235,13 @@ Caching can be disabled by explicitly setting cache to false
 * `async getAccountAssets(account: string, cache: boolean = true): Promise<RpcAsset[]>`
   * gets the complete inventory of a specific account (may take long for bigger inventories)
   
+#### RpcActionGenerator
+
+The RPC API has an `action` attribute which contains a helper class to construct contract actions 
+which can be pushed on chain with eosjs. 
+
+Detailed information about each action can be found [here](https://github.com/pinknetworkx/atomicassets-contracts/wiki/Actions) 
+ 
 #### Types
 
 These classes represent table rows of the contract and consist of getter methods
@@ -179,7 +293,3 @@ The method `toObject` returns a JavaScript object representation of the class.
   * if element is a string, the asset is not owned by the recipient anymore and the offer is invalid
 * `async memo(): Promise<string>`
 * `async toObject(): Promise<object>`
-
-### Explorer API
-
-COMING SOON

@@ -1,146 +1,182 @@
-export type EosioAuthorizationObject = {actor: string, permission: string};
+import { SchemaFormat } from '../API/Rpc/Cache';
+import SerializationError from '../Errors/SerializationError';
+
+export type EosioAuthorizationObject = { actor: string, permission: string };
 export type EosioActionObject = {
     account: string,
     name: string,
     authorization: EosioAuthorizationObject[],
-    data: any,
+    data: any
 };
-export type AttributeMap = Array<{key: string, value: [string, any]}>;
-export type Format = {name: string, type: string};
+export type AttributeMap = Array<{ key: string, value: [string, any] }>;
+export type Format = { name: string, type: string };
 
 /* tslint:disable:variable-name */
 
-export default class ActionGenerator {
-    constructor(public readonly contract: string) { }
-
-    public async acceptoffer(authorization: EosioAuthorizationObject[], offer_id: string) {
-        return this._pack(authorization, "acceptoffer", {offer_id});
+export class ActionGenerator {
+    constructor(readonly contract: string) {
     }
 
-    public async addcolauth(authorization: EosioAuthorizationObject[], collection_name: string, account_to_add: string) {
-        return this._pack(authorization, "addcolauth", {collection_name, account_to_add});
+    async acceptoffer(authorization: EosioAuthorizationObject[], offer_id: string): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'acceptoffer', {offer_id});
     }
 
-    public async addconftoken(authorization: EosioAuthorizationObject[], token_contract: string, token_symbol: string) {
-        return this._pack(authorization, "addconftoken", {token_contract, token_symbol});
+    async addcolauth(authorization: EosioAuthorizationObject[], collection_name: string, account_to_add: string): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'addcolauth', {collection_name, account_to_add});
     }
 
-    public async addnotifyacc(authorization: EosioAuthorizationObject[], collection_name: string, account_to_add: string) {
-        return this._pack(authorization, "addnotifyacc", {collection_name, account_to_add});
+    async addconftoken(authorization: EosioAuthorizationObject[], token_contract: string, token_symbol: string): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'addconftoken', {token_contract, token_symbol});
     }
 
-    public async announcedepo(authorization: EosioAuthorizationObject[], owner: string, symbol_to_announce: string) {
-        return this._pack(authorization, "announcedepo", {owner, symbol_to_announce});
+    async addnotifyacc(authorization: EosioAuthorizationObject[], collection_name: string, account_to_add: string): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'addnotifyacc', {collection_name, account_to_add});
     }
 
-    public async backasset(
-        authorization: EosioAuthorizationObject[], payer: string, asset_owner: string, asset_id: string, token_to_back: string,
-    ) {
-        return this._pack(authorization, "backasset", {payer, asset_owner, asset_id, token_to_back});
+    async announcedepo(authorization: EosioAuthorizationObject[], owner: string, symbol_to_announce: string): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'announcedepo', {owner, symbol_to_announce});
     }
 
-    public async burnasset(authorization: EosioAuthorizationObject[], asset_owner: string, asset_id: string) {
-        return this._pack(authorization, "burnasset", {asset_owner, asset_id});
+    async backasset(
+        authorization: EosioAuthorizationObject[], payer: string, asset_owner: string, asset_id: string, token_to_back: string
+    ): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'backasset', {payer, asset_owner, asset_id, token_to_back});
     }
 
-    public async canceloffer(authorization: EosioAuthorizationObject[], offer_id: string) {
-        return this._pack(authorization, "canceloffer", {offer_id});
+    async burnasset(authorization: EosioAuthorizationObject[], asset_owner: string, asset_id: string): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'burnasset', {asset_owner, asset_id});
     }
 
-    public async createcol(
+    async canceloffer(authorization: EosioAuthorizationObject[], offer_id: string): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'canceloffer', {offer_id});
+    }
+
+    async createcol(
         authorization: EosioAuthorizationObject[], author: string, collection_name: string, allow_notify: boolean,
-        authorized_accounts: string[], notify_accounts: string[], market_fee: number, data: AttributeMap,
-    ) {
-        return this._pack(authorization, "createcol", {author, collection_name, allow_notify, authorized_accounts, notify_accounts, market_fee, data});
+        authorized_accounts: string[], notify_accounts: string[], market_fee: number, data: AttributeMap
+    ): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'createcol', {
+            author,
+            collection_name,
+            allow_notify,
+            authorized_accounts,
+            notify_accounts,
+            market_fee,
+            data
+        });
     }
 
-    public async createoffer(
+    async createoffer(
         authorization: EosioAuthorizationObject[], sender: string, recipient: string,
-        sender_asset_ids: string[], recipient_asset_ids: string[], memo: string,
-    ) {
-        return this._pack(authorization, "createoffer", {sender, recipient, sender_asset_ids, recipient_asset_ids, memo});
+        sender_asset_ids: string[], recipient_asset_ids: string[], memo: string
+    ): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'createoffer', {sender, recipient, sender_asset_ids, recipient_asset_ids, memo});
     }
 
-    public async createtempl(
+    async createtempl(
         authorization: EosioAuthorizationObject[], authorized_creator: string, collection_name: string, schema_name: string,
-        transferable: boolean, burnable: boolean, max_supply: string, immutable_data: AttributeMap,
-    ) {
-        return this._pack(authorization, "createtempl", {
-            authorized_creator, collection_name, schema_name, transferable, burnable, max_supply, immutable_data,
+        transferable: boolean, burnable: boolean, max_supply: string, immutable_data: AttributeMap
+    ): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'createtempl', {
+            authorized_creator, collection_name, schema_name, transferable, burnable, max_supply, immutable_data
         });
     }
 
-    public async createschema(
+    async createschema(
         authorization: EosioAuthorizationObject[], authorized_creator: string,
-        collection_name: string, schema_name: string, schema_format: Format[],
-    ) {
-        return this._pack(authorization, "createschema", {authorized_creator, collection_name, schema_name, schema_format});
+        collection_name: string, schema_name: string, schema_format: Format[]
+    ): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'createschema', {authorized_creator, collection_name, schema_name, schema_format});
     }
 
-    public async declineoffer(authorization: EosioAuthorizationObject[], offer_id: string) {
-        return this._pack(authorization, "declineoffer", {offer_id});
+    async declineoffer(authorization: EosioAuthorizationObject[], offer_id: string): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'declineoffer', {offer_id});
     }
 
-    public async extendschema(
+    async extendschema(
         authorization: EosioAuthorizationObject[], authorized_editor: string,
-        collection_name: string, schema_name: string, schema_format_extension: Format[],
-    ) {
-        return this._pack(authorization, "extendschema", {authorized_editor, collection_name, schema_name, schema_format_extension});
+        collection_name: string, schema_name: string, schema_format_extension: Format[]
+    ): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'extendschema', {authorized_editor, collection_name, schema_name, schema_format_extension});
     }
 
-    public async forbidnotify(authorization: EosioAuthorizationObject[], collection_name: string) {
-        return this._pack(authorization, "forbidnotify", {collection_name});
+    async forbidnotify(authorization: EosioAuthorizationObject[], collection_name: string): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'forbidnotify', {collection_name});
     }
 
-    public async locktemplate(authorization: EosioAuthorizationObject[], authorized_editor: string, collection_name: string, template_id: number) {
-        return this._pack(authorization, "locktemplate", {authorized_editor, collection_name, template_id});
+    async locktemplate(
+        authorization: EosioAuthorizationObject[], authorized_editor: string, collection_name: string, template_id: number
+    ): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'locktemplate', {authorized_editor, collection_name, template_id});
     }
 
-    public async mintasset(
+    async mintasset(
         authorization: EosioAuthorizationObject[], authorized_minter: string, collection_name: string, schema_name: string, template_id: string,
-        new_asset_owner: string, immutable_data: AttributeMap, mutable_data: AttributeMap, tokens_to_back: string[],
-    ) {
-        return this._pack(authorization, "mintasset", {
-            authorized_minter, collection_name, schema_name, template_id, new_asset_owner, immutable_data, mutable_data, tokens_to_back,
+        new_asset_owner: string, immutable_data: AttributeMap, mutable_data: AttributeMap, tokens_to_back: string[]
+    ): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'mintasset', {
+            authorized_minter, collection_name, schema_name, template_id, new_asset_owner, immutable_data, mutable_data, tokens_to_back
         });
     }
 
-    public async payofferram(authorization: EosioAuthorizationObject[], payer: string, offer_id: string) {
-        return this._pack(authorization, "payofferram", {payer, offer_id});
+    async payofferram(authorization: EosioAuthorizationObject[], payer: string, offer_id: string): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'payofferram', {payer, offer_id});
     }
 
-    public async remcolauth(authorization: EosioAuthorizationObject[], collection_name: string, account_to_remove: string) {
-        return this._pack(authorization, "remcolauth", {collection_name, account_to_remove});
+    async remcolauth(authorization: EosioAuthorizationObject[], collection_name: string, account_to_remove: string): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'remcolauth', {collection_name, account_to_remove});
     }
 
-    public async remnotifyacc(authorization: EosioAuthorizationObject[], collection_name: string, account_to_remove: string) {
-        return this._pack(authorization, "remnotifyacc", {collection_name, account_to_remove});
+    async remnotifyacc(authorization: EosioAuthorizationObject[], collection_name: string, account_to_remove: string): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'remnotifyacc', {collection_name, account_to_remove});
     }
 
-    public async setassetdata(
+    async setassetdata(
         authorization: EosioAuthorizationObject[], authorized_editor: string,
-        asset_owner: string, asset_id: string, new_mutable_data: AttributeMap,
-    ) {
-        return this._pack(authorization, "setassetdata", {authorized_editor, asset_owner, asset_id, new_mutable_data});
+        asset_owner: string, asset_id: string, new_mutable_data: AttributeMap
+    ): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'setassetdata', {authorized_editor, asset_owner, asset_id, new_mutable_data});
     }
 
-    public async setcoldata(authorization: EosioAuthorizationObject[], collection_name: string, data: AttributeMap) {
-        return this._pack(authorization, "setcoldata", {collection_name, data});
+    async setcoldata(authorization: EosioAuthorizationObject[], collection_name: string, data: AttributeMap): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'setcoldata', {collection_name, data});
     }
 
-    public async setmarketfee(authorization: EosioAuthorizationObject[], collection_name: string, market_fee: number) {
-        return this._pack(authorization, "setmarketfee", {collection_name, market_fee});
+    async setmarketfee(authorization: EosioAuthorizationObject[], collection_name: string, market_fee: number): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'setmarketfee', {collection_name, market_fee});
     }
 
-    public async transfer(authorization: EosioAuthorizationObject[], account_from: string, account_to: string, asset_ids: string[], memo: string) {
-        return this._pack(authorization, "transfer", {from: account_from, to: account_to, asset_ids, memo});
+    async transfer(
+        authorization: EosioAuthorizationObject[], account_from: string, account_to: string, asset_ids: string[], memo: string
+    ): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'transfer', {from: account_from, to: account_to, asset_ids, memo});
     }
 
-    public async withdraw(authorization: EosioAuthorizationObject[], owner: string, token_to_withdraw: string) {
-        return this._pack(authorization, "withdraw", {owner, token_to_withdraw});
+    async withdraw(authorization: EosioAuthorizationObject[], owner: string, token_to_withdraw: string): Promise<EosioActionObject[]> {
+        return this._pack(authorization, 'withdraw', {owner, token_to_withdraw});
     }
 
     protected _pack(authorization: EosioAuthorizationObject[], name: string, data: any): EosioActionObject[] {
-        return [{ account: this.contract, name, authorization, data }];
+        return [{account: this.contract, name, authorization, data}];
     }
+}
+
+export function toAttributeMap(obj: any, schema: SchemaFormat): AttributeMap {
+    const types: { [id: string]: string } = {};
+    const result: AttributeMap = [];
+
+    for (const row of schema) {
+        types[row.name] = row.type;
+    }
+
+    const keys = Object.keys(obj);
+    for (const key of keys) {
+        if (typeof types[key] !== 'undefined') {
+            throw new SerializationError('field not defined in schema');
+        }
+
+        result.push({key, value: [types[key], obj[key]]});
+    }
+
+    return result;
 }

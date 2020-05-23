@@ -1,24 +1,24 @@
-import ActionGenerator from "../../Actions/Generator";
-import RpcActionGenerator from "../../Actions/Rpc";
-import RpcError from "../../Errors/RpcError";
-import RpcAsset from "./Asset";
-import RpcCache, {IConfigRow} from "./Cache";
-import RpcCollection from "./Collection";
-import RpcOffer from "./Offer";
-import RpcQueue from "./Queue";
-import RpcSchema from "./Schema";
-import RpcTemplate from "./Template";
+import RpcActionGenerator from '../../Actions/Rpc';
+import RpcError from '../../Errors/RpcError';
+import RpcAsset from './Asset';
+import RpcCache, { IConfigRow } from './Cache';
+import RpcCollection from './Collection';
+import RpcOffer from './Offer';
+import RpcQueue from './Queue';
+import RpcSchema from './Schema';
+import RpcTemplate from './Template';
 
 type Fetch = (input?: Request | string, init?: RequestInit) => Promise<Response>;
-type ApiArgs = {fetch?: Fetch, rateLimit?: number };
+type ApiArgs = { fetch?: Fetch, rateLimit?: number };
 
 export default class RpcApi {
-    public readonly queue: RpcQueue;
-    public readonly cache: RpcCache;
-    public readonly action: ActionGenerator;
+    readonly queue: RpcQueue;
+    readonly cache: RpcCache;
 
-    public readonly endpoint: string;
-    public readonly contract: string;
+    readonly action: RpcActionGenerator;
+
+    readonly endpoint: string;
+    readonly contract: string;
 
     private readonly fetchBuiltin: Fetch;
 
@@ -32,7 +32,7 @@ export default class RpcApi {
         if (args.fetch) {
             this.fetchBuiltin = args.fetch;
         } else {
-            this.fetchBuiltin = (global as any).fetch;
+            this.fetchBuiltin = (<any>global).fetch;
         }
 
         this.queue = new RpcQueue(this, args.rateLimit);
@@ -42,11 +42,11 @@ export default class RpcApi {
         this._config = new Promise((async (resolve, reject) => {
             try {
                 const resp = await this.getTableRows({
-                    code: this.contract, scope: this.contract, table: "config",
+                    code: this.contract, scope: this.contract, table: 'config'
                 });
 
-                if(resp.rows.length !== 1) {
-                    return reject("invalid config");
+                if (resp.rows.length !== 1) {
+                    return reject('invalid config');
                 }
 
                 return resolve(resp.rows[0]);
@@ -56,86 +56,86 @@ export default class RpcApi {
         }));
     }
 
-    public async config(): Promise<IConfigRow> {
+    async config(): Promise<IConfigRow> {
         return await this._config;
     }
 
-    public async getAsset(owner: string, id: string, cache: boolean = true): Promise<RpcAsset> {
-        if(!cache) {
+    async getAsset(owner: string, id: string, cache: boolean = true): Promise<RpcAsset> {
+        if (!cache) {
             this.cache.asset(id, null);
         }
 
         return new RpcAsset(this, owner, id, undefined, undefined, undefined, undefined, cache);
     }
 
-    public async getTemplate(collection: string, id: string, cache: boolean = true): Promise<RpcTemplate> {
-        if(!cache) {
+    async getTemplate(collection: string, id: string, cache: boolean = true): Promise<RpcTemplate> {
+        if (!cache) {
             this.cache.template(id, null);
         }
 
         return new RpcTemplate(this, collection, id, undefined, undefined, cache);
     }
 
-    public async getCollection(name: string, cache: boolean = true) {
-        if(!cache) {
+    async getCollection(name: string, cache: boolean = true): Promise<RpcCollection> {
+        if (!cache) {
             this.cache.collection(name, null);
         }
 
-        return new RpcCollection(this, name, undefined,  cache);
+        return new RpcCollection(this, name, undefined, cache);
     }
 
-    public async getCollectionTemplates(collection: string, cache: boolean = true): Promise<RpcTemplate[]> {
+    async getCollectionTemplates(collection: string, cache: boolean = true): Promise<RpcTemplate[]> {
         return (await this.queue.collection_templates(collection)).map((templateRow) => {
             return new RpcTemplate(this, collection, String(templateRow.template_id), templateRow, undefined, cache);
         });
     }
 
-    public async getCollectionsSchemas(collection: string, cache: boolean = true): Promise<RpcSchema[]> {
+    async getCollectionsSchemas(collection: string, cache: boolean = true): Promise<RpcSchema[]> {
         return (await this.queue.collection_schemas(collection)).map((schemaRow) => {
             return new RpcSchema(this, collection, schemaRow.schema_name, undefined, cache);
         });
     }
 
-    public async getSchema(collection: string, name: string, cache: boolean = true): Promise<RpcSchema> {
-        if(!cache) {
+    async getSchema(collection: string, name: string, cache: boolean = true): Promise<RpcSchema> {
+        if (!cache) {
             this.cache.schema(name, null);
         }
 
         return new RpcSchema(this, collection, name, undefined, cache);
     }
 
-    public async getOffer(id: string, cache: boolean = true): Promise<RpcOffer> {
-        if(!cache) {
+    async getOffer(id: string, cache: boolean = true): Promise<RpcOffer> {
+        if (!cache) {
             this.cache.offer(id, null);
         }
 
         return new RpcOffer(this, id, undefined, undefined, undefined, cache);
     }
 
-    public async getAccountOffers(account: string, cache: boolean = true): Promise<RpcOffer[]> {
+    async getAccountOffers(account: string, cache: boolean = true): Promise<RpcOffer[]> {
         return (await this.queue.account_offers(account)).map((offerRow) => {
             return new RpcOffer(this, offerRow.offer_id, offerRow, undefined, undefined, cache);
         });
     }
 
-    public async getAccountAssets(account: string, cache: boolean = true): Promise<RpcAsset[]> {
+    async getAccountAssets(account: string, cache: boolean = true): Promise<RpcAsset[]> {
         return (await this.queue.account_assets(account)).map((assetRow) => {
             return new RpcAsset(this, account, assetRow.asset_id, assetRow, undefined, undefined, undefined, cache);
         });
     }
 
-    public async getTableRows({
-        code, scope, table, table_key = "", lower_bound = "", upper_bound = "",
-        index_position = 1, key_type = "",
-    }: any): Promise<any> {
-        return await this.fetchRpc("/v1/chain/get_table_rows", {
+    async getTableRows({
+                           code, scope, table, table_key = '', lower_bound = '', upper_bound = '',
+                           index_position = 1, key_type = ''
+                       }: any): Promise<any> {
+        return await this.fetchRpc('/v1/chain/get_table_rows', {
             code, scope, table, table_key,
             lower_bound, upper_bound, index_position,
-            key_type, limit: 101, reverse: false, show_payer: false, json: true,
+            key_type, limit: 101, reverse: false, show_payer: false, json: true
         });
     }
 
-    public async fetchRpc(path: string, body: any) {
+    async fetchRpc(path: string, body: any): Promise<any> {
         let response;
         let json;
 
@@ -144,7 +144,7 @@ export default class RpcApi {
 
             response = await f(this.endpoint + path, {
                 body: JSON.stringify(body),
-                method: "POST",
+                method: 'POST'
             });
 
             json = await response.json();

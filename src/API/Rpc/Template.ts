@@ -1,10 +1,10 @@
-import {deserialize} from "../../Serialization";
-import {ITemplateRow} from "./Cache";
-import RpcApi from "./index";
-import RpcSchema from "./Schema";
+import { deserialize } from '../../Serialization';
+import { ITemplateRow } from './Cache';
+import RpcApi from './index';
+import RpcSchema from './Schema';
 
 export default class RpcTemplate {
-    public readonly id: string;
+    readonly id: string;
 
     // tslint:disable-next-line:variable-name
     private readonly _data: Promise<ITemplateRow>;
@@ -12,11 +12,11 @@ export default class RpcTemplate {
     // tslint:disable-next-line:variable-name
     private readonly _schema: Promise<RpcSchema>;
 
-    public constructor(private readonly api: RpcApi, collection: string, id: string, data?: ITemplateRow, schema?: RpcSchema, cache: boolean = true) {
+    constructor(private readonly api: RpcApi, collection: string, id: string, data?: ITemplateRow, schema?: RpcSchema, cache: boolean = true) {
         this.id = id;
 
         this._data = new Promise(async (resolve, reject) => {
-            if(data) {
+            if (data) {
                 resolve(data);
             } else {
                 try {
@@ -28,7 +28,7 @@ export default class RpcTemplate {
         });
 
         this._schema = new Promise(async (resolve, reject) => {
-            if(schema) {
+            if (schema) {
                 resolve(schema);
             } else {
                 try {
@@ -42,33 +42,33 @@ export default class RpcTemplate {
         });
     }
 
-    public async schema(): Promise<RpcSchema> {
+    async schema(): Promise<RpcSchema> {
         return await this._schema;
     }
 
-    public async immutableData(): Promise<object> {
+    async immutableData(): Promise<object> {
         const schema = await this._schema;
 
         return deserialize((await this._data).immutable_serialized_data, await schema.format());
     }
 
-    public async isTransferable(): Promise<boolean> {
+    async isTransferable(): Promise<boolean> {
         return (await this._data).transferable;
     }
 
-    public async isBurnable(): Promise<boolean> {
+    async isBurnable(): Promise<boolean> {
         return (await this._data).burnable;
     }
 
-    public async maxSupply(): Promise<number> {
+    async maxSupply(): Promise<number> {
         return (await this._data).max_supply;
     }
 
-    public async circulation(): Promise<number> {
+    async circulation(): Promise<number> {
         return (await this._data).issued_supply;
     }
 
-    public async toObject(): Promise<object> {
+    async toObject(): Promise<object> {
         return {
             template_id: this.id,
             schema: await (await this.schema()).toObject(),
@@ -76,7 +76,7 @@ export default class RpcTemplate {
             transferable: await this.isTransferable(),
             burnable: await this.isBurnable(),
             maxSupply: await this.maxSupply(),
-            circulation: await this.circulation(),
+            circulation: await this.circulation()
         };
     }
 }

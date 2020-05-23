@@ -1,21 +1,21 @@
-import {ISchema, ObjectSchema} from "../../Schema";
-import {ISchemaRow} from "./Cache";
-import RpcCollection from "./Collection";
-import RpcApi from "./index";
+import { ISchema, ObjectSchema, SchemaObject } from '../../Schema';
+import { ISchemaRow } from './Cache';
+import RpcCollection from './Collection';
+import RpcApi from './index';
 
 export default class RpcSchema {
-    public readonly name: string;
+    readonly name: string;
 
     // tslint:disable-next-line:variable-name
     private readonly _data: Promise<ISchemaRow>;
     // tslint:disable-next-line:variable-name
     private readonly _collection: Promise<RpcCollection>;
 
-    public constructor(private readonly api: RpcApi, collection: string, name: string, data?: ISchemaRow, cache: boolean = true) {
+    constructor(private readonly api: RpcApi, collection: string, name: string, data?: ISchemaRow, cache: boolean = true) {
         this.name = name;
 
         this._data = new Promise(async (resolve, reject) => {
-            if(data) {
+            if (data) {
                 resolve(data);
             } else {
                 try {
@@ -35,23 +35,23 @@ export default class RpcSchema {
         });
     }
 
-    public async collection(): Promise<RpcCollection> {
+    async collection(): Promise<RpcCollection> {
         return await this._collection;
     }
 
-    public async format(): Promise<ISchema> {
+    async format(): Promise<ISchema> {
         return ObjectSchema((await this._data).format);
     }
 
-    public async rawFormat() {
+    async rawFormat(): Promise<SchemaObject[]> {
         return (await this._data).format;
     }
 
-    public async toObject() {
+    async toObject(): Promise<object> {
         return {
             schema_name: this.name,
             collection: await (await this._collection).toObject(),
-            format: (await this._data).format,
+            format: (await this._data).format
         };
     }
 }

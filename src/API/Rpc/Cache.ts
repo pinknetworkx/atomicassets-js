@@ -1,4 +1,4 @@
-export type SchemaFormat = Array<{name: string, type: string}>;
+export type SchemaFormat = Array<{ name: string, type: string }>;
 
 export interface ICollectionRow {
     collection_name: string;
@@ -53,43 +53,43 @@ export interface IConfigRow {
 }
 
 export default class RpcCache {
+    private readonly assets: { [id: string]: { data: IAssetRow, expiration: number, updated: number } } = {};
+    private readonly templates: { [id: string]: { data: ITemplateRow, expiration: number, updated: number } } = {};
+    private readonly schemas: { [id: string]: { data: ISchemaRow, expiration: number, updated: number } } = {};
+    private readonly collections: { [id: string]: { data: ICollectionRow, expiration: number, updated: number } } = {};
+    private readonly offers: { [id: string]: { data: IOfferRow, expiration: number, updated: number } } = {};
+
     private static access<T>(
         identifier: string | number,
-        cache: {[id: string]: {expiration: number, updated: number, data: T}},
-        data?: T | null | false,
+        cache: { [id: string]: { expiration: number, updated: number, data: T } },
+        data?: T | null | false
     ): T | undefined {
-        if(data === null) {
+        if (data === null) {
             delete cache[String(identifier)];
 
-            return undefined;
+            return;
         }
 
-        if(data) {
+        if (data) {
             cache[String(identifier)] = {expiration: Date.now() + 15 * 60 * 1000, updated: Date.now(), data};
 
             return data;
         }
 
-        if(typeof cache[String(identifier)] === "undefined" || cache[String(identifier)].expiration < Date.now()) {
-            return undefined;
+        if (typeof cache[String(identifier)] === 'undefined' || cache[String(identifier)].expiration < Date.now()) {
+            return;
         }
 
         // if data is false then only return cache if it is not older than 5 seconds
-        if(data === false && Date.now() - cache[String(identifier)].updated > 5 * 1000) {
-            return undefined;
+        if (data === false && Date.now() - cache[String(identifier)].updated > 5 * 1000) {
+            return;
         }
 
         return cache[String(identifier)].data;
     }
 
-    private readonly assets: {[id: string]: {data: IAssetRow, expiration: number, updated: number}} = {};
-    private readonly templates: {[id: string]: {data: ITemplateRow, expiration: number, updated: number}} = {};
-    private readonly schemas: {[id: string]: {data: ISchemaRow, expiration: number, updated: number}} = {};
-    private readonly collections: {[id: string]: {data: ICollectionRow, expiration: number, updated: number}} = {};
-    private readonly offers: {[id: string]: {data: IOfferRow, expiration: number, updated: number}} = {};
-
-    public asset(assetID: string, data?: any | null | false): IAssetRow | undefined {
-        if(data) {
+    asset(assetID: string, data?: any | null | false): IAssetRow | undefined {
+        if (data) {
             data.mutable_serialized_data = new Uint8Array(data.mutable_serialized_data);
             data.immutable_serialized_data = new Uint8Array(data.immutable_serialized_data);
         }
@@ -97,23 +97,23 @@ export default class RpcCache {
         return RpcCache.access<IAssetRow>(assetID, this.assets, data);
     }
 
-    public template(templateID: string, data?: any | null | false): ITemplateRow | undefined {
-        if(data) {
+    template(templateID: string, data?: any | null | false): ITemplateRow | undefined {
+        if (data) {
             data.immutable_serialized_data = new Uint8Array(data.immutable_serialized_data);
         }
 
         return RpcCache.access<ITemplateRow>(templateID, this.templates, data);
     }
 
-    public schema(schema: string, data?: any | null | false): ISchemaRow | undefined {
+    schema(schema: string, data?: any | null | false): ISchemaRow | undefined {
         return RpcCache.access<ISchemaRow>(schema, this.schemas, data);
     }
 
-    public collection(collection: string, data?: any | null | false): ICollectionRow | undefined {
+    collection(collection: string, data?: any | null | false): ICollectionRow | undefined {
         return RpcCache.access<ICollectionRow>(collection, this.collections, data);
     }
 
-    public offer(offerID: string, data?: any | null | false): IOfferRow | undefined {
+    offer(offerID: string, data?: any | null | false): IOfferRow | undefined {
         return RpcCache.access<IOfferRow>(offerID, this.offers, data);
     }
 }

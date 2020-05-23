@@ -1,12 +1,12 @@
-import {deserialize} from "../../Serialization";
-import {IAssetRow} from "./Cache";
-import RpcCollection from "./Collection";
-import RpcApi from "./index";
-import RpcSchema from "./Schema";
-import RpcTemplate from "./Template";
+import { deserialize } from '../../Serialization';
+import { IAssetRow } from './Cache';
+import RpcCollection from './Collection';
+import RpcApi from './index';
+import RpcSchema from './Schema';
+import RpcTemplate from './Template';
 
 export default class RpcAsset {
-    public readonly id: string;
+    readonly id: string;
 
     // tslint:disable-next-line:variable-name
     private readonly _data: Promise<IAssetRow>;
@@ -17,7 +17,7 @@ export default class RpcAsset {
     // tslint:disable-next-line:variable-name
     private readonly _schema: Promise<RpcSchema>;
 
-    public constructor(
+    constructor(
         private readonly api: RpcApi,
         owner: string,
         id: string,
@@ -25,12 +25,12 @@ export default class RpcAsset {
         collection?: RpcCollection,
         schema?: RpcSchema,
         template?: RpcTemplate,
-        cache: boolean = true,
+        cache: boolean = true
     ) {
         this.id = id;
 
         this._data = new Promise(async (resolve, reject) => {
-            if(data) {
+            if (data) {
                 resolve(data);
             } else {
                 try {
@@ -42,13 +42,13 @@ export default class RpcAsset {
         });
 
         this._template = new Promise(async (resolve, reject) => {
-            if(template) {
+            if (template) {
                 resolve(template);
             } else {
                 try {
                     const row = await this._data;
 
-                    if(Number(row.template_id) < 0) {
+                    if (Number(row.template_id) < 0) {
                         return resolve(null);
                     }
 
@@ -60,7 +60,7 @@ export default class RpcAsset {
         });
 
         this._collection = new Promise(async (resolve, reject) => {
-            if(collection) {
+            if (collection) {
                 resolve(collection);
             } else {
                 try {
@@ -74,7 +74,7 @@ export default class RpcAsset {
         });
 
         this._schema = new Promise(async (resolve, reject) => {
-            if(schema) {
+            if (schema) {
                 resolve(schema);
             } else {
                 try {
@@ -88,37 +88,37 @@ export default class RpcAsset {
         });
     }
 
-    public async template(): Promise<RpcTemplate | null> {
+    async template(): Promise<RpcTemplate | null> {
         return await this._template;
     }
 
-    public async collection(): Promise<RpcCollection> {
+    async collection(): Promise<RpcCollection> {
         return await this._collection;
     }
 
-    public async schema(): Promise<RpcSchema> {
+    async schema(): Promise<RpcSchema> {
         return await this._schema;
     }
 
-    public async backedTokens(): Promise<string[]> {
+    async backedTokens(): Promise<string[]> {
         return (await this._data).backed_tokens;
     }
 
-    public async immutableData(): Promise<object> {
+    async immutableData(): Promise<object> {
         const schema = await this.schema();
         const row = await this._data;
 
         return deserialize(row.immutable_serialized_data, await schema.format());
     }
 
-    public async mutableData(): Promise<object> {
+    async mutableData(): Promise<object> {
         const schema = await this.schema();
         const row = await this._data;
 
         return deserialize(row.mutable_serialized_data, await schema.format());
     }
 
-    public async data(): Promise<object> {
+    async data(): Promise<object> {
         const mutableData = await this.mutableData();
         const immutableData = await this.immutableData();
 
@@ -128,7 +128,7 @@ export default class RpcAsset {
         return Object.assign({}, mutableData, immutableData, templateData);
     }
 
-    public async toObject(): Promise<object> {
+    async toObject(): Promise<object> {
         const template = await this.template();
         const collection = await this.collection();
         const schema = await this.schema();
@@ -143,7 +143,7 @@ export default class RpcAsset {
             backedTokens: await this.backedTokens(),
             immutableData: await this.immutableData(),
             mutableData: await this.mutableData(),
-            data: await this.data(),
+            data: await this.data()
         };
     }
 }

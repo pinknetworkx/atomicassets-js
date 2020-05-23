@@ -1,9 +1,9 @@
-import RpcAsset from "./Asset";
-import {IAssetRow, IOfferRow} from "./Cache";
-import RpcApi from "./index";
+import RpcAsset from './Asset';
+import { IAssetRow, IOfferRow } from './Cache';
+import RpcApi from './index';
 
 export default class RpcOffer {
-    public readonly id: string;
+    readonly id: string;
 
     // tslint:disable-next-line:variable-name
     private readonly _data: Promise<IOfferRow>;
@@ -16,7 +16,7 @@ export default class RpcOffer {
         this.id = id;
 
         this._data = new Promise(async (resolve, reject) => {
-            if(data) {
+            if (data) {
                 resolve(data);
             } else {
                 try {
@@ -28,7 +28,7 @@ export default class RpcOffer {
         });
 
         this._senderAssets = new Promise(async (resolve, reject) => {
-            if(senderAssets) {
+            if (senderAssets) {
                 resolve(senderAssets);
             } else {
                 try {
@@ -47,7 +47,7 @@ export default class RpcOffer {
         });
 
         this._recipientAssets = new Promise(async (resolve, reject) => {
-            if(receiverAssets) {
+            if (receiverAssets) {
                 resolve(receiverAssets);
             } else {
                 try {
@@ -66,38 +66,38 @@ export default class RpcOffer {
         });
     }
 
-    public async sender(): Promise<string> {
+    async sender(): Promise<string> {
         return (await this._data).sender;
     }
 
-    public async recipient(): Promise<string> {
+    async recipient(): Promise<string> {
         return (await this._data).recipient;
     }
 
-    public async senderAssets(): Promise<Array<RpcAsset | string>> {
+    async senderAssets(): Promise<Array<RpcAsset | string>> {
         return await this._senderAssets;
     }
 
-    public async recipientAssets(): Promise<Array<RpcAsset | string>> {
+    async recipientAssets(): Promise<Array<RpcAsset | string>> {
         return await this._recipientAssets;
     }
 
-    public async memo(): Promise<string> {
+    async memo(): Promise<string> {
         return (await this._data).memo;
     }
 
-    public async toObject(): Promise<object> {
+    async toObject(): Promise<object> {
         return {
             offer_id: this.id,
             sender: {
                 account: await this.sender(),
-                assets: await Promise.all((await this.senderAssets()).map(async (asset) => typeof asset === "string" ? asset : await asset.toObject())),
+                assets: await Promise.all((await this.senderAssets()).map(async (asset) => typeof asset === 'string' ? asset : await asset.toObject()))
             },
             recipient: {
                 account: await this.recipient(),
-                assets: await Promise.all((await this.recipientAssets()).map(async (asset) => typeof asset === "string" ? asset : await asset.toObject())),
+                assets: await Promise.all((await this.recipientAssets()).map(async (asset) => typeof asset === 'string' ? asset : await asset.toObject()))
             },
-            memo: await this.memo(),
+            memo: await this.memo()
         };
     }
 }
