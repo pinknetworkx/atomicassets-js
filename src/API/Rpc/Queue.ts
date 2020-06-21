@@ -6,54 +6,77 @@ export default class RpcQueue {
     private elements: any[] = [];
     private interval: any = null;
 
-    constructor(private readonly api: RpcApi, private readonly requestLimit: number = 4) {
+    constructor(private readonly api: RpcApi, private readonly requestLimit: number = 4) { }
+
+    async fetchAsset(owner: string, assetID: string, useCache: boolean = true): Promise<IAssetRow> {
+        return await this.fetch_single_row<IAssetRow>('assets', owner, assetID, (data?: IAssetRow) => {
+            return (useCache || typeof data !== 'undefined') ? this.api.cache.getAsset(assetID, data) : null;
+        });
     }
 
-    async asset(owner: string, id: string, useCache: boolean = true): Promise<IAssetRow> {
-        return this.fetch_single_row('assets', owner, id, this.api.cache.asset.bind(this.api.cache), useCache);
+    async fetchAccountAssets(account: string): Promise<IAssetRow[]> {
+        const rows = await this.fetch_all_rows<IAssetRow>('assets', account, 'asset_id');
+
+        return rows.map((asset) => {
+            return <IAssetRow>this.api.cache.getAsset(asset.asset_id, asset);
+        });
     }
 
-    async account_assets(account: string, useCache: boolean = true): Promise<IAssetRow[]> {
-        return this.fetch_all_rows('assets', account, 'id', '', '', this.api.cache.asset.bind(this.api.cache), useCache);
+    async fetchTemplate(collectionName: string, templateID: string, useCache: boolean = true): Promise<ITemplateRow> {
+        return await this.fetch_single_row<ITemplateRow>('templates', collectionName, templateID, (data?: ITemplateRow) => {
+            return (useCache || typeof data !== 'undefined') ? this.api.cache.getTemplate(collectionName, templateID, data) : null;
+        });
     }
 
-    async template(collection: string, id: string, useCache: boolean = true): Promise<ITemplateRow> {
-        return this.fetch_single_row('templates', collection, id, this.api.cache.template.bind(this.api.cache), useCache);
+    async fetchCollectionTemplates(collectionName: string): Promise<ITemplateRow[]> {
+        const rows = await this.fetch_all_rows<ITemplateRow>('templates', collectionName, 'template_id');
+
+        return rows.map((template) => {
+            return <ITemplateRow>this.api.cache.getTemplate(collectionName, String(template.template_id), template);
+        });
     }
 
-    async collection_templates(collection: string, useCache: boolean = true): Promise<ITemplateRow[]> {
-        return this.fetch_all_rows('templates', collection, 'template_id', '', '', this.api.cache.template.bind(this.api.cache), useCache);
+    async fetchSchema(collectionName: string, schemaName: string, useCache: boolean = true): Promise<ISchemaRow> {
+        return await this.fetch_single_row<ISchemaRow>('schemas', collectionName, schemaName, (data?: ISchemaRow) => {
+            return (useCache || typeof data !== 'undefined') ? this.api.cache.getSchema(collectionName, schemaName, data) : null;
+        });
     }
 
-    async schema(collection: string, name: string, useCache: boolean = true): Promise<ISchemaRow> {
-        return this.fetch_single_row('schemas', collection, name, this.api.cache.schema.bind(this.api.cache), useCache);
+    async fetchCollectionSchemas(collectionName: string): Promise<ISchemaRow[]> {
+        const rows = await this.fetch_all_rows<ISchemaRow>('schemas', collectionName, 'schema_name');
+
+        return rows.map((schema) => {
+            return <ISchemaRow>this.api.cache.getSchema(collectionName, schema.schema_name, schema);
+        });
     }
 
-    async collection_schemas(collection: string, useCache: boolean = true): Promise<ISchemaRow[]> {
-        return this.fetch_all_rows('schemas', collection, 'schema_name', '', '', this.api.cache.schema.bind(this.api.cache), useCache);
+    async fetchCollection(collectionName: string, useCache: boolean = true): Promise<ICollectionRow> {
+        return await this.fetch_single_row<ICollectionRow>('collections', this.api.contract, collectionName, (data?: ICollectionRow) => {
+            return (useCache || typeof data !== 'undefined') ? this.api.cache.getCollection(collectionName, data) : null;
+        });
     }
 
-    async collection(name: string, useCache: boolean = true): Promise<ICollectionRow> {
-        return this.fetch_single_row('collections', this.api.contract, name, this.api.cache.collection.bind(this.api.cache), useCache);
+    async fetchOffer(offerID: string, useCache: boolean = true): Promise<IOfferRow> {
+        return await this.fetch_single_row<IOfferRow>('offers', this.api.contract, offerID, (data?: IOfferRow) => {
+            return (useCache || typeof data !== 'undefined') ? this.api.cache.getOffer(offerID, data) : null;
+        });
     }
 
-    async offer(id: string, useCache: boolean = true): Promise<IOfferRow> {
-        return this.fetch_single_row('offers', this.api.contract, id, this.api.cache.offer.bind(this.api.cache), useCache);
-    }
-
-    async account_offers(account: string, useCache: boolean = true): Promise<IOfferRow[]> {
+    async fetchAccountOffers(account: string): Promise<IOfferRow[]> {
         const rows: any[][] = await Promise.all([
-            this.fetch_all_rows(
-                'offers', this.api.contract, 'offer_sender', account, account,
-                this.api.cache.offer.bind(this.api.cache), useCache, 2, 'name'
+            this.fetch_all_rows<IOfferRow>(
+                'offers', this.api.contract, 'offer_sender', account, account, 2, 'name'
             ),
-            this.fetch_all_rows(
-                'offers', this.api.contract, 'offer_recipient', account, account,
-                this.api.cache.offer.bind(this.api.cache), useCache, 3, 'name'
+            this.fetch_all_rows<IOfferRow>(
+                'offers', this.api.contract, 'offer_recipient', account, account, 3, 'name'
             )
         ]);
 
-        return rows[0].concat(rows[1]);
+        const offers: IOfferRow[] = rows[0].concat(rows[1]);
+
+        return offers.map((offer) => {
+            return <IOfferRow>this.api.cache.getOffer(offer.offer_id, offer);
+        });
     }
 
     private dequeue(): void {
@@ -71,26 +94,22 @@ export default class RpcQueue {
         }, Math.ceil(1000 / this.requestLimit));
     }
 
-    private async fetch_single_row(
+    private async fetch_single_row<T>(
         table: string, scope: string, match: any,
-        cache: any = null, useCache: boolean = true,
+        cacheFn: (data?: T) => T | null,
         indexPosition: number = 1, keyType: string = ''
-    ): Promise<any> {
-        let data = cache(match, useCache ? undefined : false);
-
+    ): Promise<T> {
         return new Promise((resolve, reject) => {
-            if (data) {
+            let data = cacheFn();
+
+            if (data !== null) {
                 return resolve(data);
             }
 
             this.elements.push(async () => {
-                data = cache(match, useCache ? undefined : false);
+                data = cacheFn();
 
-                if (data) {
-                    if (this.elements.length > 0) {
-                        this.elements.shift()();
-                    }
-
+                if (data !== null) {
                     return resolve(data);
                 }
 
@@ -101,11 +120,11 @@ export default class RpcQueue {
                         index_position: indexPosition, key_type: keyType
                     });
 
-                    if (resp.rows.length !== 1) {
+                    if (resp.rows.length === 0) {
                         return reject(new RpcError('row not found \'' + match + '\''));
                     }
 
-                    return resolve(cache(match, resp.rows[0]));
+                    return resolve(<T>cacheFn(resp.rows[0]));
                 } catch (e) {
                     return reject(e);
                 }
@@ -115,12 +134,11 @@ export default class RpcQueue {
         });
     }
 
-    private async fetch_all_rows(
+    private async fetch_all_rows<T>(
         table: string, scope: string, tableKey: string,
         lowerBound: string = '', upperBound: string = '',
-        cache: any, useCache: boolean = true,
         indexPosition: number = 1, keyType: string = ''
-    ): Promise<any[]> {
+    ): Promise<T[]> {
         return new Promise(async (resolve, reject) => {
             this.elements.push(async () => {
                 const resp: { more: boolean, rows: any[] } = await this.api.getTableRows({
@@ -132,16 +150,15 @@ export default class RpcQueue {
                 if (resp.more && indexPosition === 1) {
                     this.elements.unshift(async () => {
                         try {
-                            let next = await this.fetch_all_rows(
+                            const next = await this.fetch_all_rows(
                                 table, scope, tableKey,
                                 resp.rows[resp.rows.length - 1][tableKey],
-                                upperBound, cache, useCache
+                                upperBound, indexPosition, keyType
                             );
-                            next.shift();
 
-                            next = next.map((element) => {
-                                return cache(element[tableKey], element);
-                            });
+                            if (next.length > 0) {
+                                next.shift();
+                            }
 
                             resolve(resp.rows.concat(next));
                         } catch (e) {

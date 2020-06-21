@@ -4,6 +4,7 @@ import RpcApi from './index';
 import RpcSchema from './Schema';
 
 export default class RpcTemplate {
+    readonly collection: string;
     readonly id: string;
 
     // tslint:disable-next-line:variable-name
@@ -13,6 +14,7 @@ export default class RpcTemplate {
     private readonly _schema: Promise<RpcSchema>;
 
     constructor(private readonly api: RpcApi, collection: string, id: string, data?: ITemplateRow, schema?: RpcSchema, cache: boolean = true) {
+        this.collection = collection;
         this.id = id;
 
         this._data = new Promise(async (resolve, reject) => {
@@ -20,7 +22,7 @@ export default class RpcTemplate {
                 resolve(data);
             } else {
                 try {
-                    resolve(await api.queue.template(collection, id, cache));
+                    resolve(await api.queue.fetchTemplate(collection, id, cache));
                 } catch (e) {
                     reject(e);
                 }

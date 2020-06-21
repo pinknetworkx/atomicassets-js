@@ -84,6 +84,11 @@ export type ApiSchema = {
     }
 };
 
+export type ApiSchemaStats = {
+    assets: number,
+    templates: number
+};
+
 export type ApiTemplate = {
     contract: string,
     template_id: number,
@@ -111,6 +116,10 @@ export type ApiTemplate = {
         created_at_block: number,
         created_at_time: number
     }
+};
+
+export type ApiTemplateStats = {
+    assets: number
 };
 
 export type ApiOffer = {
@@ -152,5 +161,6 @@ export type ApiLog = {
 export type ApiConfig = {
     contract: string,
     version: string,
-    collection_format: SchemaObject[]
+    collection_format: SchemaObject[],
+    supported_tokens: Array<{token_contract: string, token_symbol: string, token_precision: number}>
 };

@@ -1,6 +1,17 @@
 import ExplorerActionGenerator from '../../Actions/Explorer';
 import ExplorerError from '../../Errors/ExplorerError';
-import { ApiAsset, ApiCollection, ApiConfig, ApiLog, ApiOffer, ApiSchema, ApiTemplate, ApiTransfer } from './types';
+import {
+    ApiAsset,
+    ApiCollection,
+    ApiConfig,
+    ApiLog,
+    ApiOffer,
+    ApiSchema,
+    ApiSchemaStats,
+    ApiTemplate,
+    ApiTemplateStats,
+    ApiTransfer
+} from './types';
 
 type Fetch = (input?: Request | string, init?: RequestInit) => Promise<Response>;
 type ApiArgs = { fetch?: Fetch, rateLimit?: number };
@@ -42,7 +53,13 @@ export default class ExplorerApi {
         order?: string,
         sort?: string,
         [key: string]: any
-    } = {}, page: number = 1, limit: number = 100): Promise<ApiAsset[]> {
+    } = {}, page: number = 1, limit: number = 100, data: { [key: string]: any} = {}): Promise<ApiAsset[]> {
+        const dataKeys = Object.keys(data);
+
+        for (const key of dataKeys) {
+            options['data.' + key] = data[key];
+        }
+
         return await this.fetchEndpoint('/v1/assets', {page, limit, ...options});
     }
 
@@ -50,8 +67,8 @@ export default class ExplorerApi {
         return await this.fetchEndpoint('/v1/assets/' + id, {});
     }
 
-    async getAssetLogs(id: string, page: number = 1, limit: number = 100): Promise<ApiLog[]> {
-        return await this.fetchEndpoint('/v1/assets/' + id + '/logs', {page, limit});
+    async getAssetLogs(id: string, page: number = 1, limit: number = 100, order: string = 'desc'): Promise<ApiLog[]> {
+        return await this.fetchEndpoint('/v1/assets/' + id + '/logs', {page, limit, order});
     }
 
     async getCollections(options: {
@@ -69,12 +86,13 @@ export default class ExplorerApi {
         return await this.fetchEndpoint('/v1/collections/' + name, {});
     }
 
-    async getCollectionLogs(name: string, page: number = 1, limit: number = 100): Promise<ApiLog[]> {
-        return await this.fetchEndpoint('/v1/collections/' + name + '/logs', {page, limit});
+    async getCollectionLogs(name: string, page: number = 1, limit: number = 100, order: string = 'desc'): Promise<ApiLog[]> {
+        return await this.fetchEndpoint('/v1/collections/' + name + '/logs', {page, limit, order});
     }
 
     async getSchemas(options: {
         collection_name?: string,
+        schema_name?: string,
         match?: string,
         authorized_account?: string,
         order?: string,
@@ -87,18 +105,29 @@ export default class ExplorerApi {
         return await this.fetchEndpoint('/v1/schemas/' + collection + '/' + name, {});
     }
 
-    async getSchemaLogs(collection: string, name: string, page: number = 1, limit: number = 100): Promise<ApiLog[]> {
-        return await this.fetchEndpoint('/v1/schemas/' + collection + '/' + name + '/logs', {page, limit});
+    async getSchemaStats(collection: string, name: string): Promise<ApiSchemaStats> {
+        return await this.fetchEndpoint('/v1/schemas/' + collection + '/' + name + '/stats', {});
+    }
+
+    async getSchemaLogs(collection: string, name: string, page: number = 1, limit: number = 100, order: string = 'desc'): Promise<ApiLog[]> {
+        return await this.fetchEndpoint('/v1/schemas/' + collection + '/' + name + '/logs', {page, limit, order});
     }
 
     async getTemplates(options: {
         collection_name?: string,
         schema_name?: string,
         authorized_account?: string,
+        template_id?: string,
         order?: string,
         sort?: string,
         [key: string]: any
-    } = {}, page: number = 1, limit: number = 100): Promise<ApiTemplate[]> {
+    } = {}, page: number = 1, limit: number = 100, data: {[key: string]: any}): Promise<ApiTemplate[]> {
+        const dataKeys = Object.keys(data);
+
+        for (const key of dataKeys) {
+            options['data.' + key] = data[key];
+        }
+
         return await this.fetchEndpoint('/v1/templates', {page, limit, ...options});
     }
 
@@ -106,14 +135,19 @@ export default class ExplorerApi {
         return await this.fetchEndpoint('/v1/templates/' + collection + '/' + id, {});
     }
 
-    async getTemplateLogs(collection: string, id: string, page: number = 1, limit: number = 100): Promise<ApiLog[]> {
-        return await this.fetchEndpoint('/v1/templates/' + collection + '/' + id + '/logs', {page, limit});
+    async getTemplateStats(collection: string, name: string): Promise<ApiTemplateStats> {
+        return await this.fetchEndpoint('/v1/templates/' + collection + '/' + name + '/stats', {});
+    }
+
+    async getTemplateLogs(collection: string, id: string, page: number = 1, limit: number = 100, order: string = 'desc'): Promise<ApiLog[]> {
+        return await this.fetchEndpoint('/v1/templates/' + collection + '/' + id + '/logs', {page, limit, order});
     }
 
     async getTransfers(options: {
         account?: string,
         sender?: string,
         recipient?: string,
+        asset_id?: string,
         order?: string,
         sort?: string
     } = {}, page: number = 1, limit: number = 100): Promise<ApiTransfer[]> {
@@ -124,6 +158,8 @@ export default class ExplorerApi {
         account?: string,
         sender?: string,
         recipient?: string,
+        is_recipient_contract?: boolean,
+        asset_id?: string,
         order?: string,
         sort?: string
     } = {}, page: number = 1, limit: number = 100): Promise<ApiOffer[]> {
@@ -136,7 +172,7 @@ export default class ExplorerApi {
 
     async fetchEndpoint(path: string, args: any): Promise<any> {
         let response;
-        let json;
+        let json = null;
 
         try {
             const f = this.fetchBuiltin;
@@ -146,11 +182,17 @@ export default class ExplorerApi {
 
             response = await f(this.endpoint + '/' + this.namespace + path + (queryString.length > 0 ? '?' + queryString : ''));
 
-            json = await response.json();
+            if (response.status === 200) {
+                json = await response.json();
+            }
         } catch (e) {
             e.isFetchError = true;
 
             throw e;
+        }
+
+        if (json === null) {
+            throw new Error('Invalid status code received');
         }
 
         if (!json.success) {

@@ -17,7 +17,7 @@ export default class RpcCollection {
                 resolve(data);
             } else {
                 try {
-                    resolve(await api.queue.collection(name, cache));
+                    resolve(await api.queue.fetchCollection(name, cache));
                 } catch (e) {
                     reject(e);
                 }

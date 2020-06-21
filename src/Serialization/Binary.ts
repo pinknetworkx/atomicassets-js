@@ -84,7 +84,7 @@ export function integer_unsign(input: any, size: number): BigInteger {
 export function zigzag_encode(input: any): BigInteger {
     const n = bigInt(input);
 
-    if (n.lesserOrEquals(0)) {
+    if (n.lesser(0)) {
         return n.plus(1).multiply(-2).plus(1);
     }
 

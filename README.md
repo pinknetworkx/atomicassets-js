@@ -2,7 +2,7 @@
 
 JS Library to read data from the atomicassets NFT standard.
 
-Contract / General Documentation can be found on [https://github.com/pinknetworkx/atomicassets-contracts/wiki](https://github.com/pinknetworkx/atomicassets-contracts/wiki)
+Contract / General Documentation can be found on [https://github.com/pinknetworkx/atomicassets-contract/wiki](https://github.com/pinknetworkx/atomicassets-contract/wiki)
 
 ## Usage
 
@@ -31,7 +31,7 @@ AtomicAssets uses serialization to store data on the blockchain more efficiently
 The API classes will handle this for you but if you need to manually parse the data,
 the library provides you a serialize and deserialize function
 
-More information can be found [here](https://github.com/pinknetworkx/atomicassets-contracts/wiki/Serialization)
+More information can be found [here](https://github.com/pinknetworkx/atomicassets-contract/wiki/Serialization)
 
 #### Example
 ```javascript
@@ -106,7 +106,7 @@ const actions = (await api.action).mintasset(
 `async getConfig(): Promise<ApiConfig>`
 
 ##### Assets
-`async getAssets(options, page: number = 1, limit: number = 100): Promise<ApiAsset[]>`
+`async getAssets(options, page: number = 1, limit: number = 100, data = {}): Promise<ApiAsset[]>`
 options
 * **owner**: string
 * **collection_name**: string
@@ -117,9 +117,12 @@ options
 * **order**: field which is used to sort result
 * **sort**: asc | desc
 
+data
+* query for specific asset attributes
+
 `async getAsset(id: string): Promise<ApiAsset>`
 
-`async getAssetLogs(id: string, page: number = 1, limit: number = 100): Promise<ApiLog[]>`
+`async getAssetLogs(id: string, page: number = 1, limit: number = 100, order: string = 'desc'): Promise<ApiLog[]>`
 
 ##### Collections
 `async getCollections(options, page: number = 1, limit: number = 100): Promise<ApiCollection[]>`
@@ -134,13 +137,14 @@ options
 
 `async getCollection(name: string): Promise<ApiCollection>`
 
-`async getCollectionLogs(name: string, page: number = 1, limit: number = 100): Promise<ApiLog[]>`
+`async getCollectionLogs(name: string, page: number = 1, limit: number = 100, order: string = 'desc'): Promise<ApiLog[]>`
 
 ##### Schemas
 `async getSchemas(options, page: number = 1, limit: number = 100): Promise<ApiSchema[]>`
 
 options
 * **collection_name**: string
+* **schema_name**: string
 * **match**: search for input in name
 * **authorized_account**: string
 * **order**: field which is used to sort result
@@ -148,10 +152,12 @@ options
 
 `async getSchema(collection: string, name: string): Promise<ApiSchema>`
 
-`async getSchemaLogs(collection: string, name: string, page: number = 1, limit: number = 100): Promise<ApiLog[]>`
+`async getSchemaStats(collection: string, name: string): Promise<ApiSchemaStats[]>`
+
+`async getSchemaLogs(collection: string, name: string, page: number = 1, limit: number = 100, order: string = 'desc'): Promise<ApiLog[]>`
 
 ##### Templates
-`async getTemplates(options, page: number = 1, limit: number = 100): Promise<ApiTemplate[]>`
+`async getTemplates(options, page: number = 1, limit: number = 100, data = {}): Promise<ApiTemplate[]>`
 
 options
 * **collection_name**: string
@@ -160,9 +166,14 @@ options
 * **order**: field which is used to sort result
 * **sort**: asc | desc
 
+data
+* filter for specific template attributes
+
 `async getTemplate(collection: string, id: string): Promise<ApiTemplate>`
 
-`async getTemplateLogs(collection: string, id: string, page: number = 1, limit: number = 100): Promise<ApiLog[]>`
+`async getTemplateStats(collection: string, id: string): Promise<ApiTemplateStats[]>`
+
+`async getTemplateLogs(collection: string, id: string, page: number = 1, limit: number = 100, order: string = 'desc'): Promise<ApiLog[]>`
 
 ##### Trading
 `async getTransfers(options, page: number = 1, limit: number = 100): Promise<ApiTransfe[]>`
@@ -171,6 +182,7 @@ options
 * **account**: string
 * **sender**: string
 * **recipient**: string
+* **asset_id**: asset id which should be included in the offer
 * **order**: field which is used to sort result
 * **sort**: asc | desc
 
@@ -180,6 +192,8 @@ options
 * **account**: notified account
 * **sender**: sender of offer
 * **recipient**: recipient of offer
+* **is_recipient_contract**: filter if recipient is contract or not
+* **asset_id**: asset_id included in offer
 * **order**: field which is used to sort result
 * **sort**: asc | desc
 
@@ -190,7 +204,7 @@ options
 The Explorer API has an `action` attribute which contains a helper class to construct contract actions 
 which can be pushed on chain with eosjs. 
 
-Detailed information about each action can be found [here](https://github.com/pinknetworkx/atomicassets-contracts/wiki/Actions) 
+Detailed information about each action can be found [here](https://github.com/pinknetworkx/atomicassets-contract/wiki/Actions) 
 
 #### Types
 
@@ -266,7 +280,7 @@ Caching can be disabled by explicitly setting cache to false
 The RPC API has an `action` attribute which contains a helper class to construct contract actions 
 which can be pushed on chain with eosjs. 
 
-Detailed information about each action can be found [here](https://github.com/pinknetworkx/atomicassets-contracts/wiki/Actions) 
+Detailed information about each action can be found [here](https://github.com/pinknetworkx/atomicassets-contract/wiki/Actions) 
  
 #### Types
 

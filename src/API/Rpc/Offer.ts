@@ -20,7 +20,7 @@ export default class RpcOffer {
                 resolve(data);
             } else {
                 try {
-                    resolve(await this.api.queue.offer(id, cache));
+                    resolve(await this.api.queue.fetchOffer(id, cache));
                 } catch (e) {
                     reject(e);
                 }
@@ -33,7 +33,7 @@ export default class RpcOffer {
             } else {
                 try {
                     const row: IOfferRow = await this._data;
-                    const inventory: IAssetRow[] = await this.api.queue.account_assets(row.sender, cache);
+                    const inventory: IAssetRow[] = await this.api.queue.fetchAccountAssets(row.sender);
 
                     return resolve(row.sender_asset_ids.map((assetID) => {
                         const asset = inventory.find((assetRow) => assetRow.asset_id === assetID);
@@ -52,7 +52,7 @@ export default class RpcOffer {
             } else {
                 try {
                     const row: IOfferRow = await this._data;
-                    const inventory: IAssetRow[] = await this.api.queue.account_assets(row.recipient, cache);
+                    const inventory: IAssetRow[] = await this.api.queue.fetchAccountAssets(row.recipient);
 
                     return resolve(row.recipient_asset_ids.map((assetID) => {
                         const asset = inventory.find((assetRow) => assetRow.asset_id === assetID);

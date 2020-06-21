@@ -7,7 +7,7 @@ import {
     hex_decode,
     hex_encode,
     int_to_byte_vector,
-    integer_sign,
+    integer_sign, integer_unsign,
     varint_decode,
     varint_encode,
     zigzag_decode,
@@ -16,12 +16,16 @@ import {
 import { prepare } from '../src/Serialization/State';
 
 describe('Binary', () => {
-    it('sign negative integer', () => {
+    it('sign integer', () => {
         expect(Number(integer_sign(BigInt(-534), 2))).to.equal(65002);
+        expect(Number(integer_sign(BigInt(534), 2))).to.equal(534);
+        expect(Number(integer_sign(BigInt(0), 2))).to.equal(0);
     });
 
-    it('sign positive integer', () => {
-        expect(Number(integer_sign(BigInt(534), 2))).to.equal(534);
+    it('unsign integer', () => {
+        expect(Number(integer_unsign(BigInt(65002), 2))).to.equal(-534);
+        expect(Number(integer_unsign(BigInt(534), 2))).to.equal(534);
+        expect(Number(integer_unsign(BigInt(0), 2))).to.equal(0);
     });
 
     it('pack integer below 127', () => {
@@ -68,9 +72,16 @@ describe('Binary', () => {
 
     it('zigzag encode', () => {
         expect(zigzag_encode(6).toJSNumber()).to.equal(12);
+        expect(zigzag_encode(1).toJSNumber()).to.equal(2);
+        expect(zigzag_encode(-1).toJSNumber()).to.equal(1);
+        expect(zigzag_encode(0).toJSNumber()).to.equal(0);
     });
 
     it('zigzag decode', () => {
         expect(zigzag_decode(12).toJSNumber()).to.equal(6);
+        expect(zigzag_decode(3).toJSNumber()).to.equal(-2);
+        expect(zigzag_decode(2).toJSNumber()).to.equal(1);
+        expect(zigzag_decode(1).toJSNumber()).to.equal(-1);
+        expect(zigzag_decode(0).toJSNumber()).to.equal(0);
     });
 });

@@ -62,72 +62,72 @@ export default class RpcApi {
 
     async getAsset(owner: string, id: string, cache: boolean = true): Promise<RpcAsset> {
         if (!cache) {
-            this.cache.asset(id, null);
+            this.cache.deleteAsset(id);
         }
 
         return new RpcAsset(this, owner, id, undefined, undefined, undefined, undefined, cache);
     }
 
-    async getTemplate(collection: string, id: string, cache: boolean = true): Promise<RpcTemplate> {
+    async getTemplate(collectionName: string, templateID: string, cache: boolean = true): Promise<RpcTemplate> {
         if (!cache) {
-            this.cache.template(id, null);
+            this.cache.deleteTemplate(collectionName, templateID);
         }
 
-        return new RpcTemplate(this, collection, id, undefined, undefined, cache);
+        return new RpcTemplate(this, collectionName, templateID, undefined, undefined, cache);
     }
 
-    async getCollection(name: string, cache: boolean = true): Promise<RpcCollection> {
+    async getCollection(collectionName: string, cache: boolean = true): Promise<RpcCollection> {
         if (!cache) {
-            this.cache.collection(name, null);
+            this.cache.deleteCollection(collectionName);
         }
 
-        return new RpcCollection(this, name, undefined, cache);
+        return new RpcCollection(this, collectionName, undefined, cache);
     }
 
-    async getCollectionTemplates(collection: string, cache: boolean = true): Promise<RpcTemplate[]> {
-        return (await this.queue.collection_templates(collection)).map((templateRow) => {
-            return new RpcTemplate(this, collection, String(templateRow.template_id), templateRow, undefined, cache);
+    async getCollectionTemplates(collectionName: string): Promise<RpcTemplate[]> {
+        return (await this.queue.fetchCollectionTemplates(collectionName)).map((templateRow) => {
+            return new RpcTemplate(this, collectionName, String(templateRow.template_id), templateRow, undefined);
         });
     }
 
-    async getCollectionsSchemas(collection: string, cache: boolean = true): Promise<RpcSchema[]> {
-        return (await this.queue.collection_schemas(collection)).map((schemaRow) => {
-            return new RpcSchema(this, collection, schemaRow.schema_name, undefined, cache);
+    async getCollectionsSchemas(collectionName: string): Promise<RpcSchema[]> {
+        return (await this.queue.fetchCollectionSchemas(collectionName)).map((schemaRow) => {
+            return new RpcSchema(this, collectionName, schemaRow.schema_name, undefined);
         });
     }
 
-    async getSchema(collection: string, name: string, cache: boolean = true): Promise<RpcSchema> {
+    async getSchema(collectionName: string, schemaName: string, cache: boolean = true): Promise<RpcSchema> {
         if (!cache) {
-            this.cache.schema(name, null);
+            this.cache.deleteSchema(collectionName, schemaName);
         }
 
-        return new RpcSchema(this, collection, name, undefined, cache);
+        return new RpcSchema(this, collectionName, schemaName, undefined, cache);
     }
 
-    async getOffer(id: string, cache: boolean = true): Promise<RpcOffer> {
+    async getOffer(offerID: string, cache: boolean = true): Promise<RpcOffer> {
         if (!cache) {
-            this.cache.offer(id, null);
+            this.cache.deleteOffer(offerID);
         }
 
-        return new RpcOffer(this, id, undefined, undefined, undefined, cache);
+        return new RpcOffer(this, offerID, undefined, undefined, undefined, cache);
     }
 
-    async getAccountOffers(account: string, cache: boolean = true): Promise<RpcOffer[]> {
-        return (await this.queue.account_offers(account)).map((offerRow) => {
-            return new RpcOffer(this, offerRow.offer_id, offerRow, undefined, undefined, cache);
+    async getAccountOffers(account: string): Promise<RpcOffer[]> {
+        return (await this.queue.fetchAccountOffers(account)).map((offerRow) => {
+            return new RpcOffer(this, offerRow.offer_id, offerRow, undefined, undefined);
         });
     }
 
-    async getAccountAssets(account: string, cache: boolean = true): Promise<RpcAsset[]> {
-        return (await this.queue.account_assets(account)).map((assetRow) => {
-            return new RpcAsset(this, account, assetRow.asset_id, assetRow, undefined, undefined, undefined, cache);
+    async getAccountAssets(account: string): Promise<RpcAsset[]> {
+        return (await this.queue.fetchAccountAssets(account)).map((assetRow) => {
+            return new RpcAsset(this, account, assetRow.asset_id, assetRow, undefined, undefined, undefined);
         });
     }
 
     async getTableRows({
-                           code, scope, table, table_key = '', lower_bound = '', upper_bound = '',
-                           index_position = 1, key_type = ''
-                       }: any): Promise<any> {
+       code, scope, table, table_key = '', lower_bound = '', upper_bound = '',
+       index_position = 1, key_type = ''
+   }: any): Promise<any> {
         return await this.fetchRpc('/v1/chain/get_table_rows', {
             code, scope, table, table_key,
             lower_bound, upper_bound, index_position,

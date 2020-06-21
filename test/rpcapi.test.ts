@@ -6,13 +6,13 @@ import RpcApi from '../src/API/Rpc';
 const fetch = require('node-fetch');
 
 describe('RPC API', () => {
-    const api = new RpcApi('https://testnet.wax.pink.gg', 'assetstest55', {
+    const api = new RpcApi('https://testnet.wax.pink.gg', '22testassets', {
         fetch, rateLimit: 4
     });
 
     const exampleAsset = {
-        owner: 'testuser2222',
-        id: '1099511627784'
+        owner: 'karlkarlkarl',
+        id: '1099511628855'
     };
 
     it('fetch asset ' + exampleAsset.id, async () => {
@@ -44,5 +44,5 @@ describe('RPC API', () => {
         const result = await Promise.all(assets.map(async (asset) => await asset.toObject()));
 
         expect(result).to.deep.equal(result);
-    }).timeout(20000);
+    }).timeout(120000);
 });

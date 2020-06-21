@@ -6,6 +6,7 @@ import RpcSchema from './Schema';
 import RpcTemplate from './Template';
 
 export default class RpcAsset {
+    readonly owner: string;
     readonly id: string;
 
     // tslint:disable-next-line:variable-name
@@ -27,6 +28,7 @@ export default class RpcAsset {
         template?: RpcTemplate,
         cache: boolean = true
     ) {
+        this.owner = owner;
         this.id = id;
 
         this._data = new Promise(async (resolve, reject) => {
@@ -34,7 +36,7 @@ export default class RpcAsset {
                 resolve(data);
             } else {
                 try {
-                    resolve(await api.queue.asset(owner, id, cache));
+                    resolve(await api.queue.fetchAsset(owner, id, cache));
                 } catch (e) {
                     reject(e);
                 }
