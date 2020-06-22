@@ -1,6 +1,5 @@
 import ExplorerActionGenerator from '../../Actions/Explorer';
 import ApiError from '../../Errors/ApiError';
-import ExplorerError from '../../Errors/ExplorerError';
 import {
     ApiAsset,
     ApiCollection,
