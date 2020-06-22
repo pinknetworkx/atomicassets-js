@@ -1,5 +1,5 @@
 import ExplorerApi from '../API/Explorer';
-import { ApiConfig } from '../API/Explorer/types';
+import { ApiConfig } from '../API/Explorer/Types';
 import { ActionGenerator, EosioActionObject, EosioAuthorizationObject, toAttributeMap } from './Generator';
 
 /* tslint:disable:variable-name */

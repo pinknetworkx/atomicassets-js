@@ -5,7 +5,7 @@ import ExplorerApi from '../src/API/Explorer';
 const fetch = require('node-fetch');
 
 describe('Explorer API', () => {
-    const api = new ExplorerApi('https://wax-test.api.atomicassets.io', 'atomicassets', {fetch});
+    const api = new ExplorerApi('https://test.wax.api.atomicassets.io', 'atomicassets', {fetch});
 
     const exampleAsset = {
         owner: 'testuser2222',

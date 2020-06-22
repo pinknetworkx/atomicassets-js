@@ -1,4 +1,5 @@
 import ExplorerActionGenerator from '../../Actions/Explorer';
+import ApiError from '../../Errors/ApiError';
 import ExplorerError from '../../Errors/ExplorerError';
 import {
     ApiAsset,
@@ -11,7 +12,7 @@ import {
     ApiTemplate,
     ApiTemplateStats,
     ApiTransfer
-} from './types';
+} from './Types';
 
 type Fetch = (input?: Request | string, init?: RequestInit) => Promise<Response>;
 type ApiArgs = { fetch?: Fetch, rateLimit?: number };
@@ -172,31 +173,26 @@ export default class ExplorerApi {
 
     async fetchEndpoint(path: string, args: any): Promise<any> {
         let response;
-        let json = null;
+
+        const f = this.fetchBuiltin;
+        const queryString = Object.keys(args).map((key) => {
+            return key + '=' + encodeURIComponent(args[key]);
+        }).join('&');
 
         try {
-            const f = this.fetchBuiltin;
-            const queryString = Object.keys(args).map((key) => {
-                return key + '=' + encodeURIComponent(args[key]);
-            }).join('&');
-
             response = await f(this.endpoint + '/' + this.namespace + path + (queryString.length > 0 ? '?' + queryString : ''));
-
-            if (response.status === 200) {
-                json = await response.json();
-            }
         } catch (e) {
-            e.isFetchError = true;
-
-            throw e;
+            throw new ApiError(e.message, 500);
         }
 
-        if (json === null) {
-            throw new Error('Invalid status code received');
+        const json = await response.json();
+
+        if (response.status !== 200) {
+            throw new ApiError(json.message, response.status);
         }
 
         if (!json.success) {
-            throw new ExplorerError(json.message);
+            throw new ApiError(json.message, response.status);
         }
 
         return json.data;
