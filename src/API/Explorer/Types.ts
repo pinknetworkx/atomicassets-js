@@ -1,5 +1,14 @@
 import { SchemaObject } from '../../Schema';
 
+export enum ApiOfferState {
+    Pending,
+    Invalid,
+    Unknown,
+    Accepted,
+    Declined,
+    Canceled
+}
+
 export type ApiAsset = {
     contract: string,
     asset_id: string,
@@ -128,7 +137,7 @@ export type ApiOffer = {
     sender_name: string,
     recipient_name: string,
     memo: string,
-    state: number,
+    state: ApiOfferState,
     is_sender_contract: boolean,
     is_recipient_contract: boolean,
     sender_assets: ApiAsset[],

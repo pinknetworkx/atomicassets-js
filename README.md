@@ -77,8 +77,8 @@ There are two methods available to fetch data from the blockchain.
 
 ### Explorer API
 
-The explorer API uses [atomicassets-api](https://github.com/pinknetworkx/atomicassets-api) to query data about the NFTs. 
-A documentation of each endpoint and its responses can be found [here](https://wax-test.api.atomicassets.io/atomicassets/docs/#/).
+The explorer API uses [eosio-contract-api](https://github.com/pinknetworkx/eosio-contract-api) to query data about the NFTs. 
+A documentation of each endpoint and its responses can be found [here](https://test.wax.api.atomicassets.io/atomicassets/docs/#/).
 It is recommended to self-host the API for the best performance.
 
 
@@ -89,7 +89,7 @@ It is recommended to self-host the API for the best performance.
 // namespace: used namespace for the API
 // options:
 // - fetch: either node-fetch module or the browser equivalent
-const api = new ExplorerApi("https://wax-test.api.atomicassets.io", "atomicassets", {fetch});
+const api = new ExplorerApi("https://test.wax.api.atomicassets.io", "atomicassets", {fetch});
 
 const asset = await api.getAsset("1099511627786");
 
@@ -209,7 +209,7 @@ Detailed information about each action can be found [here](https://github.com/pi
 #### Types
 
 Each method returns the unmodified response from the API call. For more information look at the Models 
-on [the documentation](https://wax-test.api.atomicassets.io/atomicassets/docs/#/)
+on [the documentation](https://test.wax.api.atomicassets.io/atomicassets/docs/#/)
 
 ### RpcApi
 
