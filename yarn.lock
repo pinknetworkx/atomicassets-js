@@ -1355,7 +1355,7 @@ global-prefix@^3.0.0:
   integrity sha512-awConJSVCHVGND6x3tmMaKcQvwXLhjdkmomy2W+Goaui8YPgYgXJZewhg3fWC+DlfqqQuWg8AwqjGTD2nAPVWg==
   dependencies:
     ini "^1.3.5"
-    kind-of "^6.0.2"
+    kind-of "^6.0.3"
     which "^1.3.1"
 
 graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2:
