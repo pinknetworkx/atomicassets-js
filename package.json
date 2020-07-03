@@ -9,16 +9,16 @@
     "email" : "pinknetworkx@gmail.com"
   },
   "license": "MIT",
-  "version": "0.9.3",
+  "version": "1.0.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
-  "prepublish": "npm build-npm",
   "scripts": {
     "build:npm": "tsc",
     "build:web": "webpack --config webpack.prod.js",
     "build": "yarn run build:npm && yarn run build:web",
     "lint": "tslint -p tsconfig.json",
-    "test": "mocha -r ts-node/register test/**/*.test.ts"
+    "test": "mocha -r ts-node/register test/**/*.test.ts",
+    "publish": "yarn run build && yarn publish"
   },
   "dependencies": {
     "big-integer": "^1.6.48",
