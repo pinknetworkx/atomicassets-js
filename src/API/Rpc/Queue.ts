@@ -114,14 +114,16 @@ export default class RpcQueue {
                 }
 
                 try {
-                    const resp = await this.api.getTableRows({
+                    const options = {
                         code: this.api.contract, table, scope,
                         limit: 1, lower_bound: match, upper_bound: match,
                         index_position: indexPosition, key_type: keyType
-                    });
+                    };
+
+                    const resp = await this.api.getTableRows(options);
 
                     if (resp.rows.length === 0) {
-                        return reject(new RpcError('row not found \'' + match + '\''));
+                        return reject(new Error('Row not found for ' + JSON.stringify(options)));
                     }
 
                     return resolve(<T>cacheFn(resp.rows[0]));

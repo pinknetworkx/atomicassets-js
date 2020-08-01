@@ -65,7 +65,9 @@ export default class RpcApi {
             this.cache.deleteAsset(id);
         }
 
-        return new RpcAsset(this, owner, id, undefined, undefined, undefined, undefined, cache);
+        const data = await this.queue.fetchAsset(owner, id, cache);
+
+        return new RpcAsset(this, owner, id, data, undefined, undefined, undefined, cache);
     }
 
     async getTemplate(collectionName: string, templateID: string, cache: boolean = true): Promise<RpcTemplate> {
@@ -73,7 +75,9 @@ export default class RpcApi {
             this.cache.deleteTemplate(collectionName, templateID);
         }
 
-        return new RpcTemplate(this, collectionName, templateID, undefined, undefined, cache);
+        const data = await this.queue.fetchTemplate(collectionName, templateID, cache);
+
+        return new RpcTemplate(this, collectionName, templateID, data, undefined, cache);
     }
 
     async getCollection(collectionName: string, cache: boolean = true): Promise<RpcCollection> {
@@ -81,7 +85,9 @@ export default class RpcApi {
             this.cache.deleteCollection(collectionName);
         }
 
-        return new RpcCollection(this, collectionName, undefined, cache);
+        const data = await this.queue.fetchCollection(collectionName, cache);
+
+        return new RpcCollection(this, collectionName, data, cache);
     }
 
     async getCollectionTemplates(collectionName: string): Promise<RpcTemplate[]> {
@@ -101,7 +107,9 @@ export default class RpcApi {
             this.cache.deleteSchema(collectionName, schemaName);
         }
 
-        return new RpcSchema(this, collectionName, schemaName, undefined, cache);
+        const data = await this.queue.fetchSchema(collectionName, schemaName, cache);
+
+        return new RpcSchema(this, collectionName, schemaName, data, cache);
     }
 
     async getOffer(offerID: string, cache: boolean = true): Promise<RpcOffer> {
@@ -109,7 +117,9 @@ export default class RpcApi {
             this.cache.deleteOffer(offerID);
         }
 
-        return new RpcOffer(this, offerID, undefined, undefined, undefined, cache);
+        const data = await this.queue.fetchOffer(offerID, cache);
+
+        return new RpcOffer(this, offerID, data, undefined, undefined, cache);
     }
 
     async getAccountOffers(account: string): Promise<RpcOffer[]> {
@@ -150,6 +160,7 @@ export default class RpcApi {
             json = await response.json();
         } catch (e) {
             e.isFetchError = true;
+
             throw e;
         }
 
