@@ -6,6 +6,8 @@ export default class RpcQueue {
     private elements: any[] = [];
     private interval: any = null;
 
+    private preloadedCollections: {[key: string]: number} = {};
+
     constructor(private readonly api: RpcApi, private readonly requestLimit: number = 4) { }
 
     async fetchAsset(owner: string, assetID: string, useCache: boolean = true): Promise<IAssetRow> {
@@ -28,17 +30,15 @@ export default class RpcQueue {
         });
     }
 
-    async fetchCollectionTemplates(collectionName: string): Promise<ITemplateRow[]> {
-        const rows = await this.fetch_all_rows<ITemplateRow>('templates', collectionName, 'template_id');
-
-        return rows.map((template) => {
-            return <ITemplateRow>this.api.cache.getTemplate(collectionName, String(template.template_id), template);
-        });
-    }
-
     async fetchSchema(collectionName: string, schemaName: string, useCache: boolean = true): Promise<ISchemaRow> {
         return await this.fetch_single_row<ISchemaRow>('schemas', collectionName, schemaName, (data?: ISchemaRow) => {
             return (useCache || typeof data !== 'undefined') ? this.api.cache.getSchema(collectionName, schemaName, data) : null;
+        });
+    }
+
+    async fetchCollection(collectionName: string, useCache: boolean = true): Promise<ICollectionRow> {
+        return await this.fetch_single_row<ICollectionRow>('collections', this.api.contract, collectionName, (data?: ICollectionRow) => {
+            return (useCache || typeof data !== 'undefined') ? this.api.cache.getCollection(collectionName, data) : null;
         });
     }
 
@@ -50,10 +50,19 @@ export default class RpcQueue {
         });
     }
 
-    async fetchCollection(collectionName: string, useCache: boolean = true): Promise<ICollectionRow> {
-        return await this.fetch_single_row<ICollectionRow>('collections', this.api.contract, collectionName, (data?: ICollectionRow) => {
-            return (useCache || typeof data !== 'undefined') ? this.api.cache.getCollection(collectionName, data) : null;
+    async fetchCollectionTemplates(collectionName: string): Promise<ITemplateRow[]> {
+        const rows = await this.fetch_all_rows<ITemplateRow>('templates', collectionName, 'template_id');
+
+        return rows.map((template) => {
+            return <ITemplateRow>this.api.cache.getTemplate(collectionName, String(template.template_id), template);
         });
+    }
+
+    async preloadCollection(collectionName: string, useCache: boolean = true) {
+        if (!useCache || !this.preloadedCollections[collectionName] || this.preloadedCollections[collectionName] + 15 * 60 * 1000 < Date.now()) {
+            await this.fetchCollectionSchemas(collectionName);
+            await this.fetchCollectionTemplates(collectionName);
+        }
     }
 
     async fetchOffer(offerID: string, useCache: boolean = true): Promise<IOfferRow> {
@@ -145,7 +154,7 @@ export default class RpcQueue {
             this.elements.push(async () => {
                 const resp: { more: boolean, rows: any[] } = await this.api.getTableRows({
                     code: this.api.contract, scope, table,
-                    lower_bound: lowerBound, upper_bound: upperBound, limit: 100,
+                    lower_bound: lowerBound, upper_bound: upperBound, limit: 1000,
                     index_position: indexPosition, key_type: keyType
                 });
 

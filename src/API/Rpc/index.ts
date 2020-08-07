@@ -134,6 +134,20 @@ export default class RpcApi {
         });
     }
 
+    async getCollectionInventory(collectionName: string, account: string): Promise<RpcAsset[]> {
+        await this.queue.preloadCollection(collectionName, true);
+
+        return (await this.queue.fetchAccountAssets(account))
+            .filter(assetRow => assetRow.collection_name === collectionName)
+            .map((assetRow) => {
+                return new RpcAsset(this, account, assetRow.asset_id, assetRow, undefined, undefined, undefined);
+            });
+    }
+
+    async preloadCollection(collectionName: string, cache: boolean = true): Promise<void> {
+        await this.queue.preloadCollection(collectionName, cache);
+    }
+
     async getTableRows({
        code, scope, table, table_key = '', lower_bound = '', upper_bound = '',
        index_position = 1, key_type = ''

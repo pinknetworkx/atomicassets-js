@@ -72,7 +72,9 @@ export default class RpcTemplate {
 
     async toObject(): Promise<object> {
         return {
+            collection_name: this.collection,
             template_id: this.id,
+
             schema: await (await this.schema()).toObject(),
             immutableData: await this.immutableData(),
             transferable: await this.isTransferable(),

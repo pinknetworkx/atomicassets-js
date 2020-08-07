@@ -47,6 +47,7 @@ export default class RpcSchema {
 
     async toObject(): Promise<object> {
         return {
+            collection_name: this.collection,
             schema_name: this.name,
             format: await this.rawFormat()
         };
