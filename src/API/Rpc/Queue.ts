@@ -1,4 +1,3 @@
-import RpcError from '../../Errors/RpcError';
 import { IAssetRow, ICollectionRow, IOfferRow, ISchemaRow, ITemplateRow } from './Cache';
 import RpcApi from './index';
 
@@ -58,7 +57,7 @@ export default class RpcQueue {
         });
     }
 
-    async preloadCollection(collectionName: string, useCache: boolean = true) {
+    async preloadCollection(collectionName: string, useCache: boolean = true): Promise<void> {
         if (!useCache || !this.preloadedCollections[collectionName] || this.preloadedCollections[collectionName] + 15 * 60 * 1000 < Date.now()) {
             await this.fetchCollectionSchemas(collectionName);
             await this.fetchCollectionTemplates(collectionName);

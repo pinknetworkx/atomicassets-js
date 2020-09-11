@@ -16,6 +16,78 @@ import {
 type Fetch = (input?: Request | string, init?: RequestInit) => Promise<Response>;
 type ApiArgs = { fetch?: Fetch, rateLimit?: number };
 
+export type AssetParams = {
+    owner?: string,
+    collection_name?: string,
+    schema_name?: string,
+    template_id?: number,
+    match?: string,
+    authorized_account?: string,
+    order?: string,
+    sort?: string,
+    [key: string]: any
+};
+
+export type CollectionParams = {
+    author?: string,
+    match?: string,
+    authorized_account?: string,
+    notify_account?: string,
+    order?: string,
+    sort?: string
+};
+
+export type SchemaParams = {
+    collection_name?: string,
+    schema_name?: string,
+    match?: string,
+    authorized_account?: string,
+    order?: string,
+    sort?: string
+};
+
+export type TemplateParams = {
+    collection_name?: string,
+    schema_name?: string,
+    authorized_account?: string,
+    template_id?: string,
+    order?: string,
+    sort?: string,
+    [key: string]: any
+};
+
+export type TransferParams = {
+    account?: string,
+    sender?: string,
+    recipient?: string,
+    asset_id?: string,
+    order?: string,
+    sort?: string
+};
+
+export type OfferParams = {
+    account?: string,
+    sender?: string,
+    recipient?: string,
+    is_recipient_contract?: boolean,
+    asset_id?: string,
+    order?: string,
+    sort?: string
+};
+
+export type DataOptions = {[key: string]: any};
+
+function buildDataOptions(options: {[key: string]: any}, data: DataOptions): {[key: string]: any} {
+    const dataKeys = Object.keys(data);
+    const dataFields: DataOptions = {};
+
+    for (const key of dataKeys) {
+        dataFields['data.' + key] = data[key];
+    }
+
+    return Object.assign({}, options, dataFields);
+}
+
 export default class ExplorerApi {
     readonly action: Promise<ExplorerActionGenerator>;
 
@@ -31,7 +103,7 @@ export default class ExplorerApi {
         if (args.fetch) {
             this.fetchBuiltin = args.fetch;
         } else {
-            this.fetchBuiltin = (<any>global).fetch;
+            this.fetchBuiltin = <any>window.fetch;
         }
 
         this.action = (async () => {
@@ -43,24 +115,12 @@ export default class ExplorerApi {
         return await this.fetchEndpoint('/v1/config', {});
     }
 
-    async getAssets(options: {
-        owner?: string,
-        collection_name?: string,
-        schema_name?: string,
-        template_id?: number,
-        match?: string,
-        authorized_account?: string,
-        order?: string,
-        sort?: string,
-        [key: string]: any
-    } = {}, page: number = 1, limit: number = 100, data: { [key: string]: any} = {}): Promise<ApiAsset[]> {
-        const dataKeys = Object.keys(data);
+    async getAssets(options: AssetParams = {}, page: number = 1, limit: number = 100, data: DataOptions = {}): Promise<ApiAsset[]> {
+        return await this.fetchEndpoint('/v1/assets', {page, limit, ...buildDataOptions(options, data)});
+    }
 
-        for (const key of dataKeys) {
-            options['data.' + key] = data[key];
-        }
-
-        return await this.fetchEndpoint('/v1/assets', {page, limit, ...options});
+    async countAssets(options: AssetParams, data: DataOptions): Promise<number> {
+        return await this.countEndpoint('/v1/assets', buildDataOptions(options, data));
     }
 
     async getAsset(id: string): Promise<ApiAsset> {
@@ -71,15 +131,12 @@ export default class ExplorerApi {
         return await this.fetchEndpoint('/v1/assets/' + id + '/logs', {page, limit, order});
     }
 
-    async getCollections(options: {
-        author?: string,
-        match?: string,
-        authorized_account?: string,
-        notify_account?: string,
-        order?: string,
-        sort?: string
-    } = {}, page: number = 1, limit: number = 100): Promise<ApiCollection[]> {
+    async getCollections(options: CollectionParams = {}, page: number = 1, limit: number = 100): Promise<ApiCollection[]> {
         return await this.fetchEndpoint('/v1/collections', {page, limit, ...options});
+    }
+
+    async countCollections(options: CollectionParams = {}): Promise<number> {
+        return await this.countEndpoint('/v1/collections', options);
     }
 
     async getCollection(name: string): Promise<ApiCollection> {
@@ -90,15 +147,12 @@ export default class ExplorerApi {
         return await this.fetchEndpoint('/v1/collections/' + name + '/logs', {page, limit, order});
     }
 
-    async getSchemas(options: {
-        collection_name?: string,
-        schema_name?: string,
-        match?: string,
-        authorized_account?: string,
-        order?: string,
-        sort?: string
-    } = {}, page: number = 1, limit: number = 100): Promise<ApiSchema[]> {
+    async getSchemas(options: SchemaParams = {}, page: number = 1, limit: number = 100): Promise<ApiSchema[]> {
         return await this.fetchEndpoint('/v1/schemas', {page, limit, ...options});
+    }
+
+    async countSchemas(options: SchemaParams = {}): Promise<number> {
+        return await this.countEndpoint('/v1/schemas', options);
     }
 
     async getSchema(collection: string, name: string): Promise<ApiSchema> {
@@ -113,22 +167,12 @@ export default class ExplorerApi {
         return await this.fetchEndpoint('/v1/schemas/' + collection + '/' + name + '/logs', {page, limit, order});
     }
 
-    async getTemplates(options: {
-        collection_name?: string,
-        schema_name?: string,
-        authorized_account?: string,
-        template_id?: string,
-        order?: string,
-        sort?: string,
-        [key: string]: any
-    } = {}, page: number = 1, limit: number = 100, data: {[key: string]: any}): Promise<ApiTemplate[]> {
-        const dataKeys = Object.keys(data);
+    async getTemplates(options: TemplateParams = {}, page: number = 1, limit: number = 100, data: DataOptions = {}): Promise<ApiTemplate[]> {
+        return await this.fetchEndpoint('/v1/templates', {page, limit, ...buildDataOptions(options, data)});
+    }
 
-        for (const key of dataKeys) {
-            options['data.' + key] = data[key];
-        }
-
-        return await this.fetchEndpoint('/v1/templates', {page, limit, ...options});
+    async countTemplates(options: TemplateParams = {}, data: DataOptions = {}): Promise<number> {
+        return await this.countEndpoint('/v1/templates', buildDataOptions(options, data));
     }
 
     async getTemplate(collection: string, id: string): Promise<ApiTemplate> {
@@ -143,27 +187,20 @@ export default class ExplorerApi {
         return await this.fetchEndpoint('/v1/templates/' + collection + '/' + id + '/logs', {page, limit, order});
     }
 
-    async getTransfers(options: {
-        account?: string,
-        sender?: string,
-        recipient?: string,
-        asset_id?: string,
-        order?: string,
-        sort?: string
-    } = {}, page: number = 1, limit: number = 100): Promise<ApiTransfer[]> {
+    async getTransfers(options: TransferParams = {}, page: number = 1, limit: number = 100): Promise<ApiTransfer[]> {
         return await this.fetchEndpoint('/v1/transfers', {page, limit, ...options});
     }
 
-    async getOffers(options: {
-        account?: string,
-        sender?: string,
-        recipient?: string,
-        is_recipient_contract?: boolean,
-        asset_id?: string,
-        order?: string,
-        sort?: string
-    } = {}, page: number = 1, limit: number = 100): Promise<ApiOffer[]> {
+    async countTransfers(options: TransferParams = {}): Promise<number> {
+        return await this.countEndpoint('/v1/transfers', options);
+    }
+
+    async getOffers(options: OfferParams = {}, page: number = 1, limit: number = 100): Promise<ApiOffer[]> {
         return await this.fetchEndpoint('/v1/offers', {page, limit, ...options});
+    }
+
+    async countOffers(options: OfferParams = {}): Promise<number> {
+        return await this.countEndpoint('/v1/offers', options);
     }
 
     async getOffer(id: string): Promise<ApiOffer> {
@@ -195,5 +232,11 @@ export default class ExplorerApi {
         }
 
         return json.data;
+    }
+
+    async countEndpoint(path: string, args: any): Promise<number> {
+        const res = await this.fetchEndpoint(path + '/_count', args);
+
+        return parseInt(res, 10);
     }
 }
