@@ -119,7 +119,7 @@ export default class ExplorerApi {
         return await this.fetchEndpoint('/v1/assets', {page, limit, ...buildDataOptions(options, data)});
     }
 
-    async countAssets(options: AssetParams, data: DataOptions): Promise<number> {
+    async countAssets(options: AssetParams, data: DataOptions = {}): Promise<number> {
         return await this.countEndpoint('/v1/assets', buildDataOptions(options, data));
     }
 
