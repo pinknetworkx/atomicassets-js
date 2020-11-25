@@ -16,64 +16,99 @@ import {
 type Fetch = (input?: Request | string, init?: RequestInit) => Promise<Response>;
 type ApiArgs = { fetch?: Fetch, rateLimit?: number };
 
-export type AssetParams = {
-    owner?: string,
-    collection_name?: string,
-    schema_name?: string,
-    template_id?: number,
-    match?: string,
-    authorized_account?: string,
-    order?: string,
-    sort?: string,
-    [key: string]: any
-};
+interface GreylistParams {
+    collection_blacklist?: string;
+    collection_whitelist?: string;
+}
 
-export type CollectionParams = {
-    author?: string,
-    match?: string,
-    authorized_account?: string,
-    notify_account?: string,
-    order?: string,
-    sort?: string
-};
+interface HideOffersParams {
+    hide_offers?: boolean;
+    hide_sales?: boolean;
+}
 
-export type SchemaParams = {
-    collection_name?: string,
-    schema_name?: string,
-    match?: string,
-    authorized_account?: string,
-    order?: string,
-    sort?: string
-};
+interface PrimaryBoundaryParams {
+    ids?: string;
+    lower_bound?: string;
+    upper_bound?: string;
+}
 
-export type TemplateParams = {
-    collection_name?: string,
-    schema_name?: string,
-    authorized_account?: string,
-    template_id?: string,
-    order?: string,
-    sort?: string,
-    [key: string]: any
-};
+interface DateBoundaryParams {
+    before?: number;
+    after?: number;
+}
 
-export type TransferParams = {
-    account?: string,
-    sender?: string,
-    recipient?: string,
-    asset_id?: string,
-    order?: string,
-    sort?: string
-};
+export interface AssetParams extends GreylistParams, HideOffersParams, PrimaryBoundaryParams, DateBoundaryParams {
+    owner?: string;
+    collection_name?: string;
+    schema_name?: string;
+    template_id?: number;
+    match?: string;
+    authorized_account?: string;
+    is_transferable?: boolean;
+    is_burnable?: boolean;
+    only_duplicate_templates?: boolean;
+    order?: string;
+    sort?: string;
+    [key: string]: any;
+}
 
-export type OfferParams = {
-    account?: string,
-    sender?: string,
-    recipient?: string,
-    is_recipient_contract?: boolean,
-    asset_id?: string,
-    order?: string,
-    sort?: string
-};
+export interface CollectionParams extends GreylistParams, PrimaryBoundaryParams, DateBoundaryParams {
+    author?: string;
+    match?: string;
+    authorized_account?: string;
+    notify_account?: string;
+    order?: string;
+    sort?: string;
+}
+
+export interface SchemaParams extends GreylistParams, PrimaryBoundaryParams, DateBoundaryParams {
+    collection_name?: string;
+    schema_name?: string;
+    match?: string;
+    authorized_account?: string;
+    order?: string;
+    sort?: string;
+}
+
+export interface TemplateParams extends GreylistParams, PrimaryBoundaryParams, DateBoundaryParams {
+    collection_name?: string;
+    schema_name?: string;
+    authorized_account?: string;
+    template_id?: string;
+    max_supply?: number;
+    issued_supply?: number;
+    is_transferable?: boolean;
+    is_burnable?: boolean;
+    order?: string;
+    sort?: string;
+    [key: string]: any;
+}
+
+export interface TransferParams extends GreylistParams, PrimaryBoundaryParams, DateBoundaryParams {
+    account?: string;
+    sender?: string;
+    recipient?: string;
+    asset_id?: string;
+    order?: string;
+    sort?: string;
+}
+
+export interface OfferParams extends GreylistParams, PrimaryBoundaryParams, DateBoundaryParams {
+    account?: string;
+    sender?: string;
+    recipient?: string;
+    is_recipient_contract?: boolean;
+    asset_id?: string;
+    order?: string;
+    sort?: string;
+}
+
+export interface AccountParams extends GreylistParams, PrimaryBoundaryParams, DateBoundaryParams {
+    match?: string;
+    collection_name?: string;
+    schema_name?: string;
+    template_id?: string;
+}
 
 export type DataOptions = {[key: string]: any};
 
@@ -205,6 +240,24 @@ export default class ExplorerApi {
 
     async getOffer(id: string): Promise<ApiOffer> {
         return await this.fetchEndpoint('/v1/offers/' + id, {});
+    }
+
+    async getAccounts(options: AccountParams = {}, page: number = 1, limit: number = 100): Promise<Array<{account: string, assets: string}>> {
+        return await this.fetchEndpoint('/v1/accounts', {page, limit, ...options});
+    }
+
+    async countAccounts(options: AccountParams = {}): Promise<number> {
+        return await this.countEndpoint('/v1/accounts', options);
+    }
+
+    async getAccount(account: string, options: any = {}): Promise<{assets: string, collections: Array<{collection: ApiCollection, assets: string}>}> {
+        return await this.fetchEndpoint('/v1/accounts/' + account, options);
+    }
+
+    async getAccountCollection(
+        account: string, collection: string, options: any = {}
+    ): Promise<{templates: Array<{template_id: string, assets: string}>, schemas: Array<{schema_name: string, assets: string}>}> {
+        return await this.fetchEndpoint('/v1/accounts/' + account + '/' + collection, options);
     }
 
     async fetchEndpoint(path: string, args: any): Promise<any> {

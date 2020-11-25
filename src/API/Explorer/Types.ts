@@ -9,13 +9,13 @@ export enum ApiOfferState {
     Canceled
 }
 
-export type ApiAsset = {
-    contract: string,
-    asset_id: string,
-    owner: string,
-    name: string,
-    is_transferable: boolean,
-    is_burnable: boolean,
+export interface ApiAsset {
+    contract: string;
+    asset_id: string;
+    owner: string;
+    name: string;
+    is_transferable: boolean;
+    is_burnable: boolean;
     collection: {
         collection_name: string,
         name: string,
@@ -24,62 +24,63 @@ export type ApiAsset = {
         authorized_accounts: string[],
         notify_accounts: string[],
         market_fee: boolean,
-        created_at_block: number,
-        created_at_time: number
-    },
+        created_at_block: string,
+        created_at_time: string
+    };
     schema: {
         schema_name: string,
         format: SchemaObject[],
         created_at_block: number,
         created_at_time: number
-    },
+    };
     template: null | {
         template_id: number,
-        max_supply: number,
-        issued_supply: number,
+        max_supply: string,
+        issued_supply: string,
         is_transferable: boolean,
-        is_burnable: boolean,
+        is_burnable: boolean;
         immutable_data: {[key: string]: any},
-        created_at_time: number,
-        created_at_block: number
-    },
+        created_at_time: string,
+        created_at_block: string
+    };
     backed_tokens: Array<{
         token_contract: string,
         token_symbol: string,
         token_precision: number,
         amount: number
-    }>,
-    immutable_data: {[key: string]: any},
-    mutable_data: {[key: string]: any},
-    data: {[key: string]: any},
-    burned_at_time: number | null,
-    burned_at_block: number | null,
-    updated_at_time: number,
-    updated_at_block: number,
-    minted_at_time: number,
-    minted_at_block: number
-};
+    }>;
+    immutable_data: {[key: string]: any};
+    mutable_data: {[key: string]: any};
+    data: {[key: string]: any};
+    burned_by_account: string | null;
+    burned_at_time: string | null;
+    burned_at_block: string | null;
+    updated_at_time: string;
+    updated_at_block: string;
+    minted_at_time: string;
+    minted_at_block: string;
+}
 
-export type ApiCollection = {
-    contract: string,
-    collection_name: string,
-    name: string,
-    author: string,
-    allow_notify: boolean,
-    authorized_accounts: string[],
-    notify_accounts: string[],
-    market_fee: number,
-    data: {[key: string]: any},
-    created_at_block: number,
-    created_at_time: number
-};
+export interface ApiCollection {
+    contract: string;
+    collection_name: string;
+    name: string;
+    author: string;
+    allow_notify: boolean;
+    authorized_accounts: string[];
+    notify_accounts: string[];
+    market_fee: number;
+    data: {[key: string]: any};
+    created_at_block: string;
+    created_at_time: string;
+}
 
-export type ApiSchema = {
-    contract: string,
-    schema_name: string,
-    format: SchemaObject[],
-    created_at_block: number,
-    created_at_time: number,
+export interface ApiSchema {
+    contract: string;
+    schema_name: string;
+    format: SchemaObject[];
+    created_at_block: number;
+    created_at_time: number;
     collection: {
         collection_name: string,
         name: string,
@@ -88,26 +89,26 @@ export type ApiSchema = {
         authorized_accounts: string[],
         notify_accounts: string[],
         market_fee: boolean,
-        created_at_block: number,
-        created_at_time: number
-    }
-};
+        created_at_block: string,
+        created_at_time: string
+    };
+}
 
-export type ApiSchemaStats = {
-    assets: number,
-    templates: number
-};
+export interface ApiSchemaStats {
+    assets: string;
+    templates: string;
+}
 
-export type ApiTemplate = {
-    contract: string,
-    template_id: number,
-    max_supply: number,
-    issued_supply: number,
-    is_transferable: boolean,
-    is_burnable: boolean,
-    immutable_data: {[key: string]: any},
-    created_at_time: number,
-    created_at_block: number,
+export interface ApiTemplate {
+    contract: string;
+    template_id: number;
+    max_supply: number;
+    issued_supply: number;
+    is_transferable: boolean;
+    is_burnable: boolean;
+    immutable_data: {[key: string]: any};
+    created_at_time: string;
+    created_at_block: string;
     collection: {
         collection_name: string,
         name: string,
@@ -116,60 +117,60 @@ export type ApiTemplate = {
         authorized_accounts: string[],
         notify_accounts: string[],
         market_fee: boolean,
-        created_at_block: number,
-        created_at_time: number
-    },
+        created_at_block: string,
+        created_at_time: string
+    };
     schema: {
         schema_name: string,
         format: SchemaObject[],
-        created_at_block: number,
-        created_at_time: number
-    }
-};
+        created_at_block: string,
+        created_at_time: string
+    };
+}
 
-export type ApiTemplateStats = {
-    assets: number
-};
+export interface ApiTemplateStats {
+    assets: string;
+}
 
-export type ApiOffer = {
-    contract: string,
-    offer_id: string,
-    sender_name: string,
-    recipient_name: string,
-    memo: string,
-    state: ApiOfferState,
-    is_sender_contract: boolean,
-    is_recipient_contract: boolean,
-    sender_assets: ApiAsset[],
-    recipient_assets: ApiAsset[],
-    updated_at_block: number,
-    updated_at_time: number,
-    created_at_block: number,
-    created_at_time: number
-};
+export interface ApiOffer {
+    contract: string;
+    offer_id: string;
+    sender_name: string;
+    recipient_name: string;
+    memo: string;
+    state: ApiOfferState;
+    is_sender_contract: boolean;
+    is_recipient_contract: boolean;
+    sender_assets: ApiAsset[];
+    recipient_assets: ApiAsset[];
+    updated_at_block: string;
+    updated_at_time: string;
+    created_at_block: string;
+    created_at_time: string;
+}
 
-export type ApiTransfer = {
-    contract: string,
-    sender_name: string,
-    recipient_name: string,
-    memo: string,
-    assets: ApiAsset[],
-    created_at_block: number,
-    created_at_time: number
-};
+export interface ApiTransfer {
+    contract: string;
+    sender_name: string;
+    recipient_name: string;
+    memo: string;
+    assets: ApiAsset[];
+    created_at_block: string;
+    created_at_time: string;
+}
 
-export type ApiLog = {
-    log_id: number,
-    name: string,
-    data: any,
-    txid: string,
-    created_at_block: number,
-    created_at_time: number
-};
+export interface ApiLog {
+    log_id: number;
+    name: string;
+    data: any;
+    txid: string;
+    created_at_block: string;
+    created_at_time: string;
+}
 
-export type ApiConfig = {
-    contract: string,
-    version: string,
-    collection_format: SchemaObject[],
-    supported_tokens: Array<{token_contract: string, token_symbol: string, token_precision: number}>
-};
+export interface ApiConfig {
+    contract: string;
+    version: string;
+    collection_format: SchemaObject[];
+    supported_tokens: Array<{token_contract: string, token_symbol: string, token_precision: number}>;
+}

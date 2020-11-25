@@ -199,6 +199,14 @@ options
 
 `async getOffer(id: string): Promise<ApiOffer>`
 
+##### Accounts
+
+`async getAccounts(account: string): Promise<any>`
+
+`async getAccount(account: string): Promise<any>`
+
+`async getAccountCollection(account: string): Promise<any>`
+
 #### ExplorerActionGenerator
 
 The Explorer API has an `action` attribute which contains a helper class to construct contract actions 
