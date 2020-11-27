@@ -117,7 +117,13 @@ function buildDataOptions(options: {[key: string]: any}, data: DataOptions): {[k
     const dataFields: DataOptions = {};
 
     for (const key of dataKeys) {
-        dataFields['data.' + key] = data[key];
+        if (typeof data[key] === 'number') {
+            dataFields['data:number.' + key] = data[key];
+        } else if (typeof data[key] === 'boolean') {
+            dataFields['data:bool.' + key] = data[key];
+        } else {
+            dataFields['data.' + key] = data[key];
+        }
     }
 
     return Object.assign({}, options, dataFields);
