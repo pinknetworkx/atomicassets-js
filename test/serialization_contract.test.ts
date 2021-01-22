@@ -58,7 +58,7 @@ describe('Serialization Contract', () => {
         name: 'Munich',
         test2: [18, 123, 33, 912],
         test3: -0.75,
-        isTrueTrue: true,
+        isTrueTrue: 1,
         image: 'Qmag1NRBcpYyz27Kq2demHavXoi7nwbcCfkUq5vh6nuNN7',
         gibnumber: 123,
         onemore: [32767, -32768, 8, 12, 8, 3743, -213, 12345]

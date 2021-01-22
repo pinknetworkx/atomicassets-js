@@ -6,10 +6,10 @@ export default class BooleanParser extends FixedParser {
         super(1);
     }
 
-    deserialize(state: SerializationState): boolean {
+    deserialize(state: SerializationState): number {
         const data: Uint8Array = super.deserialize(state);
 
-        return data[0] === 1;
+        return data[0] === 1 ? 1 : 0;
     }
 
     serialize(data: boolean): Uint8Array {

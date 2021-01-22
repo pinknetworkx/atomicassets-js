@@ -35,7 +35,7 @@ describe('Basic Serialization', () => {
         depth3: '-1000000',
         depth4: 4293967296,
         wear: 0.75,
-        tradeable: true,
+        tradeable: 1,
         share: 1024.25
     };
 

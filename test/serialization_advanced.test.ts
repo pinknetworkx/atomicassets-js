@@ -94,7 +94,7 @@ describe('Advanced Serialization', () => {
                 1234989880
             ]
         ],
-        isCool: true
+        isCool: 1
     };
 
     it('serialize object', () => {
