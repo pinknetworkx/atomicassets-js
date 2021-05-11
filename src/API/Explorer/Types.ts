@@ -16,6 +16,7 @@ export interface ApiAsset {
     name: string;
     is_transferable: boolean;
     is_burnable: boolean;
+    template_mint: string;
     collection: {
         collection_name: string,
         name: string,
