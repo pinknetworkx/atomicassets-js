@@ -30,11 +30,11 @@ export interface ApiAsset {
     schema: {
         schema_name: string,
         format: SchemaObject[],
-        created_at_block: number,
-        created_at_time: number
+        created_at_block: string,
+        created_at_time: string
     };
     template: null | {
-        template_id: number,
+        template_id: string,
         max_supply: string,
         issued_supply: string,
         is_transferable: boolean,
@@ -47,7 +47,7 @@ export interface ApiAsset {
         token_contract: string,
         token_symbol: string,
         token_precision: number,
-        amount: number
+        amount: string
     }>;
     immutable_data: {[key: string]: any};
     mutable_data: {[key: string]: any};
@@ -55,6 +55,8 @@ export interface ApiAsset {
     burned_by_account: string | null;
     burned_at_time: string | null;
     burned_at_block: string | null;
+    transferred_at_time: string;
+    transferred_at_block: string;
     updated_at_time: string;
     updated_at_block: string;
     minted_at_time: string;
@@ -65,6 +67,7 @@ export interface ApiCollection {
     contract: string;
     collection_name: string;
     name: string;
+    img: string;
     author: string;
     allow_notify: boolean;
     authorized_accounts: string[];
@@ -79,11 +82,12 @@ export interface ApiSchema {
     contract: string;
     schema_name: string;
     format: SchemaObject[];
-    created_at_block: number;
-    created_at_time: number;
+    created_at_block: string;
+    created_at_time: string;
     collection: {
         collection_name: string,
         name: string,
+        img: string,
         author: string,
         allow_notify: boolean,
         authorized_accounts: string[],
@@ -101,9 +105,9 @@ export interface ApiSchemaStats {
 
 export interface ApiTemplate {
     contract: string;
-    template_id: number;
-    max_supply: number;
-    issued_supply: number;
+    template_id: string;
+    max_supply: string;
+    issued_supply: string;
     is_transferable: boolean;
     is_burnable: boolean;
     immutable_data: {[key: string]: any};
@@ -112,6 +116,7 @@ export interface ApiTemplate {
     collection: {
         collection_name: string,
         name: string,
+        img: string,
         author: string,
         allow_notify: boolean,
         authorized_accounts: string[],

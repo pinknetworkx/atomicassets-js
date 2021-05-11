@@ -9,7 +9,7 @@ export default class MappingSchema implements ISchema {
     constructor(private readonly attributes: MappingAttribute[]) {
     }
 
-    deserialize(state: SerializationState): any {
+    deserialize(state: SerializationState, upwardsCompatible: boolean = false): any {
         const object: any = {};
 
         while (state.position < state.data.length) {
@@ -19,9 +19,11 @@ export default class MappingSchema implements ISchema {
                 break;
             }
 
-            const attribute = this.getAttribute(identifier.toJSNumber());
+            const attribute = this.getAttribute(identifier.toJSNumber(), !upwardsCompatible);
 
-            object[attribute.name] = attribute.value.deserialize(state);
+            if (attribute) {
+                object[attribute.name] = attribute.value.deserialize(state);
+            }
         }
 
         return object;
@@ -46,11 +48,15 @@ export default class MappingSchema implements ISchema {
         return concat_byte_arrays(data);
     }
 
-    private getAttribute(identifier: number): MappingAttribute {
+    private getAttribute(identifier: number, throwError: boolean = true): MappingAttribute | undefined {
         const attributeID = identifier - this.reserved;
 
         if (attributeID >= this.attributes.length) {
-            throw new SchemaError('attribute does not exists');
+            if (throwError) {
+                throw new SchemaError('attribute does not exists');
+            }
+
+            return;
         }
 
         return this.attributes[Number(attributeID)];

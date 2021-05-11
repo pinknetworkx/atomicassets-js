@@ -39,6 +39,7 @@ interface DateBoundaryParams {
 
 export interface AssetParams extends GreylistParams, HideOffersParams, PrimaryBoundaryParams, DateBoundaryParams {
     owner?: string;
+    burned?: boolean;
     collection_name?: string;
     schema_name?: string;
     template_id?: number;
@@ -168,6 +169,10 @@ export default class ExplorerApi {
         return await this.fetchEndpoint('/v1/assets/' + id, {});
     }
 
+    async getAssetStats(id: string): Promise<ApiAsset> {
+        return await this.fetchEndpoint('/v1/assets/' + id + '/stats', {});
+    }
+
     async getAssetLogs(id: string, page: number = 1, limit: number = 100, order: string = 'desc'): Promise<ApiLog[]> {
         return await this.fetchEndpoint('/v1/assets/' + id + '/logs', {page, limit, order});
     }
@@ -182,6 +187,10 @@ export default class ExplorerApi {
 
     async getCollection(name: string): Promise<ApiCollection> {
         return await this.fetchEndpoint('/v1/collections/' + name, {});
+    }
+
+    async getCollectionStats(name: string): Promise<ApiCollection> {
+        return await this.fetchEndpoint('/v1/collections/' + name + '/stats', {});
     }
 
     async getCollectionLogs(name: string, page: number = 1, limit: number = 100, order: string = 'desc'): Promise<ApiLog[]> {
@@ -252,35 +261,57 @@ export default class ExplorerApi {
         return await this.fetchEndpoint('/v1/accounts', {page, limit, ...options});
     }
 
+    async getBurns(options: AccountParams = {}, page: number = 1, limit: number = 100): Promise<Array<{account: string, assets: string}>> {
+        return await this.fetchEndpoint('/v1/burns', {page, limit, ...options});
+    }
+
     async countAccounts(options: AccountParams = {}): Promise<number> {
         return await this.countEndpoint('/v1/accounts', options);
     }
 
-    async getAccount(account: string, options: any = {}): Promise<{assets: string, collections: Array<{collection: ApiCollection, assets: string}>}> {
+    async getAccount(
+        account: string, options: GreylistParams & HideOffersParams = {}
+    ): Promise<{assets: string, collections: Array<{collection: ApiCollection, assets: string}>}> {
         return await this.fetchEndpoint('/v1/accounts/' + account, options);
     }
 
     async getAccountCollection(
-        account: string, collection: string, options: any = {}
+        account: string, collection: string
     ): Promise<{templates: Array<{template_id: string, assets: string}>, schemas: Array<{schema_name: string, assets: string}>}> {
-        return await this.fetchEndpoint('/v1/accounts/' + account + '/' + collection, options);
+        return await this.fetchEndpoint('/v1/accounts/' + account + '/' + collection, {});
+    }
+
+    async getAccountBurns(
+        account: string, options: GreylistParams & HideOffersParams = {}
+    ): Promise<{assets: string, collections: Array<{collection: ApiCollection, assets: string}>}> {
+        return await this.fetchEndpoint('/v1/burns/' + account, options);
     }
 
     async fetchEndpoint(path: string, args: any): Promise<any> {
-        let response;
+        let response, json;
 
         const f = this.fetchBuiltin;
         const queryString = Object.keys(args).map((key) => {
-            return key + '=' + encodeURIComponent(args[key]);
+            let value = args[key];
+
+            if (value === true) {
+                value = 'true';
+            }
+
+            if (value === false) {
+                value = 'false';
+            }
+
+            return key + '=' + encodeURIComponent(value);
         }).join('&');
 
         try {
             response = await f(this.endpoint + '/' + this.namespace + path + (queryString.length > 0 ? '?' + queryString : ''));
+
+            json = await response.json();
         } catch (e) {
             throw new ApiError(e.message, 500);
         }
-
-        const json = await response.json();
 
         if (response.status !== 200) {
             throw new ApiError(json.message, response.status);
