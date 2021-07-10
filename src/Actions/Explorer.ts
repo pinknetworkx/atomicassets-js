@@ -1,11 +1,11 @@
 import ExplorerApi from '../API/Explorer';
-import { ApiConfig } from '../API/Explorer/Types';
+import { IConfig } from '../API/Explorer/Objects';
 import { ActionGenerator, EosioActionObject, EosioAuthorizationObject, toAttributeMap } from './Generator';
 
 /* tslint:disable:variable-name */
 
 export default class ExplorerActionGenerator extends ActionGenerator {
-    private config: Promise<ApiConfig>;
+    private config: Promise<IConfig>;
 
     constructor(contract: string, readonly api: ExplorerApi) {
         super(contract);
