@@ -25,7 +25,7 @@ import {
 } from './Params';
 
 type Fetch = (input?: Request | string, init?: RequestInit) => Promise<Response>;
-type ApiArgs = { fetch?: Fetch, rateLimit?: number };
+type ApiArgs = { fetch?: Fetch };
 
 export type DataOptions = Array<{key: string, value: any, type?: string}>;
 
