@@ -131,6 +131,8 @@ export interface ICollectionStats {
     burned: string;
     templates: string;
     schemas: string;
+    burned_by_template: Array<{template_id: string, burned: number}>;
+    burned_by_schema: Array<{schema_name: string, burned: number}>;
 }
 
 export interface ISchemaStats {
