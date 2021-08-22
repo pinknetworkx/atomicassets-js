@@ -33,7 +33,7 @@ export interface AssetFilterParams {
     [key: string]: any;
 }
 
-export interface AssetsApiParams extends GreylistParams, HideOffersParams, PrimaryBoundaryParams, DateBoundaryParams {
+export interface AssetsApiParams extends AssetFilterParams, GreylistParams, HideOffersParams, PrimaryBoundaryParams, DateBoundaryParams {
     authorized_account?: string;
     only_duplicate_templates?: boolean;
 
