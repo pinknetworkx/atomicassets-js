@@ -217,7 +217,22 @@ export default class ExplorerApi {
         }).join('&');
 
         try {
-            response = await f(this.endpoint + '/' + this.namespace + path + (queryString.length > 0 ? '?' + queryString : ''));
+            if ( queryString.length < 1000 ) {
+                response = await f(this.endpoint + '/' + this.namespace + path + (queryString.length > 0 ? '?' + queryString : ''));
+            }
+            else {
+                response = await f(
+                    this.endpoint + '/' + this.namespace + path,
+                    {
+                        headers: {
+                            'accept': '*.*',
+                            'content-type': 'application/json'
+                        },
+                        method: 'POST',
+                        body: JSON.stringify(args)
+                    }
+                )
+            }
 
             json = await response.json();
         } catch (e) {
