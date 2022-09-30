@@ -21,8 +21,7 @@
     "publish": "yarn run build && yarn publish"
   },
   "dependencies": {
-    "big-integer": "^1.6.48",
-    "pure-cache": "^1.0.5"
+    "big-integer": "^1.6.48"
   },
   "devDependencies": {
     "@types/node": "^14.14.44",

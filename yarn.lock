@@ -1025,11 +1025,6 @@ minimist@0.0.8:
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-0.0.8.tgz#857fcabfc3397d2625b8228262e86aa7a011b05d"
   integrity sha1-hX/Kv8M5fSYluCKCYuhqp6ARsF0=
 
-mitt@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/mitt/-/mitt-1.2.0.tgz#cb24e6569c806e31bd4e3995787fe38a04fdf90d"
-  integrity sha512-r6lj77KlwqLhIUku9UWYes7KJtsczvolZkzp8hbaDPPaE24OmWl5s539Mytlj22siEQKosZ26qCBgda2PKwoJw==
-
 mkdirp@^0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
@@ -1203,13 +1198,6 @@ punycode@^2.1.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
-
-pure-cache@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/pure-cache/-/pure-cache-1.0.5.tgz#870c1e9f289de01c27cec42ffb4950d48386dcad"
-  integrity sha512-DH42Hwq0wHzQczXM6f4wZe4o0hvBomF8ef2hBFYEFeOt/tfycDK3n14oJEftx/nrk8ZJaaI0ZPv3z7uBTb3DuA==
-  dependencies:
-    mitt "^1.2.0"
 
 randombytes@^2.1.0:
   version "2.1.0"
