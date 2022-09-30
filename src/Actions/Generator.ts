@@ -1,4 +1,4 @@
-import { SchemaFormat } from '../API/Rpc/Cache';
+import { SchemaFormat } from '../API/Rpc/RpcCache';
 import SerializationError from '../Errors/SerializationError';
 
 export type EosioAuthorizationObject = { actor: string, permission: string };

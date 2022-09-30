@@ -1,5 +1,5 @@
 import { ISchema, ObjectSchema, SchemaObject } from '../../Schema';
-import { ISchemaRow } from './Cache';
+import { ISchemaRow } from './RpcCache';
 import RpcCollection from './Collection';
 import RpcApi from './index';
 

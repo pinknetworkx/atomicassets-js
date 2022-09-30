@@ -1,5 +1,5 @@
 import RpcAsset from './Asset';
-import { IAssetRow, IOfferRow } from './Cache';
+import { IAssetRow, IOfferRow } from './RpcCache';
 import RpcApi from './index';
 
 export default class RpcOffer {

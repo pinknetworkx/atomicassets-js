@@ -1,5 +1,5 @@
 import { deserialize } from '../../Serialization';
-import { IAssetRow } from './Cache';
+import { IAssetRow } from './RpcCache';
 import RpcCollection from './Collection';
 import RpcApi from './index';
 import RpcSchema from './Schema';

@@ -2,7 +2,7 @@
 
 JS Library to read data from the atomicassets NFT standard.
 
-Contract / General Documentation can be found on [https://github.com/pinknetworkx/atomicassets-contract/wiki](https://github.com/pinknetworkx/atomicassets-contract/wiki)
+Contract / General Documentation can be found on [https://github.com/pink.gg/atomicassets-contract/wiki](https://github.com/pink.gg/atomicassets-contract/wiki)
 
 ## Usage
 
@@ -16,7 +16,7 @@ $ npm install atomicassets
 
 ### Initialize
 
-Web library can be found in the [dist](https://github.com/pinknetworkx/atomicassets-js/blob/master/dist/atomicassets.js) folder
+Web library can be found in the [dist](https://github.com/pink.gg/atomicassets-js/blob/master/dist/atomicassets.js) folder
 
 ```javascript
 // standard import
@@ -31,7 +31,7 @@ AtomicAssets uses serialization to store data on the blockchain more efficiently
 The API classes will handle this for you but if you need to manually parse the data,
 the library provides you a serialize and deserialize function
 
-More information can be found [here](https://github.com/pinknetworkx/atomicassets-contract/wiki/Serialization)
+More information can be found [here](https://github.com/pink.gg/atomicassets-contract/wiki/Serialization)
 
 #### Example
 ```javascript
@@ -77,7 +77,7 @@ There are two methods available to fetch data from the blockchain.
 
 ### Explorer API
 
-The explorer API uses [eosio-contract-api](https://github.com/pinknetworkx/eosio-contract-api) to query data about the NFTs. 
+The explorer API uses [eosio-contract-api](https://github.com/pink.gg/eosio-contract-api) to query data about the NFTs. 
 A documentation of each endpoint and its responses can be found [here](https://test.wax.api.atomicassets.io/atomicassets/docs/#/).
 It is recommended to self-host the API for the best performance.
 
@@ -95,8 +95,8 @@ const asset = await api.getAsset("1099511627786");
 
 // create the action to mint an asset
 const actions = (await api.action).mintasset(
-    [{actor: "pinknetworkx", permission: "active"}],
-    "collection", "scheme", -1, "pinknetworkx", {"name": "test"}, {"species": "test2"}
+    [{actor: "pink.gg", permission: "active"}],
+    "pink.gg", "collection", "schema", -1, "pink.gg", {"name": "test"}, {"species": "test2"}
 )
 ```
 
@@ -212,7 +212,7 @@ options
 The Explorer API has an `action` attribute which contains a helper class to construct contract actions 
 which can be pushed on chain with eosjs. 
 
-Detailed information about each action can be found [here](https://github.com/pinknetworkx/atomicassets-contract/wiki/Actions) 
+Detailed information about each action can be found [here](https://github.com/pink.gg/atomicassets-contract/wiki/Actions) 
 
 #### Types
 
@@ -238,8 +238,8 @@ const asset = await api.getAsset("leonleonleon", "1099511627786");
 
 // create the action to mint an asset
 const actions = api.action.mintasset(
-    [{actor: "pinknetworkx", permission: "active"}],
-    "collection", "scheme", -1, "pinknetworkx", {"name": "test"}, {"species": "test2"}
+    [{actor: "pink.gg", permission: "active"}],
+    "collection", "schema", -1, "pink.gg", {"name": "test"}, {"species": "test2"}
 )
 ```
 
@@ -255,9 +255,9 @@ Caching can be disabled by explicitly setting cache to false
 
 *Gets a specific template by id*
 
-`async getScheme(collection: string, name: string, cache: boolean = true): Promise<RpcScheme>`
+`async getSchema(collection: string, name: string, cache: boolean = true): Promise<RpcSchema>`
 
-*Get a scheme by its name*
+*Get a schema by its name*
 
 `async getCollection(name: string, cache: boolean = true): Promise<RpcCollection>`
 
@@ -267,9 +267,9 @@ Caching can be disabled by explicitly setting cache to false
 
 *Gets all templates of a collection*
 
-`async getCollectionSchemes(collection: string, cache: boolean = true): Promise<RpcSchemes[]>`
+`async getCollectionSchemas(collection: string, cache: boolean = true): Promise<RpcSchemas[]>`
 
-*Gets all schemes of a collection*
+*Gets all schemas of a collection*
 
 `async getOffer(id: string, cache: boolean = true): Promise<RpcOffer>`
 
@@ -288,7 +288,7 @@ Caching can be disabled by explicitly setting cache to false
 The RPC API has an `action` attribute which contains a helper class to construct contract actions 
 which can be pushed on chain with eosjs. 
 
-Detailed information about each action can be found [here](https://github.com/pinknetworkx/atomicassets-contract/wiki/Actions) 
+Detailed information about each action can be found [here](https://github.com/pink.gg/atomicassets-contract/wiki/Actions) 
  
 #### Types
 
@@ -319,7 +319,7 @@ The method `toObject` returns a JavaScript object representation of the class.
 
 `async collection(): Promise<RpcCollection>`
 
-`async scheme(): Promise<RpcScheme>`
+`async schema(): Promise<RpcSchema>`
 
 `async immutableData(): Promise<object>`
 

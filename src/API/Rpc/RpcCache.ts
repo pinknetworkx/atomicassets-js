@@ -1,3 +1,4 @@
+import { ICache, MemoryCache } from './BaseCache';
 
 export type SchemaFormat = Array<{ name: string, type: string }>;
 
@@ -52,40 +53,11 @@ export interface IConfigRow {
     collection_format: SchemaFormat;
 }
 
-class SaneCache {
-  private readonly store: any;
-  constructor() {
-    this.store = {};
-  }
-  
-  get(key: string) {
-    const res = this.store[key];
-    if(typeof res === 'undefined') {
-      return null;
-    }
-    const [value, expires] = res;
-    if(new Date() > expires) {
-      delete this.store[key];
-      return null;
-    } else {
-      return value
-    }
-  }
-  
-  put(key: string, value: any, timeout: number) {
-    const expires = new Date(Date.now() + timeout);
-    this.store[key] = [value, expires];
-  }
-  remove(key: string) {
-    delete this.store[key];
-  }
-}
-
 export default class RpcCache {
-    private readonly cache: any;
+    private readonly cache: ICache;
 
     constructor() {
-        this.cache = new SaneCache();
+        this.cache = new MemoryCache();
     }
 
     getAsset(assetID: string, data?: IAssetRow): IAssetRow | null {

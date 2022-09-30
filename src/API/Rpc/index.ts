@@ -1,7 +1,7 @@
 import RpcActionGenerator from '../../Actions/Rpc';
 import RpcError from '../../Errors/RpcError';
 import RpcAsset from './Asset';
-import RpcCache, { IConfigRow } from './Cache';
+import RpcCache, { IConfigRow } from './RpcCache';
 import RpcCollection from './Collection';
 import RpcOffer from './Offer';
 import RpcQueue from './Queue';

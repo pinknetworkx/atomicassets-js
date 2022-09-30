@@ -1,6 +1,6 @@
 import { ObjectSchema } from '../../Schema';
 import { deserialize } from '../../Serialization';
-import { ICollectionRow } from './Cache';
+import { ICollectionRow } from './RpcCache';
 import RpcApi from './index';
 
 export default class RpcCollection {

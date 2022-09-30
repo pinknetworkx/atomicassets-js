@@ -1,4 +1,4 @@
-import { IAssetRow, ICollectionRow, IOfferRow, ISchemaRow, ITemplateRow } from './Cache';
+import { IAssetRow, ICollectionRow, IOfferRow, ISchemaRow, ITemplateRow } from './RpcCache';
 import RpcApi from './index';
 
 export default class RpcQueue {
