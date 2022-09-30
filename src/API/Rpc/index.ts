@@ -172,7 +172,7 @@ export default class RpcApi {
             });
 
             json = await response.json();
-        } catch (e) {
+        } catch (e: any) {
             e.isFetchError = true;
 
             throw e;

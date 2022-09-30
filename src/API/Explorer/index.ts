@@ -231,11 +231,11 @@ export default class ExplorerApi {
                         method: 'POST',
                         body: JSON.stringify(args)
                     }
-                )
+                );
             }
 
             json = await response.json();
-        } catch (e) {
+        } catch (e: any) {
             throw new ApiError(e.message, 500);
         }
 
