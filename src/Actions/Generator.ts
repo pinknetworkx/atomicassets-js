@@ -171,7 +171,7 @@ export function toAttributeMap(obj: any, schema: SchemaFormat): AttributeMap {
 
     const keys = Object.keys(obj);
     for (const key of keys) {
-        if (typeof types[key] !== 'undefined') {
+        if (typeof types[key] === 'undefined') {
             throw new SerializationError('field not defined in schema');
         }
 
