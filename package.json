@@ -27,7 +27,7 @@
     "publish": "yarn run build && yarn publish"
   },
   "dependencies": {
-    "big-integer": "^1.6.48"
+    "big-integer": "^1.6.51"
   },
   "devDependencies": {
     "@types/chai": "^4.2.18",
