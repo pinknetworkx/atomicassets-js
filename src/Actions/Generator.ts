@@ -162,6 +162,13 @@ export class ActionGenerator {
 }
 
 export function toAttributeMap(obj: any, schema: SchemaFormat): AttributeMap {
+    const translation: {[key: string]: string} = {
+        image: 'string',
+        ipfs: 'string',
+        bool: 'uint8',
+        double: 'float64'
+    };
+
     const types: { [id: string]: string } = {};
     const result: AttributeMap = [];
 
@@ -175,7 +182,14 @@ export function toAttributeMap(obj: any, schema: SchemaFormat): AttributeMap {
             throw new SerializationError('field not defined in schema');
         }
 
-        result.push({key, value: [types[key], obj[key]]});
+        const type = types[key];
+        let value = obj[key];
+
+        if (type === 'bool') {
+            value = value ? 1 : 0;
+        }
+
+        result.push({key, value: [translation[type] ?? type, value]});
     }
 
     return result;
