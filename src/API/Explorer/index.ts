@@ -256,3 +256,5 @@ export default class ExplorerApi {
         return parseInt(res, 10);
     }
 }
+
+export * from './Objects';

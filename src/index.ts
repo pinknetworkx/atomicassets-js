@@ -11,3 +11,5 @@ export {
     RpcApi, ExplorerApi, ObjectSchema, deserialize, serialize, ParserTypes,
     RpcActionGenerator, ExplorerActionGenerator, ActionGenerator
 };
+
+export * from './API/Explorer';
