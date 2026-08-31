@@ -148,7 +148,7 @@ export interface ITemplateStats {
 
 export interface IAccountStats {
     collections: Array<{collection: ICollection, assets: string}>;
-    templates: Array<{template_id: string, assets: string}>;
+    templates: Array<{template_id: string, assets: string; collection_name: string}>;
     assets: string;
 }
 
